@@ -22,8 +22,8 @@ def method_sets(rec: dict, method: str, p_inst: str, how: str | None = None) -> 
         return set(rec[method])
     if method == "c":
         return set(rec["c"][p_inst]["flag_by_raise"])
-    if method == "d":
-        return set(rec["d"][p_inst]["flag_by_raise"])
+    if method in ("d", "d2"):
+        return set(rec[method][p_inst]["flag_by_raise"])
     raise KeyError(method)
 
 
@@ -34,7 +34,8 @@ def _czk_before(flows: pl.DataFrame, clients: set[str], day: int | None) -> floa
     return float(f["amount_out"].sum()) if f.height else 0.0
 
 
-def world_metrics(replay: dict, path: str, p_inst: str, methods: tuple[str, ...] = ("a", "b", "c", "e")) -> dict:
+def world_metrics(replay: dict, path: str, p_inst: str, methods: tuple[str, ...] = ("a", "b", "c", "e"), cumulative: bool = False) -> dict:
+    """cumulative=True (Amendment 2, P1): a raised/flagged customer stays in the queue, so the flag set at day t is the union of the days <= t."""
     p = Path(path)
     lab = pl.read_parquet(p / "labels.parquet")
     meta = json.loads((p / "meta.json").read_text(encoding="utf-8"))
@@ -45,15 +46,23 @@ def world_metrics(replay: dict, path: str, p_inst: str, methods: tuple[str, ...]
     rings = {int(i): set(g["client_id"]) for (i,), g in ring_rows.group_by("instance")}
     ring_mules = set().union(*rings.values()) if rings else set()
     times = sorted(int(t) for t in replay["times"])
+    cache: dict[tuple[str, int], set[str]] = {}
+
+    def sets_at(rec_t: dict, m: str, t: int) -> set[str]:
+        if not cumulative:
+            return method_sets(rec_t, m, p_inst)
+        if (m, t) not in cache:
+            cache[(m, t)] = set().union(*(method_sets(replay["times"][str(u)], m, p_inst) for u in times if u <= t))
+        return cache[(m, t)]
     final = replay["times"][str(max(times))]
     probs_a = final["probs_a"] or {}
     stealth = {m for m in ring_mules if probs_a.get(m, 0.0) < MIN_PROB}
-    fa = set(final["a"])
+    fa = sets_at(final, "a", max(times))
     out: dict = {"world": path, "hub_mode": meta["hub_mode"], "script_jitter": meta["script_jitter"], "crime_free": meta["crime_free"],
                  "n_ring_mules": len(ring_mules), "n_stealth": len(stealth), "methods": {}}
-    e_final = set(final["e"])
+    e_final = sets_at(final, "e", max(times))
     for m in methods:
-        fl = method_sets(final, m, p_inst)
+        fl = sets_at(final, m, max(times))
         raised = (fl - fa)
         tp = len(fl & mules)
         rec = {
@@ -72,11 +81,11 @@ def world_metrics(replay: dict, path: str, p_inst: str, methods: tuple[str, ...]
         czk: dict[int, float] = {}
         per_mule: dict[str, dict] = {}
         for ring, ms in rings.items():
-            ft = next((t for t in times if method_sets(replay["times"][str(t)], m, p_inst) & ms), None)
+            ft = next((t for t in times if sets_at(replay["times"][str(t)], m, t) & ms), None)
             first[ring] = ft
             czk[ring] = _czk_before(flows, ms, ft) if flows is not None else 0.0
         for mid in ring_mules:
-            ft = next((t for t in times if mid in method_sets(replay["times"][str(t)], m, p_inst)), None)
+            ft = next((t for t in times if mid in sets_at(replay["times"][str(t)], m, t)), None)
             per_mule[mid] = {"first_day": ft, "czk_before": _czk_before(flows, {mid}, ft) if flows is not None else 0.0}
         rec["first_flag_day_by_ring"] = {str(k): v for k, v in first.items()}
         rec["czk_before_first_flag_by_ring"] = {str(k): v for k, v in czk.items()}

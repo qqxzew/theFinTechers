@@ -19,7 +19,7 @@ def cell_name(hub: str, jit: str) -> str:
 
 
 def _one(args: tuple) -> tuple:
-    seed, hub, jit, split, times = args
+    seed, hub, jit, split, times, how = args
     from eval.collector_eval import replay_world
     from redteam.generate_collector import generate_collector
     name = cell_name(hub, jit)
@@ -27,7 +27,7 @@ def _one(args: tuple) -> tuple:
     t0 = time.time()
     if not Path(world, "tx.parquet").exists():
         generate_collector(seed, world, hub_mode="shared" if hub == "crimefree" else hub, script_jitter=jit, crime_free=hub == "crimefree")
-    replay_world(world, f"eval/out/collector/{split}/{seed}_{name}.json", times=times)
+    replay_world(world, f"eval/out/collector/{split}{'_how' if how else ''}/{seed}_{name}.json", times=times, with_how=how)
     return seed, name, round(time.time() - t0, 1)
 
 
@@ -36,10 +36,11 @@ def main() -> None:
     ap.add_argument("--split", required=True, choices=["dev", "test"])
     ap.add_argument("--seeds", type=int, nargs="+", required=True)
     ap.add_argument("--workers", type=int, default=10)
+    ap.add_argument("--how", action="store_true")
     ap.add_argument("--times", type=int, nargs="*", default=None)
     a = ap.parse_args()
     os.environ.setdefault("POLARS_MAX_THREADS", "2")
-    jobs = [(s, h, j, a.split, a.times) for s in a.seeds for h, j in CELLS]
+    jobs = [(s, h, j, a.split, a.times, a.how) for s in a.seeds for h, j in CELLS]
     with ProcessPoolExecutor(max_workers=a.workers) as ex:
         for seed, name, secs in ex.map(_one, jobs):
             print(f"done seed={seed} cell={name} {secs}s", flush=True)

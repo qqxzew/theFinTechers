@@ -15,11 +15,11 @@ import numpy as np
 import polars as pl
 
 import radar.sessions as rs
-from collector.stats import where_test
+from collector.stats import how_test, where_test
 from eval.redteam_eval import _flag, load_world, to_bank_node
-from node.expansion import expand_where
+from node.expansion import expand_how, expand_where
 from node.pipeline import NodeResult, apply_clusters, load_config, run_node
-from node.signatures import EVAL_DAY0, HIST_START, N_BUCKETS, bucket_index, build_signatures, where_vectors
+from node.signatures import EVAL_DAY0, HIST_START, N_BUCKETS, bucket_index, build_signatures, how_vectors, where_vectors
 from radar.guards import Guards
 from radar.sessions import BankNode, run_radar
 
@@ -107,7 +107,7 @@ def _radar(nodes: list[BankNode], cfg: dict):
 
 
 def replay_world(path: str, out_json: str | None = None, times: list[int] | None = None, p_inst_variants: tuple[int, ...] = P_INST_VARIANTS,
-                 q: float = 0.01) -> dict:
+                 q: float = 0.01, with_how: bool = False, how_min_obs: int = 4) -> dict:
     use_plain_psi()
     cfg = load_config()
     tau = cfg["cases"]["fp_max_priority"]
@@ -118,6 +118,10 @@ def replay_world(path: str, out_json: str | None = None, times: list[int] | None
     sigs = {b: build_signatures(b, tx.filter(pl.col("bank_id") == b), cl.filter(pl.col("bank_id") == b), KEY, cfg["features"]["popular_min"]) for b in banks}
     own = {b: {c: c for c in cl.filter(pl.col("bank_id") == b)["client_id"].to_list()} for b in banks}
     tx_month = tx.filter(pl.col("ts") >= JULY1)
+    cb = {}
+    if with_how:       # daily HOW count arrays (day 0 = 2026-06-01), one per bank
+        for b in banks:
+            cb[b] = np.stack([how_vectors(sigs[b], d)["C"] for d in range(61)]).reshape(61, 30, 6, 2)
     out: dict = {"world": path, "banks": banks, "times": {}, "variants": list(p_inst_variants)}
     for t in times or REPLAY_T:
         day = EVAL_DAY0 + t - 1
@@ -139,6 +143,13 @@ def replay_world(path: str, out_json: str | None = None, times: list[int] | None
         rec = {"a": sorted(flag_set(cases_a, tau)), "b": sorted(flag_set(cases_b, tau)), "e": sorted(flag_set(cases_e, tau)),
                "probs_a": {k: round(v, 4) for k, v in probs_a.items()} if t == 31 else None,
                "psi_bytes_b": radar_b.exposure["bytes_exchanged"], "c": {}}
+        how_flagged: list[dict] = []
+        how_n = (0, 0)
+        if with_how:
+            ct = sum(cb[b][:day + 1].astype(np.int64) for b in banks)
+            bt = sum((cb[b][:day + 1] > 0).astype(np.int64) for b in banks)
+            how_res = {k: how_test(ct, bt, last_days=2, q=q, min_obs=how_min_obs, family=fam) for k, fam in (("d", "enumerated"), ("d2", "tested"))}
+            rec["d"], rec["d2"] = {}, {}
         for pi in p_inst_variants:
             wr = where_test(tot["P"], tot["K"], tot["I"], q=q, p_inst=pi, allowlist_buckets=allow)
             raised: dict[str, dict] = {}
@@ -163,9 +174,29 @@ def replay_world(path: str, out_json: str | None = None, times: list[int] | None
                                  "evidence": {k: raised[k] for k in sorted(raised)[:50]},
                                  "n_tested": wr.n_tested, "p0": wr.p0, "n_flagged_buckets": len(wr.flagged), "n_suppressed_buckets": len(wr.suppressed),
                                  "suppressed": wr.suppressed[:20], "flagged": wr.flagged[:50]}
+            for key, hr in (how_res.items() if with_how else ()):
+                how_flagged, how_n = hr.flagged, (hr.n_windows, hr.n_tested)
+                raised_d = dict(raised)
+                per_bank_d = {}
+                for b in banks:
+                    exh = expand_how(sigs[b], how_flagged)
+                    per_bank_d[b] = per_bank_raised[b] | set(exh)
+                    for k, v in exh.items():
+                        raised_d.setdefault(k, v)
+                ext_d, nodes_d = {}, []
+                for b in banks:
+                    r2, bn = extend_node(iso[b], per_bank_d[b], f"secret-{b}".encode())
+                    ext_d[b] = r2
+                    nodes_d.append(bn)
+                radar_d = _radar(nodes_d, cfg)
+                cases_d = {c.client_id: c for b in banks for c in apply_clusters(ext_d[b], radar_d.clusters)}
+                prio_d = flag_set(cases_d, tau)
+                rec[key][str(pi)] = {"flag_by_priority": sorted(prio_d), "flag_by_raise": sorted(prio_d | set(raised_d)), "raised": sorted(raised_d),
+                                     "n_windows": how_n[0], "n_tested": how_n[1], "n_flagged_windows": len(how_flagged), "flagged": how_flagged[:50]}
         out["times"][str(t)] = rec
     # bytes per bank for the collector: P, K, I vectors of 2^18 uint32 per round, one round per day of the evaluation month
     out["bytes_collector_per_bank_per_month"] = 3 * N_BUCKETS * 4 * 31
+    out["bytes_how_per_bank_per_month"] = 2 * 360 * 4 * 31 if with_how else 0
     if out_json:
         Path(out_json).parent.mkdir(parents=True, exist_ok=True)
         Path(out_json).write_text(json.dumps(out), encoding="utf-8")

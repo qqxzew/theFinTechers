@@ -19,12 +19,12 @@ OUT = Path("eval/out/collector")
 RING_CELLS = [cell_name(h, j) for h, j in CELLS if h != "crimefree"]
 
 
-def load(split: str, p_inst: str, methods: tuple[str, ...]) -> dict[str, dict[int, dict]]:
+def load(split: str, p_inst: str, methods: tuple[str, ...], cumulative: bool = False) -> dict[str, dict[int, dict]]:
     res: dict[str, dict[int, dict]] = defaultdict(dict)
     for f in sorted((OUT / split).glob("*.json")):
         seed_s, cell = f.stem.split("_", 1)
         rep = json.loads(f.read_text(encoding="utf-8"))
-        res[cell][int(seed_s)] = world_metrics(rep, rep["world"], p_inst, methods)
+        res[cell][int(seed_s)] = world_metrics(rep, rep["world"], p_inst, methods, cumulative)
     return res
 
 
@@ -168,6 +168,7 @@ def main() -> None:
     ap.add_argument("cmd", choices=["tune", "report"])
     ap.add_argument("--split", default="dev")
     ap.add_argument("--p-inst", default="50")
+    ap.add_argument("--cumulative", action="store_true")
     ap.add_argument("--methods", nargs="+", default=["a", "b", "c"])
     a = ap.parse_args()
     if a.cmd == "tune":
@@ -176,12 +177,12 @@ def main() -> None:
         print(json.dumps(t, indent=1))
         return
     methods = tuple(a.methods)
-    res = load(a.split, a.p_inst, methods + (("e",) if "e" not in methods else ()))
+    res = load(a.split, a.p_inst, methods + (("e",) if "e" not in methods else ()), a.cumulative)
     summ = {c: cell_summary(r, methods + (("e",) if "e" not in methods else ())) for c, r in res.items()}
     crit = criteria(summ)
-    (OUT / f"{a.split}_summary.json").write_text(json.dumps({"p_inst": a.p_inst, "summary": summ, "criteria": crit}, indent=1, default=str), encoding="utf-8")
+    (OUT / f"{a.split}{'_cum' if a.cumulative else ''}_summary.json").write_text(json.dumps({"p_inst": a.p_inst, "summary": summ, "criteria": crit}, indent=1, default=str), encoding="utf-8")
     md = markdown(summ, crit, methods + ("e",), f"{a.split} seeds, p_inst={a.p_inst}")
-    (OUT / f"{a.split}_tables.md").write_text(md, encoding="utf-8")
+    (OUT / f"{a.split}{'_cum' if a.cumulative else ''}_tables.md").write_text(md, encoding="utf-8")
     print(md)
 
 

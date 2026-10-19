@@ -79,13 +79,15 @@ def _window_max(a: np.ndarray, skim_w: int, days: int) -> np.ndarray:
     return out
 
 
-def how_test(C: np.ndarray, B: np.ndarray, *, last_days: int = 2, q: float = 0.01, min_obs: int = 4, min_banks: int = 2) -> HowResult:
+def how_test(C: np.ndarray, B: np.ndarray, *, last_days: int = 2, q: float = 0.01, min_obs: int = 4, min_banks: int = 2,
+             family: str = "enumerated") -> HowResult:
     """Space-time permutation scan (Kulldorff et al. 2005 style) on summed cell counts.
 
     C: (D, 30, 6, 2) customers with an event per day/cell (sum over banks); B: same shape, number of banks with C > 0 (sum of the indicators).
     mu(cell, day) = C(cell, .) * C(., day) / C(., .) over the whole history plus the current window. Windows: skim width 1 or 3 x one delay bin x
     one dormant value x 1-3 consecutive days; only windows ENDING in the last `last_days` days are scanned (the scan runs every replay step).
-    Family for BH-FDR = all enumerated windows of that scan.
+    Family for BH-FDR: 'enumerated' = all enumerated windows of the scan (literal reading of the task, pre-registered); 'tested' = only the windows
+    that pass obs/banks (Amendment 2, reported separately).
     """
     from scipy.stats import poisson
     C = C.astype(np.float64)
@@ -117,7 +119,7 @@ def how_test(C: np.ndarray, B: np.ndarray, *, last_days: int = 2, q: float = 0.0
     pv = np.array([r[0] for r in rows])
     # BH over ALL enumerated windows of the scan: untested windows have p = 1, so the family size is n_windows
     order = np.argsort(pv)
-    thresh = q * (np.arange(1, len(pv) + 1) / max(n_windows, len(pv)))
+    thresh = q * (np.arange(1, len(pv) + 1) / (max(n_windows, len(pv)) if family == "enumerated" else len(pv)))
     ok = pv[order] <= thresh
     kmax = int(np.max(np.nonzero(ok)[0])) + 1 if ok.any() else 0
     res = HowResult(n_windows, len(rows))
