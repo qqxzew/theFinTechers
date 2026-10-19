@@ -55,5 +55,5 @@ def rule_c(tx: pl.DataFrame, cfg: dict) -> pl.DataFrame:
                 )
                 break
     if not alerts:
-        return pl.DataFrame(schema=schema)
-    return pl.DataFrame(alerts, schema=schema, orient="row").select(_COLUMNS)
+        return pl.DataFrame(schema=schema)  # type: ignore[arg-type]
+    return pl.DataFrame(alerts, schema=schema, orient="row").select(_COLUMNS)  # type: ignore[arg-type]

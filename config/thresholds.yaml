@@ -43,7 +43,7 @@ cases:
   fp_max_priority: 30
   weights:
     bias: -4.0
-    points: {D1: 3.0, D2: 3.5, D3: 1.0, D4: 2.0, D5: 2.0, D6: 3.0, D7: 3.0, D8: 1.5, R-A: 0.5, R-B: 1.0, R-C: 2.0, X: 3.5,
+    points: {D1: 3.0, D2: 3.5, D3: 1.0, D4: 2.0, D5: 2.0, D6: 3.0, D7: 3.0, D8: 1.5, R-A: 0.5, R-B: 1.0, R-C: 2.0, X: 2.5,
              E1: -3.0, E2: -1.5, E3: -2.0, E4: -1.5, E5: -1.5, E6: -3.0, E7: -2.0, E8: -2.0}
   explains:
     E1: [D1, D4, D5, D8, R-C]
@@ -62,7 +62,7 @@ cases:
     new_client_points: [8, 4]
     distant_form: 4
     multi_flag: {"2": 4, "3": 8}
-    cluster: 15
+    cluster: 10
     amount_log_points: 15
     amount_ref: 10000.0
 token_export:

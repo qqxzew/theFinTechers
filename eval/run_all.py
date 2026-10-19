@@ -14,8 +14,9 @@ from pathlib import Path
 from eval import cnb_eval
 from eval.redteam_eval import evaluate
 
-DEV = [7, 101]
-HELD_OUT = [202, 303]
+DEV = [7, 101, 202, 303, 404]       # 202/303/404 were looked at by the audit agent, so they count as dev
+HELD_OUT = [505, 606]
+RING_SIZES = [6, 9]                  # stealth ring size sweep (accounts in the ring; default world has 12-18)
 OUT = Path("eval")
 
 
@@ -23,6 +24,13 @@ def ensure_world(seed: int) -> str:
     d = f"data/redteam/seed{seed}"
     if not Path(d, "tx.parquet").exists():
         subprocess.run([sys.executable, "-m", "redteam.generate", "--seed", str(seed), "--out", d], check=True)
+    return d
+
+
+def ensure_ring_world(seed: int, n: int) -> str:
+    d = f"data/redteam/seed{seed}_ring{n}"
+    if not Path(d, "tx.parquet").exists():
+        subprocess.run([sys.executable, "-m", "redteam.generate", "--seed", str(seed), "--out", d, "--stealth-n", str(n)], check=True)
     return d
 
 
@@ -35,6 +43,11 @@ def main(skip_cnb: bool = False) -> dict:
     for s in DEV + HELD_OUT:
         seeds[s] = evaluate(ensure_world(s), audit_path=f"eval/out/audit_seed{s}.jsonl")
         json.dump(seeds[s], open(f"eval/out/redteam_seed{s}.json", "w", encoding="utf-8"), indent=1, default=str)
+    ring = {}
+    for n in RING_SIZES:
+        for s in HELD_OUT:
+            r = evaluate(ensure_ring_world(s, n))
+            ring[f"seed{s}_ring{n}"] = {m: r["curves"][m]["30"] for m in ("isolated", "staj_psi")}
     cnb = None if skip_cnb else cnb_eval.main()
     held = [seeds[s] for s in HELD_OUT]
 
@@ -47,9 +60,11 @@ def main(skip_cnb: bool = False) -> dict:
         headline[m]["precision_at_k"] = agg(m, "precision_at_k", "rank")
         headline[m]["raw_records_exposed"] = int(statistics.fmean(r["modes"][m]["exposure"]["raw_records_exposed"] for r in held))
         headline[m]["bytes_exchanged"] = int(statistics.fmean(r["modes"][m]["exposure"]["bytes_exchanged"] for r in held))
+    curve = {m: {t: {k: mean([r["curves"][m][t][k] for r in held]) for k in ("tp", "fp", "fn", "precision", "recall")} for t in ("30", "40", "50", "60")}
+             for m in ("isolated", "staj_psi", "naive_raw_sharing")}
     abl = {k: {m: mean([r["ablations"][k][m] for r in held]) for m in ("precision", "recall", "f1")} for k in held[0]["ablations"]}
     report = {"synthetic": True, "operating_point": held[0]["operating_point"], "dev_seeds": DEV, "held_out_seeds": HELD_OUT,
-              "headline_held_out_mean": headline, "ablations_held_out_mean": abl,
+              "headline_held_out_mean": headline, "threshold_curve_held_out_mean": curve, "ring_size_sweep": ring, "ablations_held_out_mean": abl,
               "per_seed": {str(s): {"modes": {m: {"overall": r["modes"][m]["overall"], "rank": r["modes"][m]["rank"], "exposure": r["modes"][m]["exposure"]}
                                               for m in r["modes"]}, "ablations": r["ablations"], "breakdown_staj_psi": r["breakdown_staj_psi"],
                                     "disclosed_cluster_candidate_labels": r["disclosed_cluster_candidate_labels"],
@@ -80,6 +95,13 @@ def to_markdown(r: dict) -> str:
          "## Headline (held-out mean)", "", "| mode | precision | recall | F1 | AP (rank) | P@K | raw records exposed | bytes exchanged |", "|---|---|---|---|---|---|---|---|"]
     for m, v in r["headline_held_out_mean"].items():
         L.append(f"| {m} | {v['precision']} | {v['recall']} | {v['f1']} | {v['average_precision']} | {v['precision_at_k']} | {v['raw_records_exposed']:,} | {v['bytes_exchanged']:,} |")
+    L += ["", "## Priority-threshold curve (held-out mean TP / FP / FN)", "", "| tau | isolated | staj_psi | naive_raw_sharing |", "|---|---|---|---|"]
+    for t in ("30", "40", "50", "60"):
+        L.append(f"| {t} | " + " | ".join(f"{r['threshold_curve_held_out_mean'][m][t]['tp']} / {r['threshold_curve_held_out_mean'][m][t]['fp']} / "
+                                          f"{r['threshold_curve_held_out_mean'][m][t]['fn']}" for m in ("isolated", "staj_psi", "naive_raw_sharing")) + " |")
+    L += ["", "## Stealth ring-size sweep (tau 30, TP/FP/FN, all variants shown)", "", "| world | isolated | staj_psi |", "|---|---|---|"]
+    for k, v in r["ring_size_sweep"].items():
+        L.append(f"| {k} | {v['isolated']['tp']}/{v['isolated']['fp']}/{v['isolated']['fn']} | {v['staj_psi']['tp']}/{v['staj_psi']['fp']}/{v['staj_psi']['fn']} |")
     L += ["", "## Ablations (held-out mean)", "", "| variant | precision | recall | F1 |", "|---|---|---|---|"]
     for k, v in r["ablations_held_out_mean"].items():
         L.append(f"| {k} | {v['precision']} | {v['recall']} | {v['f1']} |")

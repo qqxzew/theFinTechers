@@ -32,14 +32,16 @@ LOOKALIKES = {"migrant_remit": 10, "students_rent": 6, "second_hand_seller": 10,
               "middleman_cohost": 6, "freelancer": 10, "fundraiser": 6}
 
 
-def generate(seed: int, out: str, n_banks: int = 3, n_per_bank: int = 1000, cnb_dir: str = "data/raw/cnb") -> World:
+def generate(seed: int, out: str, n_banks: int = 3, n_per_bank: int = 1000, cnb_dir: str = "data/raw/cnb",
+             stealth_n: int | None = None) -> World:
     w = World(rng=np.random.default_rng(seed), banks=[f"B{i + 1}" for i in range(n_banks)])
     fx = load_fx("config/fx.yaml")
     add_background(w, f"{cnb_dir}/transactions.csv", f"{cnb_dir}/clients.csv", n_per_bank, fx)
     plant_day_zero(w, n=SCHEMES["day_zero"])
     for inst in range(SCHEMES["same_hand"]):
         plant_same_hand(w, n=int(w.rng.integers(9, 16)), instance=inst + 1)
-    plant_same_hand_stealth(w, n=int(w.rng.integers(12, 19)), instance=10)
+    n_stealth = int(w.rng.integers(12, 19))      # drawn even when overridden so that the rest of the world is identical
+    plant_same_hand_stealth(w, n=stealth_n or n_stealth, instance=10)
     plant_fixed_skim(w, n=SCHEMES["fixed_skim"], k=float(w.rng.uniform(0.06, 0.12)))
     plant_invoice_mule(w, n=SCHEMES["invoice_mule"])
     plant_victim(w, n=SCHEMES["victim"])
@@ -63,6 +65,7 @@ if __name__ == "__main__":
     ap.add_argument("--seed", type=int, default=7)
     ap.add_argument("--out", default="data/redteam/seed7")
     ap.add_argument("--n-per-bank", type=int, default=1000)
+    ap.add_argument("--stealth-n", type=int, default=None)
     a = ap.parse_args()
-    w = generate(a.seed, a.out, n_per_bank=a.n_per_bank)
+    w = generate(a.seed, a.out, n_per_bank=a.n_per_bank, stealth_n=a.stealth_n)
     print(f"tx={len(w.tx)} clients={len(w.clients)} labels={len(w.labels)}")

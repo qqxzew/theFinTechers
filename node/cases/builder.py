@@ -17,7 +17,7 @@ def build_case(bank_id: str, client_id: str, signals: list[Signal], exculpatory:
     case_id = f"{bank_id}-{client_id}"
     suspicious = [s for s in signals if s.detector_id != "VICTIM"]
     route = "victim_protection" if any(s.detector_id == "VICTIM" for s in signals) else "mule_review"
-    meta2 = {**meta, "n_distinct_detectors": len({s.detector_id for s in suspicious})}
+    meta2 = {**meta, "n_distinct_detectors": len({s.detector_id for s in suspicious if s.detector_id != "X"})}   # X is already counted by in_cluster
     prob = score_case(suspicious, exculpatory, cfg["weights"])["prob"]
     prio = priority(prob, meta2, cfg)
     verdict, reasons = triage(suspicious, exculpatory, prio, route, cfg)

@@ -58,7 +58,7 @@ radar:
   candidate_offset: 1.5       # candidate band = score >= threshold - 1.5 (includes weakly suspicious accounts), never all accounts
   token_max_degree: 3         # only rare counterparty tokens are submitted (popular tokens carry little signal and more exposure)
   tokens_per_candidate: 4     # top counterparties by amount per candidate
-  max_tokens_per_bank: 600    # PSI cost: ~22 ms per 2048-bit modexp on this laptop, ~8 modexps per token per pair session
+  max_tokens_per_bank: 1500   # PSI budget; kept below radar.psi.dh_psi.PARALLEL_MIN (2000) to avoid nested process pools; cost is measured per run
   workers: 10                 # pairwise sessions run in parallel processes (each one calls radar.sessions.run_radar on one pair)
   cluster_boost: 2.0          # logit points added to every account in a disclosed cluster (never removed: monotone)
   epoch_key: "ibm-eval-epoch-1"

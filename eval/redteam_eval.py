@@ -119,7 +119,11 @@ def evaluate(path: str, cfg: dict | None = None, audit_path: str | None = None) 
     sub = {b: set(cl.filter(pl.col("bank_id") == b)["client_id"]) for b in iso}
     per_bank = {b: _metrics({c.client_id: c for c in r.cases}, lab, sub[b], tau) for b, r in iso.items()}
     per_bank_any = {b: _metrics({c.client_id: c for c in r.cases}, lab, sub[b]) for b, r in iso.items()}
+    curve_taus = [30, 40, 50, 60]
+    curves = {m: {str(t): _metrics(c, lab, None, t) for t in curve_taus}
+              for m, c in (("isolated", cases_iso), ("staj_psi", cases_psi), ("naive_raw_sharing", cases_naive))}
     out = {
+        "curves": curves,
         "world": path, "synthetic": True, "n_tx": tx.height, "n_clients": cl.height,
         "modes": {
             "isolated": {"overall": _metrics(cases_iso, lab, None, tau), "rank": _rank(cases_iso, lab), "overall_any_priority": _metrics(cases_iso, lab), "per_bank": per_bank, "per_bank_any_priority": per_bank_any,

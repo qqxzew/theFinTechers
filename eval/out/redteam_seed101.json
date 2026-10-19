@@ -1,4 +1,132 @@
 {
+ "curves": {
+  "isolated": {
+   "30": {
+    "tp": 54,
+    "fp": 7,
+    "fn": 1,
+    "precision": 0.8852,
+    "recall": 0.9818,
+    "f1": 0.931,
+    "n_mules": 55,
+    "n_accounts": 3117
+   },
+   "40": {
+    "tp": 49,
+    "fp": 0,
+    "fn": 6,
+    "precision": 1.0,
+    "recall": 0.8909,
+    "f1": 0.9423,
+    "n_mules": 55,
+    "n_accounts": 3117
+   },
+   "50": {
+    "tp": 48,
+    "fp": 0,
+    "fn": 7,
+    "precision": 1.0,
+    "recall": 0.8727,
+    "f1": 0.932,
+    "n_mules": 55,
+    "n_accounts": 3117
+   },
+   "60": {
+    "tp": 48,
+    "fp": 0,
+    "fn": 7,
+    "precision": 1.0,
+    "recall": 0.8727,
+    "f1": 0.932,
+    "n_mules": 55,
+    "n_accounts": 3117
+   }
+  },
+  "staj_psi": {
+   "30": {
+    "tp": 55,
+    "fp": 7,
+    "fn": 0,
+    "precision": 0.8871,
+    "recall": 1.0,
+    "f1": 0.9402,
+    "n_mules": 55,
+    "n_accounts": 3117
+   },
+   "40": {
+    "tp": 55,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "n_mules": 55,
+    "n_accounts": 3117
+   },
+   "50": {
+    "tp": 55,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "n_mules": 55,
+    "n_accounts": 3117
+   },
+   "60": {
+    "tp": 55,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "n_mules": 55,
+    "n_accounts": 3117
+   }
+  },
+  "naive_raw_sharing": {
+   "30": {
+    "tp": 55,
+    "fp": 6,
+    "fn": 0,
+    "precision": 0.9016,
+    "recall": 1.0,
+    "f1": 0.9483,
+    "n_mules": 55,
+    "n_accounts": 3117
+   },
+   "40": {
+    "tp": 50,
+    "fp": 0,
+    "fn": 5,
+    "precision": 1.0,
+    "recall": 0.9091,
+    "f1": 0.9524,
+    "n_mules": 55,
+    "n_accounts": 3117
+   },
+   "50": {
+    "tp": 46,
+    "fp": 0,
+    "fn": 9,
+    "precision": 1.0,
+    "recall": 0.8364,
+    "f1": 0.9109,
+    "n_mules": 55,
+    "n_accounts": 3117
+   },
+   "60": {
+    "tp": 45,
+    "fp": 0,
+    "fn": 10,
+    "precision": 1.0,
+    "recall": 0.8182,
+    "f1": 0.9,
+    "n_mules": 55,
+    "n_accounts": 3117
+   }
+  }
+ },
  "world": "data/redteam/seed101",
  "synthetic": true,
  "n_tx": 219140,
@@ -6,14 +134,20 @@
  "modes": {
   "isolated": {
    "overall": {
-    "tp": 48,
+    "tp": 54,
     "fp": 7,
-    "fn": 7,
-    "precision": 0.8727,
-    "recall": 0.8727,
-    "f1": 0.8727,
+    "fn": 1,
+    "precision": 0.8852,
+    "recall": 0.9818,
+    "f1": 0.931,
     "n_mules": 55,
     "n_accounts": 3117
+   },
+   "rank": {
+    "average_precision": 0.9893,
+    "precision_at_k": 0.9455,
+    "k": 55,
+    "mules_without_case": 0
    },
    "overall_any_priority": {
     "tp": 55,
@@ -27,32 +161,32 @@
    },
    "per_bank": {
     "B1": {
-     "tp": 18,
+     "tp": 19,
      "fp": 2,
-     "fn": 2,
-     "precision": 0.9,
-     "recall": 0.9,
-     "f1": 0.9,
+     "fn": 1,
+     "precision": 0.9048,
+     "recall": 0.95,
+     "f1": 0.9268,
      "n_mules": 20,
      "n_accounts": 1035
     },
     "B2": {
-     "tp": 15,
+     "tp": 18,
      "fp": 2,
-     "fn": 3,
-     "precision": 0.8824,
-     "recall": 0.8333,
-     "f1": 0.8571,
+     "fn": 0,
+     "precision": 0.9,
+     "recall": 1.0,
+     "f1": 0.9474,
      "n_mules": 18,
      "n_accounts": 1040
     },
     "B3": {
-     "tp": 15,
+     "tp": 17,
      "fp": 3,
-     "fn": 2,
-     "precision": 0.8333,
-     "recall": 0.8824,
-     "f1": 0.8571,
+     "fn": 0,
+     "precision": 0.85,
+     "recall": 1.0,
+     "f1": 0.9189,
      "n_mules": 17,
      "n_accounts": 1042
     }
@@ -89,8 +223,8 @@
      "n_accounts": 1042
     }
    },
-   "best_single_bank_f1": 0.9,
-   "mean_bank_f1": 0.8714,
+   "best_single_bank_f1": 0.9474,
+   "mean_bank_f1": 0.931,
    "exposure": {
     "raw_records_exposed": 0,
     "bytes_exchanged": 0
@@ -98,14 +232,20 @@
   },
   "staj_psi": {
    "overall": {
-    "tp": 48,
+    "tp": 55,
     "fp": 7,
-    "fn": 7,
-    "precision": 0.8727,
-    "recall": 0.8727,
-    "f1": 0.8727,
+    "fn": 0,
+    "precision": 0.8871,
+    "recall": 1.0,
+    "f1": 0.9402,
     "n_mules": 55,
     "n_accounts": 3117
+   },
+   "rank": {
+    "average_precision": 1.0,
+    "precision_at_k": 1.0,
+    "k": 55,
+    "mules_without_case": 0
    },
    "overall_any_priority": {
     "tp": 55,
@@ -122,21 +262,27 @@
     "raw_records_exposed": 0,
     "blinded_elements": 568,
     "bytes_exchanged": 145408,
-    "match_rows_to_coordinator": 69
+    "match_rows_to_coordinator": 81
    },
    "clusters_disclosed": 3,
    "refused": {}
   },
   "naive_raw_sharing": {
    "overall": {
-    "tp": 45,
+    "tp": 55,
     "fp": 6,
-    "fn": 10,
-    "precision": 0.8824,
-    "recall": 0.8182,
-    "f1": 0.8491,
+    "fn": 0,
+    "precision": 0.9016,
+    "recall": 1.0,
+    "f1": 0.9483,
     "n_mules": 55,
     "n_accounts": 3117
+   },
+   "rank": {
+    "average_precision": 0.9974,
+    "precision_at_k": 0.9636,
+    "k": 55,
+    "mules_without_case": 0
    },
    "overall_any_priority": {
     "tp": 55,
@@ -159,6 +305,60 @@
   "min_priority": 30
  },
  "breakdown_isolated": {
+  "mule/fixed_skim": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "background/cnb_background": {
+   "n": 3000,
+   "flagged_as_mule_case": 7,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0023
+  },
+  "mule/same_hand": {
+   "n": 20,
+   "flagged_as_mule_case": 20,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "victim/victim": {
+   "n": 8,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 7,
+   "rate": 0.875
+  },
+  "honest/students_rent": {
+   "n": 6,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "mule/day_zero": {
+   "n": 8,
+   "flagged_as_mule_case": 8,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/freelancer": {
+   "n": 10,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "honest/fundraiser": {
+   "n": 6,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "honest/middleman_cohost": {
+   "n": 6,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
   "honest/group_collection": {
    "n": 6,
    "flagged_as_mule_case": 0,
@@ -171,109 +371,31 @@
    "routed_to_victim_protection": 0,
    "rate": 0.0
   },
-  "mule/same_hand": {
-   "n": 20,
-   "flagged_as_mule_case": 20,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
-  "honest/second_hand_seller": {
-   "n": 10,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "background/cnb_background": {
-   "n": 3000,
-   "flagged_as_mule_case": 7,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0023
-  },
-  "mule/same_hand_stealth": {
-   "n": 15,
-   "flagged_as_mule_case": 8,
-   "routed_to_victim_protection": 0,
-   "rate": 0.5333
-  },
-  "mule/day_zero": {
-   "n": 8,
-   "flagged_as_mule_case": 8,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
   "mule/invoice_mule": {
    "n": 6,
    "flagged_as_mule_case": 6,
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
-  "honest/freelancer": {
+  "mule/same_hand_stealth": {
+   "n": 15,
+   "flagged_as_mule_case": 14,
+   "routed_to_victim_protection": 0,
+   "rate": 0.9333
+  },
+  "honest/second_hand_seller": {
    "n": 10,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "honest/students_rent": {
-   "n": 6,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "honest/middleman_cohost": {
-   "n": 6,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "victim/victim": {
-   "n": 8,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 7,
-   "rate": 0.875
-  },
-  "mule/fixed_skim": {
-   "n": 6,
-   "flagged_as_mule_case": 6,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
-  "honest/fundraiser": {
-   "n": 6,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
   }
  },
  "breakdown_staj_psi": {
-  "mule/same_hand_stealth": {
-   "n": 15,
-   "flagged_as_mule_case": 8,
-   "routed_to_victim_protection": 0,
-   "rate": 0.5333
-  },
-  "background/cnb_background": {
-   "n": 3000,
-   "flagged_as_mule_case": 7,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0023
-  },
-  "mule/fixed_skim": {
-   "n": 6,
-   "flagged_as_mule_case": 6,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
-  "honest/middleman_cohost": {
-   "n": 6,
+  "honest/migrant_remit": {
+   "n": 10,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
-  },
-  "mule/invoice_mule": {
-   "n": 6,
-   "flagged_as_mule_case": 6,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
   },
   "honest/second_hand_seller": {
    "n": 10,
@@ -287,61 +409,17 @@
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
-  "honest/students_rent": {
+  "mule/invoice_mule": {
    "n": 6,
-   "flagged_as_mule_case": 0,
+   "flagged_as_mule_case": 6,
    "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "honest/migrant_remit": {
-   "n": 10,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "honest/fundraiser": {
-   "n": 6,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
+   "rate": 1.0
   },
   "mule/same_hand": {
    "n": 20,
    "flagged_as_mule_case": 20,
    "routed_to_victim_protection": 0,
    "rate": 1.0
-  },
-  "victim/victim": {
-   "n": 8,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 7,
-   "rate": 0.875
-  },
-  "honest/group_collection": {
-   "n": 6,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "honest/freelancer": {
-   "n": 10,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  }
- },
- "breakdown_staj_psi_any_priority": {
-  "honest/migrant_remit": {
-   "n": 10,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "victim/victim": {
-   "n": 8,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 7,
-   "rate": 0.875
   },
   "mule/same_hand_stealth": {
    "n": 15,
@@ -349,6 +427,74 @@
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
+  "honest/middleman_cohost": {
+   "n": 6,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "background/cnb_background": {
+   "n": 3000,
+   "flagged_as_mule_case": 7,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0023
+  },
+  "honest/freelancer": {
+   "n": 10,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "victim/victim": {
+   "n": 8,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 7,
+   "rate": 0.875
+  },
+  "honest/group_collection": {
+   "n": 6,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "mule/fixed_skim": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/students_rent": {
+   "n": 6,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "honest/fundraiser": {
+   "n": 6,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  }
+ },
+ "breakdown_staj_psi_any_priority": {
+  "honest/students_rent": {
+   "n": 6,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "mule/same_hand_stealth": {
+   "n": 15,
+   "flagged_as_mule_case": 15,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/migrant_remit": {
+   "n": 10,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
   "honest/fundraiser": {
    "n": 6,
    "flagged_as_mule_case": 6,
@@ -361,29 +507,17 @@
    "routed_to_victim_protection": 0,
    "rate": 0.0
   },
-  "background/cnb_background": {
-   "n": 3000,
-   "flagged_as_mule_case": 10,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0033
-  },
-  "honest/students_rent": {
-   "n": 6,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "mule/fixed_skim": {
-   "n": 6,
-   "flagged_as_mule_case": 6,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
   "mule/day_zero": {
    "n": 8,
    "flagged_as_mule_case": 8,
    "routed_to_victim_protection": 0,
    "rate": 1.0
+  },
+  "background/cnb_background": {
+   "n": 3000,
+   "flagged_as_mule_case": 10,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0033
   },
   "honest/freelancer": {
    "n": 10,
@@ -391,7 +525,13 @@
    "routed_to_victim_protection": 0,
    "rate": 0.0
   },
-  "honest/middleman_cohost": {
+  "victim/victim": {
+   "n": 8,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 7,
+   "rate": 0.875
+  },
+  "mule/invoice_mule": {
    "n": 6,
    "flagged_as_mule_case": 6,
    "routed_to_victim_protection": 0,
@@ -403,15 +543,21 @@
    "routed_to_victim_protection": 0,
    "rate": 0.5
   },
-  "mule/invoice_mule": {
+  "mule/same_hand": {
+   "n": 20,
+   "flagged_as_mule_case": 20,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/middleman_cohost": {
    "n": 6,
    "flagged_as_mule_case": 6,
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
-  "mule/same_hand": {
-   "n": 20,
-   "flagged_as_mule_case": 20,
+  "mule/fixed_skim": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
    "routed_to_victim_protection": 0,
    "rate": 1.0
   }
@@ -571,122 +717,7 @@
     ]
    }
   ],
-  "false_negatives": [
-   {
-    "client_id": "R03029",
-    "label": "mule",
-    "scheme": "same_hand_stealth",
-    "persona": null,
-    "priority": 10,
-    "triage": "REVIEW",
-    "signals": [
-     "R-A:R03029"
-    ],
-    "exculpatory": [],
-    "reasons": [
-     "B1-R03029: priority 10 < 30",
-     "B1-R03029: R-A:R03029 unexplained"
-    ]
-   },
-   {
-    "client_id": "R03030",
-    "label": "mule",
-    "scheme": "same_hand_stealth",
-    "persona": null,
-    "priority": 17,
-    "triage": "REVIEW",
-    "signals": [
-     "R-A:R03030"
-    ],
-    "exculpatory": [],
-    "reasons": [
-     "B2-R03030: priority 17 < 30",
-     "B2-R03030: R-A:R03030 unexplained"
-    ]
-   },
-   {
-    "client_id": "R03031",
-    "label": "mule",
-    "scheme": "same_hand_stealth",
-    "persona": null,
-    "priority": 12,
-    "triage": "REVIEW",
-    "signals": [
-     "R-A:R03031"
-    ],
-    "exculpatory": [],
-    "reasons": [
-     "B3-R03031: priority 12 < 30",
-     "B3-R03031: R-A:R03031 unexplained"
-    ]
-   },
-   {
-    "client_id": "R03033",
-    "label": "mule",
-    "scheme": "same_hand_stealth",
-    "persona": null,
-    "priority": 19,
-    "triage": "REVIEW",
-    "signals": [
-     "R-A:R03033",
-     "D3:R03033"
-    ],
-    "exculpatory": [],
-    "reasons": [
-     "B2-R03033: priority 19 < 30",
-     "B2-R03033: R-A:R03033 unexplained",
-     "B2-R03033: D3:R03033 unexplained"
-    ]
-   },
-   {
-    "client_id": "R03039",
-    "label": "mule",
-    "scheme": "same_hand_stealth",
-    "persona": null,
-    "priority": 14,
-    "triage": "REVIEW",
-    "signals": [
-     "R-A:R03039"
-    ],
-    "exculpatory": [],
-    "reasons": [
-     "B2-R03039: priority 14 < 30",
-     "B2-R03039: R-A:R03039 unexplained"
-    ]
-   },
-   {
-    "client_id": "R03040",
-    "label": "mule",
-    "scheme": "same_hand_stealth",
-    "persona": null,
-    "priority": 12,
-    "triage": "REVIEW",
-    "signals": [
-     "R-A:R03040"
-    ],
-    "exculpatory": [],
-    "reasons": [
-     "B3-R03040: priority 12 < 30",
-     "B3-R03040: R-A:R03040 unexplained"
-    ]
-   },
-   {
-    "client_id": "R03041",
-    "label": "mule",
-    "scheme": "same_hand_stealth",
-    "persona": null,
-    "priority": 18,
-    "triage": "REVIEW",
-    "signals": [
-     "R-A:R03041"
-    ],
-    "exculpatory": [],
-    "reasons": [
-     "B1-R03041: priority 18 < 30",
-     "B1-R03041: R-A:R03041 unexplained"
-    ]
-   }
-  ]
+  "false_negatives": []
  },
  "clusters": [
   {
@@ -703,6 +734,19 @@
    "n_candidates": 11
   },
   {
+   "cluster_id": "66cbd1ef57d0",
+   "banks": [
+    "B1",
+    "B2",
+    "B3"
+   ],
+   "score": 0.9278,
+   "disclosed": true,
+   "same_hand_global": true,
+   "lag_ret_concentration": 1.0,
+   "n_candidates": 15
+  },
+  {
    "cluster_id": "21d1c20074d0",
    "banks": [
     "B1",
@@ -714,39 +758,26 @@
    "same_hand_global": true,
    "lag_ret_concentration": 1.0,
    "n_candidates": 9
-  },
-  {
-   "cluster_id": "26ca23fd2a71",
-   "banks": [
-    "B1",
-    "B2",
-    "B3"
-   ],
-   "score": 0.8528,
-   "disclosed": true,
-   "same_hand_global": true,
-   "lag_ret_concentration": 1.0,
-   "n_candidates": 8
   }
  ],
  "ablations": {
   "without_innocence_layer": {
-   "tp": 48,
+   "tp": 54,
    "fp": 22,
-   "fn": 7,
-   "precision": 0.6857,
-   "recall": 0.8727,
-   "f1": 0.768,
+   "fn": 1,
+   "precision": 0.7105,
+   "recall": 0.9818,
+   "f1": 0.8244,
    "n_mules": 55,
    "n_accounts": 3117
   },
   "without_radar": {
-   "tp": 48,
+   "tp": 54,
    "fp": 7,
-   "fn": 7,
-   "precision": 0.8727,
-   "recall": 0.8727,
-   "f1": 0.8727,
+   "fn": 1,
+   "precision": 0.8852,
+   "recall": 0.9818,
+   "f1": 0.931,
    "n_mules": 55,
    "n_accounts": 3117
   },
@@ -762,6 +793,6 @@
   }
  },
  "disclosed_cluster_candidate_labels": {
-  "mule": 28
+  "mule": 35
  }
 }

@@ -83,5 +83,6 @@ def build_case_json(case: Case, feat: dict, cluster: dict | None, secret: bytes 
     }
     if cluster:
         out["cluster"] = {"cluster_id": cluster["cluster_id"], "n_other_banks": cluster["n_other_banks"],
-                          "n_other_candidates": cluster["n_other_candidates"], "lag_ret_concentration": cluster.get("lag_ret_concentration")}
+                          "n_other_candidates": cluster["n_other_candidates"], "lag_ret_concentration": cluster.get("lag_ret_concentration"),
+                          "matched_exit_accounts": cluster.get("matched_exit_accounts", [])}
     return out

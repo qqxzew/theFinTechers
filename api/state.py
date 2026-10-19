@@ -19,8 +19,9 @@ from copilot.tools.case_tools import CaseTools
 from eval.redteam_eval import load_world, run_banks, to_bank_node
 from node.pipeline import apply_clusters, load_config
 from radar.guards import Guards
-from radar.sessions import run_radar
+from radar.sessions import run_radar, token_id
 
+EPOCH_KEY = b"epoch-demo"
 STAFF = ["ann", "tom", "rob", "zoe", "max", "eva", "jan", "lea"]
 RULE_AUTHOR = "rob"
 
@@ -50,6 +51,16 @@ class DemoState:
     def owner_of(self, client_id: str) -> str:
         return STAFF[int(hashlib.sha256(client_id.encode()).hexdigest(), 16) % len(STAFF)]
 
+    def matched_accounts(self, case, cluster: dict) -> list[str]:
+        """The accounts behind the drops: this client's own exit accounts whose keyed ids matched other banks' candidates.
+
+        Plaintext is known only to the owning bank (the radar saw keyed ids); resolving the account owner is the bank's own job, outside Stau.
+        """
+        res = self.results[case.bank_id]
+        ref = next((r for r, cid in res.ref_to_client.items() if cid == case.client_id), None)
+        toks = {c["token"] for c in res.candidates if c["cand_ref"] == ref}
+        return sorted(t for t in toks if token_id(EPOCH_KEY, t) in set(cluster["tokens"]))
+
     def case_json(self, case_id: str) -> dict:
         if case_id not in self.case_jsons:
             case = self.cases[case_id]
@@ -59,6 +70,7 @@ class DemoState:
                 for c in self.radar.clusters:
                     if c["cluster_id"] == case.cluster_id:
                         cluster = c["post_match"].get(case.bank_id) | {"cluster_id": c["cluster_id"]}
+                        cluster["matched_exit_accounts"] = self.matched_accounts(case, c)
             cj = build_case_json(case, feat, cluster)
             cj["case_id"] = case_id
             self.case_jsons[case_id] = cj
@@ -72,7 +84,7 @@ def build_state(world: str = "data/redteam/seed101", audit_path: str = "eval/out
     if fresh and os.path.exists(audit_path):
         os.remove(audit_path)
     audit = AuditLog(audit_path)
-    radar = run_radar([to_bank_node(r) for r in results.values()], Guards(cfg["radar_guards"]), epoch_key=b"epoch-demo", audit=audit)
+    radar = run_radar([to_bank_node(r) for r in results.values()], Guards(cfg["radar_guards"]), epoch_key=EPOCH_KEY, audit=audit)
     cases, feats, case_bank = {}, {}, {}
     for b, r in results.items():
         for c in apply_clusters(r, radar.clusters):

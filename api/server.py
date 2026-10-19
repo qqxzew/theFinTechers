@@ -19,6 +19,7 @@ from copilot.budgets import Budget
 from copilot.explain import explain_case
 from copilot.model_registry import ModelRegistry, load_models
 from copilot.opo_draft import build_opo, draft_section_v, load_settings, to_markdown
+from copilot.rule_qa import answer_question
 from escalation.conflicts import check_decision, validate_approval
 from escalation.matrix import route
 
@@ -31,6 +32,10 @@ class DecisionBody(BaseModel):
     role: str
     reason: str = ""
     approver: str | None = None
+
+
+class AskBody(BaseModel):
+    question: str
 
 
 class SectionV(BaseModel):
@@ -142,6 +147,19 @@ def create_app(st: DemoState) -> FastAPI:
         st.proposals.setdefault(case_id, []).append({"triage": st.cases[case_id].triage.value, "reason": "; ".join(st.cases[case_id].triage_reasons[:2]),
                                                       "agent": "narrative", "ts": datetime.now(UTC).isoformat()})
         return {**(res["explanation"] or {}), "violations": res["violations"], "model_id": res["model_id"], "cached": res.get("cached", False)}
+
+    @app.post("/api/cases/{case_id}/ask")
+    def ask(case_id: str, body: AskBody):
+        """Ruleset navigation Q&A: grounded in the case JSON, rule definitions and the configured thresholds."""
+        get_case(case_id)
+        cj = st.case_json(case_id)
+        used = {s["detector_id"] for s in [*cj["signals"], *cj["exculpatory"]]}
+        params = {"rule_a": st.cfg["rule_a"], "rule_b": st.cfg["rule_b"], "rule_c": st.cfg["rule_c"],
+                  **{d: v for d, v in st.cfg["detectors"].items() if d in used}}
+        res = answer_question(llm(), cj, body.question, params, Budget(6, 60000, 1.0, 300), role=narrative_role)
+        st.audit.append(actor="human:analyst", action="rule_question", why=body.question[:200], rule_version="copilot-1", model_version=res["model_id"],
+                        input_hash=case_id)
+        return res
 
     @app.post("/api/cases/{case_id}/decision")
     def decision(case_id: str, body: DecisionBody):

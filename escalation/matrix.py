@@ -9,7 +9,8 @@ import yaml
 def load_matrix(path: str | Path) -> dict[str, Any]:
     """Load a routing matrix from a YAML file."""
     with open(path) as f:
-        return yaml.safe_load(f)
+        data: dict[str, Any] = yaml.safe_load(f)
+        return data
 
 
 def _matches(when: dict[str, Any], meta: dict[str, Any]) -> bool:

@@ -12,8 +12,8 @@ pass that looks at the first-pass score of counterparties that are the node's OW
 hand-set weights from config/ibm.yaml.
 
 Radar = the project's code: radar.sessions.run_radar (DH-PSI via radar.psi.dh_psi.PsiParty) for each bank pair, radar.guards.Guards
-for admission, radar.clustering.build_clusters for the cross-pair union. Pair sessions run in parallel processes because one
-2048-bit modexp costs ~22 ms here.
+for admission, radar.clustering.build_clusters for the cross-pair union. Pair sessions run in parallel processes (PSI cost is
+measured in every run, see `psi_benchmark`).
 
 Run:  python -m eval.ibm_eval
 """
@@ -396,7 +396,7 @@ def choose_threshold(scores: pl.DataFrame, truth: set[str], n_q: int) -> dict:
 
 
 def evaluate_window(name: str, raw: pl.DataFrame, rows_all: pl.DataFrame, txp: pl.DataFrame, cfg: dict, threshold: float,
-                    guards_cfg: dict, with_radar: bool = True) -> dict:
+                    guards_cfg: dict, with_radar: bool = True, ref_model: dict | None = None) -> dict:
     t_start = time.perf_counter()
     w = cfg["windows"][name]
     rows = in_window(rows_all, w)
@@ -425,8 +425,8 @@ def evaluate_window(name: str, raw: pl.DataFrame, rows_all: pl.DataFrame, txp: p
                                                "rows": rows.filter(pl.col("bank_id") == b).height}
     modes: dict[str, dict] = {}
     modes["isolated"] = {
-        "overall": prf(f_iso, truth), "average_precision": average_precision(iso, truth), "tx_level": tx_level(allw, f_iso),
-        "per_bank": per_bank,
+        "overall": prf(f_iso, truth), "average_precision": average_precision(iso, truth), "precision_at_k": precision_at(iso, truth),
+        "tx_level": tx_level(allw, f_iso), "per_bank": per_bank,
         "best_single_bank": max(per_bank, key=lambda b: (per_bank[b]["f1"], b)),
         "best_single_bank_f1": max(m["f1"] for m in per_bank.values()),
         "mean_bank_precision": round(sum(m["precision"] for m in per_bank.values()) / len(banks), 4),
@@ -443,7 +443,8 @@ def evaluate_window(name: str, raw: pl.DataFrame, rows_all: pl.DataFrame, txp: p
         f_psi = flag(psi) | f_iso
         disclosed = [c for c in rr["clusters"] if c["disclosed"]]
         modes["staj_psi"] = {
-            "overall": prf(f_psi, truth), "average_precision": average_precision(psi, truth), "tx_level": tx_level(allw, f_psi),
+            "overall": prf(f_psi, truth), "average_precision": average_precision(psi, truth), "precision_at_k": precision_at(psi, truth),
+            "tx_level": tx_level(allw, f_psi),
             "per_pattern": per_pattern(acc_pat, f_psi, truth),
             "exposure": rr["exposure"] | {"psi_wall_seconds": rr["wall_seconds"], "psi_sequential_seconds": rr["sequential_seconds"]},
             "radar": {"refused": rr["refused"], "pairs": rr["pairs"], "clusters_total": len(rr["clusters"]), "clusters_disclosed": len(disclosed),
@@ -452,6 +453,8 @@ def evaluate_window(name: str, raw: pl.DataFrame, rows_all: pl.DataFrame, txp: p
                       "newly_flagged_by_radar": len(f_psi - f_iso), "newly_flagged_laundering": len((f_psi - f_iso) & truth),
                       "candidates_in_band": {b: e.n_in_band for b, e in exports.items()},
                       "candidates_submitted": {b: e.n_submitted_candidates for b, e in exports.items()},
+                      "submitted_candidates_laundering_share": round(sum(1 for e in exports.values() for c in e.ref_to_client.values() if c in truth)
+                                                                     / max(1, sum(len(e.ref_to_client) for e in exports.values())), 4),
                       "tokens_submitted": {b: len(e.node.submission()) for b, e in exports.items()},
                       "disclosed_cluster_sizes": sorted((len(c["candidates"]) for c in disclosed), reverse=True)[:20],
                       "disclosed_cluster_laundering_share": [round(sum(1 for b, r in c["candidates"] if exports[b].ref_to_client[r] in truth) / len(c["candidates"]), 3)
@@ -464,7 +467,8 @@ def evaluate_window(name: str, raw: pl.DataFrame, rows_all: pl.DataFrame, txp: p
     rows.write_parquet(buf)
     t_ser = time.perf_counter() - t
     modes["naive_raw_sharing"] = {
-        "overall": prf(f_nv, truth), "average_precision": average_precision(naive, truth), "tx_level": tx_level(allw, f_nv),
+        "overall": prf(f_nv, truth), "average_precision": average_precision(naive, truth), "precision_at_k": precision_at(naive, truth),
+        "tx_level": tx_level(allw, f_nv),
         "per_pattern": per_pattern(acc_pat, f_nv, truth),
         "exposure": {"raw_records_exposed": rows.height, "raw_source_transactions": allw.height,
                      "bytes_exchanged_parquet": buf.getbuffer().nbytes, "bytes_in_memory_arrow": int(rows.estimated_size()),
@@ -483,11 +487,34 @@ def evaluate_window(name: str, raw: pl.DataFrame, rows_all: pl.DataFrame, txp: p
         | {"average_precision": average_precision(feats.with_columns(dc=pl.col("deg_in") + pl.col("deg_out")), truth, "dc")},
         "random_topk_seeded": prf(top_k(rnd, k, "rnd"), truth) | {"average_precision": average_precision(rnd, truth, "rnd")},
         "prevalence": round(len(truth) / len(universe), 5)}
-    return {"window": w, "rows": rows.height, "source_transactions_non_self": allw.height, "accounts": len(universe),
+    feats = feats.with_columns(dc=pl.col("deg_in") + pl.col("deg_out"))
+    for bname, bscores, bcol in (("tx_count", feats, "n_tx"), ("distinct_counterparties", feats, "dc"), ("random", rnd, "rnd")):
+        baselines[f"{bname}_precision_at_k"] = precision_at(bscores, truth, col=bcol)
+    if ref_model is not None:
+        rs = reference_scores(iso, ref_model)
+        baselines["fitted_reference_isolated"] = {
+            "what": "EVALUATION-ONLY logistic regression on the same isolated-mode features, fitted on calibration-window labels; not in the decision path",
+            "average_precision": average_precision(rs, truth, "ref"), "precision_at_k": precision_at(rs, truth, col="ref")}
+    return {"window": w, "rows": rows.height, "flagged_share_isolated": round(len(f_iso) / len(universe), 4), "source_transactions_non_self": allw.height, "accounts": len(universe),
             "laundering_accounts": len(truth), "laundering_transactions_non_self": lt.height,
             "accounts_per_bank": {b: per_bank[b]["accounts"] for b in banks},
             "laundering_accounts_per_bank": {b: per_bank[b]["positives"] for b in banks},
             "modes": modes, "baselines": baselines, "seconds": round(time.perf_counter() - t_start, 1)}
+
+
+def psi_benchmark(n: int = 300) -> dict:
+    """Measured cost of one complete two-party PsiParty session (both sides learn the intersection), n tokens per side."""
+    from radar.psi.dh_psi import PsiParty  # noqa: PLC0415
+    a = PsiParty([f"bench-a-{i}" for i in range(n)], "staj-psi-bench")
+    b = PsiParty([f"bench-a-{i}" for i in range(n // 2, n + n // 2)], "staj-psi-bench")
+    t = time.perf_counter()
+    m1 = a.blind()
+    m2, m3 = b.respond(m1)
+    hits, back = a.finish(m2, m3)
+    hb = b.learn_from_return(back)
+    el = time.perf_counter() - t
+    assert len(hits) == len(hb) == n - n // 2
+    return {"n_tokens": n, "seconds": round(el, 3), "ms_per_token_per_pair_session": round(1000 * el / n, 2)}
 
 
 def fx_check(raw: pl.DataFrame, table: dict[str, float]) -> dict:
@@ -520,7 +547,10 @@ def main(out_path: str = "eval/out/ibm_eval.json", md_path: str = "docs/IBM_EVAL
     truth_all = set(lt_all["sender"].to_list()) | set(lt_all["receiver"].to_list())
     l_self = raw.filter((pl.col("is_laundering") == 1) & selfmask)
     self_only = set((l_self["from_bank"] + ":" + l_self["from_account"]).to_list()) - truth_all
+    tail = raw.filter(pl.col("ts") >= datetime(2022, 9, 11, tzinfo=UTC))
 
+    psi_bench = psi_benchmark()
+    print(f"psi benchmark {psi_bench}", flush=True)
     # 1. threshold choice on the calibration window (isolated mode, pooled)
     w = cfg["windows"]["calibration"]
     rows_cal = in_window(rows_all, w)
@@ -531,11 +561,13 @@ def main(out_path: str = "eval/out/ibm_eval.json", md_path: str = "docs/IBM_EVAL
     thr |= {"calibration_average_precision": average_precision(iso_cal, truth_cal), "calibration_accounts": iso_cal.height,
             "calibration_laundering_accounts": len(truth_cal)}
     print(f"threshold {thr}", flush=True)
+    ref_model = fit_reference(iso_cal, truth_cal)
+    thr["fitted_reference_calibration_average_precision"] = average_precision(reference_scores(iso_cal, ref_model), truth_cal, "ref")
 
     # 2. held-out window and full period, all three modes
     windows = {}
     for name in ("heldout", "full"):
-        windows[name] = evaluate_window(name, raw, rows_all, txp, cfg, thr["threshold"], guards_cfg)
+        windows[name] = evaluate_window(name, raw, rows_all, txp, cfg, thr["threshold"], guards_cfg, ref_model=ref_model)
         print(f"{name} done in {windows[name]['seconds']}s", flush=True)
 
     bank_sizes = rows_all.group_by("bank_id").agg(rows=pl.len(), accounts=pl.col("client_id").n_unique()).sort("bank_id")
@@ -550,6 +582,8 @@ def main(out_path: str = "eval/out/ibm_eval.json", md_path: str = "docs/IBM_EVAL
                           "the held-out window was never used for any choice; 'full' contains the calibration days and is labelled so",
                   "features_per_window": "features are computed only from rows inside the window"},
         "ingest": {"source_rows": raw.height, "self_transfers_dropped": raw.filter(selfmask).height,
+                   "accounts_in_source": len(set((raw["from_bank"] + ":" + raw["from_account"]).to_list()) | set((raw["to_bank"] + ":" + raw["to_account"]).to_list())),
+                   "tail_days_2022_09_11_to_18": {"rows": tail.height, "laundering": int(tail["is_laundering"].sum())},
                    "laundering_self_transfers_dropped": l_self.height,
                    "accounts_labelled_only_via_self_transfers": len(self_only),
                    "canonical_rows": rows_all.height, "accounts": rows_all["client_id"].n_unique(),
@@ -561,10 +595,13 @@ def main(out_path: str = "eval/out/ibm_eval.json", md_path: str = "docs/IBM_EVAL
                    "simulated_banks": {r["bank_id"]: {"rows": r["rows"], "accounts": r["accounts"]} for r in bank_sizes.iter_rows(named=True)},
                    "seconds": round(t_ingest, 1)},
         "fx_placeholder_check": fx_check(raw, cfg["fx"]["usd_per_unit"]),
+        "psi_benchmark": psi_bench,
         "threshold": thr,
         "engine": {"name": "IBM-scale vectorised variant of D1 flow-through+ / D5 rare-exit concentration (own design)",
                    "weights": cfg["engine"]["weights"], "features": FEATURES},
         "radar_config": cfg["radar"], "guards": guards_cfg,
+        "fitted_reference_model": {"columns": ref_model["columns"], "standardised_weights": [round(x, 4) for x in ref_model["w"]],
+                                   "note": "evaluation-only; fitted on calibration labels; not used for any flag"},
         "windows": windows,
         "total_seconds": round(time.perf_counter() - t0, 1),
     }
@@ -576,8 +613,214 @@ def main(out_path: str = "eval/out/ibm_eval.json", md_path: str = "docs/IBM_EVAL
     return result
 
 
+def _cmp(a: float, b: float) -> str:
+    return "higher than" if a > b else ("lower than" if a < b else "equal to")
+
+
 def render_md(r: dict) -> str:
-    return "# IBM eval (render pending)\n"
+    """docs/IBM_EVAL.md, generated from the result dict. No number in this file is typed by hand."""
+    L: list[str] = []
+    a = L.append
+    ing, thr = r["ingest"], r["threshold"]
+    a("# IBM AMLworld evaluation (SYNTHETIC data)\n")
+    a(f"> Generated by `python -m eval.ibm_eval` at {r['generated_at_utc']} from `eval/out/ibm_eval.json` (config `{r['config_path']}`, "
+      f"sha256 `{r['config_sha256'][:16]}…`). **Every number below is computed by code.** Dataset: {r['dataset']}. "
+      "**Synthetic data. Generic laundering patterns from the AMLworld generator, NOT Czech money-mule schemes.**\n")
+    a("## 1. What was done\n")
+    a(f"* **Ingest** (`ingest/ibm.py`): {ing['source_rows']:,} source rows; {ing['self_transfers_dropped']:,} self-transfers dropped "
+      f"({ing['laundering_self_transfers_dropped']} of them labelled laundering; {ing['accounts_labelled_only_via_self_transfers']} account(s) were laundering only through a self-transfer and so leave the truth set). "
+      f"{ing['ibm_banks']:,} IBM bank ids → 5 simulated banks by SHA-256 of the id (all accounts of one IBM bank stay together). "
+      f"Each transaction → one OUT row at the sender's bank and one IN row at the receiver's bank: {ing['canonical_rows']:,} canonical rows, {ing['accounts']:,} accounts. "
+      "Own account = `client_id` `<ibm bank>:<account>`; the counterparty is only an external token of the same form (like an IBAN).")
+    a("* **Amounts**: Amount Paid × a hand-typed **PLACEHOLDER** USD table (`config/ibm.yaml`, `placeholder: true`). See §6 for its deviation from the rates implied by the dataset itself.")
+    a(f"* **Labels** (`Is Laundering`, pattern types) are split off before the bank split and read only by the metric code in `eval/ibm_eval.py`; `bank_split` refuses a labelled table (unit test). "
+      f"Account truth = sender or receiver of ≥ 1 laundering transaction. Pattern types: {ing['pattern_lines']:,} lines of the patterns file, "
+      f"{ing['pattern_lines_matched_to_transactions']:,} matched to transactions on (timestamp, both accounts, amount, currency, format), {ing['attempts']} attempts. "
+      "Laundering accounts not covered by the patterns file are reported as `unattributed`.")
+    a("* **Bank-side engine** (own design, IBM-scale vectorised variant of D1 flow-through+ / D5 rare-exit concentration; polars, no python loop per client): "
+      "per own account inside ONE node — counterparty degree within the node, in/out totals and counts, max 24 h inflow window, share of the largest inflow sent on within 24 h "
+      "(to others than its payer), share of outflow to rare counterparties (degree ≤ 3 within the node), distinct rare counterparties, retention, and a second pass with the max first-pass "
+      "probability of counterparties that are the node's OWN clients. Score = additive log-odds with **hand-set** weights (no fitting):")
+    a("")
+    a("| weight | value |\n|---|---|")
+    for k, v in r["engine"]["weights"].items():
+        a(f"| `{k}` | {v} |")
+    a("")
+    a(f"* **Split / threshold** (the only use of labels for a choice): {r['split']['rule']}. Calibration window {r['split']['calibration']['start']} … < {r['split']['calibration']['end']}; "
+      f"threshold grid = {thr['grid_size']} score quantiles; chosen logit threshold **{thr['threshold']}** (calibration F1 {thr['calibration_f1']}, P {thr['calibration_precision']}, "
+      f"R {thr['calibration_recall']}, {thr['calibration_flagged']:,} of {thr['calibration_accounts']:,} accounts flagged; calibration AP {thr['calibration_average_precision']}). "
+      f"Features are computed only from rows inside each window.")
+    a(f"* **Radar** (`staj_psi`): candidate band = score ≥ threshold − {r['radar_config']['candidate_offset']} (weakly suspicious included, never all accounts); per candidate the top "
+      f"{r['radar_config']['tokens_per_candidate']} counterparty tokens by amount with in-bank degree ≤ {r['radar_config']['token_max_degree']}; at most {r['radar_config']['max_tokens_per_bank']} tokens per bank "
+      f"(highest scores first; measured PSI cost in this run: {r['psi_benchmark']['ms_per_token_per_pair_session']} ms per token per pair session, "
+      f"{r['psi_benchmark']['n_tokens']} tokens per side). Admission by `radar.guards.Guards` (config from `config/thresholds.yaml`); every bank pair runs "
+      "`radar.sessions.run_radar` (real `PsiParty` DH-PSI) in its own process; the coordinator unions the per-pair matches and calls `radar.clustering.build_clusters` once "
+      "(same connected components as one all-bank run). Disclosure needs ≥ 2 banks and ≥ 3 candidates. Each bank maps its own `cand_ref`s in disclosed clusters back to accounts and adds "
+      f"{r['radar_config']['cluster_boost']} logit points; a flag is never removed. The post-match lag/retention exchange (§6.4 'same hand global') is **not** used on IBM.")
+    a("* **naive_raw_sharing**: all canonical rows pooled into one node, same engine (global counterparty degree, neighbours across banks). Exposure = all rows; bytes = parquet serialisation.")
+    a("* **Baselines** on the same accounts: top-k by transaction count, by distinct counterparties, seeded random (k = number flagged by `isolated`). "
+      "An **evaluation-only** logistic regression fitted on calibration labels over the same features is reported as a reference, never used for a flag.\n")
+
+    for wname, title in (("heldout", "Held-out window (never used for any choice)"), ("full", "Full period (CONTAINS the 9 calibration days)")):
+        w = r["windows"][wname]
+        m = w["modes"]
+        a(f"## 2{'a' if wname == 'heldout' else 'b'}. {title}: {w['window']['start']} … < {w['window']['end']}\n")
+        a(f"{w['source_transactions_non_self']:,} transactions, {w['accounts']:,} accounts, {w['laundering_accounts']:,} laundering accounts "
+          f"(prevalence {w['baselines']['prevalence']}), {w['laundering_transactions_non_self']:,} laundering transactions. Runtime {w['seconds']} s.\n")
+        a("| mode | precision | recall | F1 | flagged | AP (rank) | P@100 | P@1000 | tx-level P / R | records exposed | bytes exposed |")
+        a("|---|---|---|---|---|---|---|---|---|---|---|")
+        iso = m["isolated"]
+        for name, mm in (("isolated (all banks, pooled count)", iso), ("staj_psi", m["staj_psi"]), ("naive_raw_sharing", m["naive_raw_sharing"])):
+            o, ex = mm["overall"], mm["exposure"]
+            rec = ex.get("raw_records_exposed", 0)
+            byt = ex.get("bytes_exchanged", ex.get("bytes_exchanged_parquet", 0))
+            a(f"| {name} | {o['precision']} | {o['recall']} | {o['f1']} | {o['flagged']:,} | {mm['average_precision']} | {mm['precision_at_k']['100']} | "
+              f"{mm['precision_at_k']['1000']} | {mm['tx_level']['precision']} / {mm['tx_level']['recall']} | {rec:,} | {byt:,} |")
+        a(f"| isolated: best single bank ({iso['best_single_bank']}) | {iso['per_bank'][iso['best_single_bank']]['precision']} | {iso['per_bank'][iso['best_single_bank']]['recall']} | "
+          f"{iso['best_single_bank_f1']} | {iso['per_bank'][iso['best_single_bank']]['flagged']:,} | {iso['per_bank'][iso['best_single_bank']]['average_precision']} | | | | 0 | 0 |")
+        a(f"| isolated: mean over banks | {iso['mean_bank_precision']} | {iso['mean_bank_recall']} | {iso['mean_bank_f1']} | | | | | | 0 | 0 |")
+        b = w["baselines"]
+        for bn, label in (("tx_count_topk", "baseline: top-k by transaction count"), ("distinct_counterparties_topk", "baseline: top-k by distinct counterparties"),
+                          ("random_topk_seeded", "baseline: random top-k (seeded)")):
+            o = b[bn]
+            pk = b.get({"tx_count_topk": "tx_count_precision_at_k", "random_topk_seeded": "random_precision_at_k",
+                        "distinct_counterparties_topk": "distinct_counterparties_precision_at_k"}[bn], {})
+            a(f"| {label} | {o['precision']} | {o['recall']} | {o['f1']} | {o['flagged']:,} | {o['average_precision']} | {pk.get('100', '')} | {pk.get('1000', '')} | | | |")
+        if "fitted_reference_isolated" in b:
+            fr = b["fitted_reference_isolated"]
+            a(f"| reference: logistic fit on calibration labels (eval only) | | | | | {fr['average_precision']} | {fr['precision_at_k']['100']} | {fr['precision_at_k']['1000']} | | | |")
+        a("")
+        a("Per bank (isolated):\n")
+        a("| bank | accounts | laundering accounts | precision | recall | F1 | AP |\n|---|---|---|---|---|---|---|")
+        for bk, pb in iso["per_bank"].items():
+            a(f"| {bk} | {pb['accounts']:,} | {pb['positives']:,} | {pb['precision']} | {pb['recall']} | {pb['f1']} | {pb['average_precision']} |")
+        a("")
+        a("Detection per pattern type (account recall; attempts with ≥ 1 flagged account):\n")
+        a("| pattern | accounts | isolated | staj_psi | naive | attempts | attempts hit (isolated / staj_psi / naive) |\n|---|---|---|---|---|---|---|")
+        for pt in PATTERN_TYPES + ["unattributed"]:
+            pi, pp, pn = (m[x]["per_pattern"][pt] for x in ("isolated", "staj_psi", "naive_raw_sharing"))
+            att = "" if pt == "unattributed" else f"{pi['attempts']}"
+            hits = "" if pt == "unattributed" else f"{pi['attempts_with_a_flagged_account']} / {pp['attempts_with_a_flagged_account']} / {pn['attempts_with_a_flagged_account']}"
+            a(f"| {pt} | {pi['accounts']} | {pi['account_recall']} | {pp['account_recall']} | {pn['account_recall']} | {att} | {hits} |")
+        a("")
+        rd = m["staj_psi"]["radar"]
+        ex = m["staj_psi"]["exposure"]
+        a(f"Radar: tokens submitted per bank {rd['tokens_submitted']}; candidates submitted {rd['candidates_submitted']} out of {rd['candidates_in_band']} in the band; "
+          f"refused {rd['refused'] or 'none'}. {len(rd['pairs'])} pair sessions, {ex['blinded_elements']:,} blinded group elements, **{ex['bytes_exchanged']:,} bytes**, "
+          f"PSI wall time **{ex['psi_wall_seconds']} s** (parallel; {ex['psi_sequential_seconds']} s summed over pairs), plaintext tokens found in wire messages: {ex['plaintext_tokens_in_wire']}. "
+          f"{rd['matched_tokens']} matched tokens, {rd['clusters_total']} clusters, **{rd['clusters_disclosed']} disclosed**, {rd['boosted_accounts']} accounts boosted "
+          f"of which {rd['boosted_laundering']} laundering; newly flagged by the radar: {rd['newly_flagged_by_radar']} ({rd['newly_flagged_laundering']} laundering). "
+          f"Disclosed cluster sizes {rd['disclosed_cluster_sizes']}, laundering share per disclosed cluster {rd['disclosed_cluster_laundering_share']}.\n")
+        a(f"Reading: staj_psi AP {m['staj_psi']['average_precision']} is {_cmp(m['staj_psi']['average_precision'], iso['average_precision'])} isolated AP {iso['average_precision']}; "
+          f"naive AP {m['naive_raw_sharing']['average_precision']} is {_cmp(m['naive_raw_sharing']['average_precision'], iso['average_precision'])} isolated; "
+          f"the best simple baseline AP is {max(b['tx_count_topk']['average_precision'], b['distinct_counterparties_topk']['average_precision'])} "
+          f"and random AP {b['random_topk_seeded']['average_precision']}.\n")
+        fl = m["staj_psi"]["failures"]
+        a("Worst false positives (staj_psi, highest score among non-laundering flagged accounts):\n")
+        a("| account | bank | score | n_in | n_out | deg_in | deg_out | drain_24h | flow_ratio | rare_out_share | n_rare_cp | nbr |\n|---|---|---|---|---|---|---|---|---|---|---|---|")
+        for x in fl["worst_false_positives"]:
+            a(f"| {x['client_id']} | {x['bank_id']} | {x['score']} | {x['n_in']} | {x['n_out']} | {x['deg_in']} | {x['deg_out']} | {x['drain_24h']} | {x['flow_ratio']} | {x['rare_out_share']} | {x['n_rare_cp']} | {x['nbr']} |")
+        a("\nMissed laundering accounts with the most laundering transactions (staj_psi):\n")
+        a("| account | bank | score | laundering tx | patterns | n_in | n_out | deg_in | deg_out | drain_24h | flow_ratio |\n|---|---|---|---|---|---|---|---|---|---|---|")
+        for x in fl["missed_laundering_accounts_most_laundering_tx"]:
+            a(f"| {x['client_id']} | {x['bank_id']} | {x['score']} | {x['laundering_tx']} | {', '.join(x['patterns'])} | {x['n_in']} | {x['n_out']} | {x['deg_in']} | {x['deg_out']} | {x['drain_24h']} | {x['flow_ratio']} |")
+        a("")
+
+    a("## 3. Simulated banks\n")
+    a("| bank | canonical rows | accounts |\n|---|---|---|")
+    for bk, v in ing["simulated_banks"].items():
+        a(f"| {bk} | {v['rows']:,} | {v['accounts']:,} |")
+    a(f"\nAttempts per pattern type in the patterns file: {ing['attempts_per_type']}.\n")
+    a("## 4. Honest assessment\n")
+    h, fu = r["windows"]["heldout"], r["windows"]["full"]
+    hi, fi = h["modes"]["isolated"], fu["modes"]["isolated"]
+    a(f"* **The bank-side engine is weak on AMLworld.** Held-out AP {hi['average_precision']} vs prevalence {h['baselines']['prevalence']} "
+      f"(×{round(hi['average_precision'] / h['baselines']['prevalence'], 1)}); full-period AP {fi['average_precision']} vs prevalence {fu['baselines']['prevalence']} "
+      f"(×{round(fi['average_precision'] / fu['baselines']['prevalence'], 1)}). F1 at the calibrated threshold: {hi['overall']['f1']} held-out, {fi['overall']['f1']} full. "
+      f"The F1-optimal threshold flags {round(100 * h['flagged_share_isolated'], 1)} % (held-out) and {round(100 * fu['flagged_share_isolated'], 1)} % (full) of all accounts: "
+      "**not a usable alert volume**. A one-line baseline, distinct counterparties, reaches AP "
+      f"{h['baselines']['distinct_counterparties_topk']['average_precision']} (held-out) and {fu['baselines']['distinct_counterparties_topk']['average_precision']} (full), "
+      f"i.e. it is {_cmp(h['baselines']['distinct_counterparties_topk']['average_precision'], hi['average_precision'])} the isolated engine on the held-out window and "
+      f"{_cmp(fu['baselines']['distinct_counterparties_topk']['average_precision'], fi['average_precision'])} it on the full period.")
+    if "fitted_reference_isolated" in h["baselines"]:
+        fr = h["baselines"]["fitted_reference_isolated"]["average_precision"]
+        a(f"* The evaluation-only logistic fit on the same features reaches held-out AP {fr} (×{round(fr / hi['average_precision'], 1)} the hand-set engine) and P@1000 "
+          f"{h['baselines']['fitted_reference_isolated']['precision_at_k']['1000']}: the hand-set weights leave signal on the table, but even fitted these features stay far from a usable detector.")
+    for wn, wv in (("held-out", h), ("full", fu)):
+        rd = wv["modes"]["staj_psi"]["radar"]
+        sp, iso_ = wv["modes"]["staj_psi"], wv["modes"]["isolated"]
+        share = round(100 * rd["submitted_candidates_laundering_share"], 1)
+        if rd["clusters_disclosed"]:
+            a(f"* **Radar, {wn}**: {rd['clusters_disclosed']} disclosed clusters, {rd['boosted_laundering']} of {rd['boosted_accounts']} boosted accounts are laundering. "
+              f"Ranking effect: AP {iso_['average_precision']} → {sp['average_precision']} ({'lifted' if sp['average_precision'] > iso_['average_precision'] else 'no lift'}), "
+              f"P@100 {iso_['precision_at_k']['100']} → {sp['precision_at_k']['100']}; boosted-account precision {round(rd['boosted_laundering'] / rd['boosted_accounts'], 3)} "
+              f"vs flag precision {iso_['overall']['precision']}. The radar "
+              f"adds {rd['newly_flagged_by_radar']} new flags: the boosted accounts were already above the threshold, so precision/recall/F1 do not change. "
+              f"{share} % of the submitted candidates are laundering accounts.")
+        else:
+            a(f"* **Radar, {wn}**: **no cluster was disclosed** ({rd['matched_tokens']} matched tokens, {rd['clusters_total']} clusters, none spanning ≥ 2 banks with ≥ 3 candidates); "
+              f"staj_psi equals isolated. The token budget covers only the top {min(rd['candidates_submitted'].values())}–{max(rd['candidates_submitted'].values())} candidates per bank "
+              f"(of {min(rd['candidates_in_band'].values()):,}–{max(rd['candidates_in_band'].values()):,} in the band), and only {share} % of the submitted candidates are laundering accounts.")
+    nh, nf = h["modes"]["naive_raw_sharing"], fu["modes"]["naive_raw_sharing"]
+    a(f"* **naive_raw_sharing is not an upper bound** with this engine: F1 {nh['overall']['f1']} vs isolated {hi['overall']['f1']} (held-out), {nf['overall']['f1']} vs {fi['overall']['f1']} (full). "
+      "Pooling changes counterparty degrees (fewer tokens count as 'rare') and lets the neighbour pass see every account. It exposes "
+      f"{nf['exposure']['raw_records_exposed']:,} rows ({nf['exposure']['bytes_exchanged_parquet']:,} bytes as parquet) over the full period; staj_psi exposes 0 raw records and "
+      f"{fu['modes']['staj_psi']['exposure']['bytes_exchanged']:,} bytes of blinded group elements.")
+    pp = {k: v["account_recall"] for k, v in hi["per_pattern"].items() if k in PATTERN_TYPES and v["account_recall"] is not None}
+    best = sorted(pp, key=lambda k: -pp[k])[:2]
+    worst = sorted(pp, key=lambda k: pp[k])[:3]
+    a(f"* **Pattern types (held-out, isolated)**: best account recall {', '.join(f'{k} {pp[k]}' for k in best)}; worst {', '.join(f'{k} {pp[k]}' for k in worst)}. "
+      "Pass-through members (e.g. of cycles) look like flow-through accounts and are found more often. The most-missed accounts are the patterns' endpoints: pure senders "
+      "(n_in = 0, e.g. fan-out and scatter-gather sources) and pure receivers (n_out = 0, e.g. fan-in sinks), for which every flow-through feature is 0 (see the missed-accounts tables). "
+      "Token matching on shared counterparties cannot link a chain across banks (consecutive hops share no counterparty); submitting the candidate's OWN account token would, "
+      "but discloses more and was not evaluated.")
+    wf = fu["modes"]["staj_psi"]["failures"]["worst_false_positives"]
+    hi_nbr = sum(1 for x in wf if x["nbr"] >= 0.9)
+    hi_drain = sum(1 for x in wf if x["drain_24h"] >= 0.95 and x["rare_out_share"] >= 0.95)
+    a(f"* **Worst false positives** (full period): {hi_nbr} of the top {len(wf)} have a neighbour score ≥ 0.9 (groups of mutually high-scoring accounts inside one simulated bank "
+      f"reinforce each other through the neighbour pass); {hi_drain} of {len(wf)} send ≥ 95 % of their largest inflow on within 24 h, ≥ 95 % of outflow to rare counterparties. "
+      "Under these features they are indistinguishable from mules; that is a weakness of the features and of the second pass.")
+    tl = r["ingest"]["tail_days_2022_09_11_to_18"]
+    a(f"* The held-out window is unusual: 2022-09-10 is a partial day and 2022-09-11 … 09-18 hold only {tl['rows']:,} rows, {tl['laundering']:,} of them laundering (tail of attempts). "
+      "Features see only rows inside the window, so held-out accounts have at most ~9 days of history.\n")
+    a("## 4b. Deviations from the design brief (and why)\n")
+    a("1. **Split**: the brief allows 'report on the later days'. Days 10–18 hold only "
+      f"{h['source_transactions_non_self']:,} of {r['ingest']['source_rows'] - r['ingest']['self_transfers_dropped']:,} non-self transactions, so the full period is reported as well, "
+      "labelled as containing the calibration days.")
+    a("2. **PSI orchestration**: one `run_radar` over all 5 banks runs its 10 pair sessions sequentially "
+      f"(~{round(fu['modes']['staj_psi']['exposure']['psi_sequential_seconds'])} s of PSI summed over pairs in the full window). Each pair therefore calls `run_radar` on that pair in its own process, and the "
+      "coordinator re-clusters the union with `build_clusters` (identical connected components, unit-tested on a 3-bank example). Token budget "
+      f"{r['radar_config']['max_tokens_per_bank']} per bank, kept below `radar.psi.dh_psi.PARALLEL_MIN` so the per-pair processes do not start nested process pools. "
+      "Note: `radar/psi/dh_psi.py` was changed by another engineer during this work (256-bit secret exponents, Jacobi-symbol subgroup check, optional process pool); "
+      "the numbers here come from the version on disk at generation time, and the per-run benchmark above is the measured cost.")
+    a(f"3. **Accounts**: the source has {r['ingest']['accounts_in_source']:,} accounts; {r['ingest']['accounts_in_source'] - r['ingest']['accounts']:,} of them appear only in self-transfers, "
+      f"which are dropped, leaving {r['ingest']['accounts']:,}. Laundering accounts lost that way: {r['ingest']['accounts_labelled_only_via_self_transfers']}.")
+    a(f"4. **Patterns file** lines matched to {r['ingest']['pattern_lines_matched_to_transactions']:,} laundering transactions; laundering accounts outside the file are reported as `unattributed`.")
+    a("5. **Post-match lag/retention exchange** ('same hand global') is not used on IBM; it would add disclosure without a tested benefit here.\n")
+    a("## 5. Limitations (exact)\n")
+    a("1. Synthetic data; generic AMLworld laundering patterns, **not** Czech mule schemes; results say nothing about real portfolios.")
+    a("2. FX is a hand-typed **placeholder** table (approximate public rates); it differs from the dataset's own implied rates (§6). Amounts enter only ratios and log-materiality.")
+    a("3. Weights are hand-set; only the flag threshold was chosen on calibration labels (days 1–9). The engine design (D1/D5 features) predates this run; the payment-format/label crosstab was "
+      "seen during data exploration and payment format is deliberately NOT a feature.")
+    a("4. The simulated bank split is a hash of IBM bank ids; real banks differ in size and customer mix.")
+    fr_ = r["windows"]["full"]["modes"]["staj_psi"]["radar"]
+    a(f"5. The radar is limited by DH-PSI cost and the token budget: {min(fr_['candidates_submitted'].values())}–{max(fr_['candidates_submitted'].values())} candidates per bank enter PSI "
+      f"(full period) out of {min(fr_['candidates_in_band'].values()):,}–{max(fr_['candidates_in_band'].values()):,} in the band, so most of the band never enters PSI. "
+      "Pair sessions run in parallel processes on one laptop; nodes are not separate machines.")
+    a("6. Security model is semi-honest. A malicious bank could submit arbitrary tokens to probe whether an account is a candidate elsewhere, inject fake tokens to create or enlarge "
+      "clusters (poisoning), or abort after learning its result. Mitigations in this code: Guards (minimum set size, max tokens, rate limit, share of unscored tokens), disclosure only "
+      "for ≥ 2 banks and ≥ 3 candidates, only keyed token ids reach the coordinator, humans decide. Not mitigated: a bank that scores fake accounts to pass the 'scored' check, collusion "
+      "of two banks, traffic analysis by the coordinator. PSI minimises disclosure; it is **not a legal basis** for sharing.")
+    a("7. `naive_raw_sharing` is a privacy-exposure reference, not a detection upper bound.\n")
+    a("## 6. Placeholder FX vs rates implied by the dataset\n")
+    a("| currency | placeholder USD/unit | dataset-implied median | relative deviation | rows |\n|---|---|---|---|---|")
+    for c, v in r["fx_placeholder_check"].items():
+        a(f"| {c} | {v['placeholder']} | {v['dataset_implied_median']} | {v['relative_deviation']} | {v['n_rows']} |")
+    a("\n## 7. Reproduce\n")
+    a("```bash\ncd staj\nPYTHONIOENCODING=utf-8 PYTHONPATH=. .venv/Scripts/python -m pytest tests/unit/test_ibm.py -q\n"
+      "PYTHONIOENCODING=utf-8 PYTHONPATH=. .venv/Scripts/python -m eval.ibm_eval   # writes eval/out/ibm_eval.json and docs/IBM_EVAL.md\n```\n")
+    a(f"Total runtime of the generating run: {r['total_seconds']} s. Deterministic except wall times (PSI exponents are fresh per session; matches do not depend on them).\n")
+    return "\n".join(L)
 
 
 if __name__ == "__main__":

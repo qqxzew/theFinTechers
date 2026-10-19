@@ -9,3 +9,11 @@ ignore = ["E501"]
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+
+[tool.mypy]
+ignore_missing_imports = true
+follow_imports = "silent"
+files = ["common", "audit", "radar/psi", "radar/clustering.py", "radar/guards.py", "escalation", "export", "copilot/budgets.py", "copilot/qa.py", "node/cases", "node/rules"]
+# strict on the core decision/crypto/governance packages; bare `dict` / `list` generics are tolerated (documented in METHODOLOGY.md)
+strict = true
+disallow_any_generics = false

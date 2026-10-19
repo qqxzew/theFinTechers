@@ -65,12 +65,13 @@ def detect_group(rows: list[dict], ctx: dict) -> list[Signal]:
     if not real:
         return []
     rng = random.Random(cfg.get("seed", 0))
+    pool = [r for r in rows if r.get("lag_median_h") is not None and r.get("retention_median") is not None and r.get("hour_hist")]
+    pool = pool if len(pool) >= len(cand) else cand
     base = []
     for _ in range(cfg.get("baseline_runs", 20)):
-        perm = list(range(len(cand)))
-        rng.shuffle(perm)
-        shuffled = [{**cand[i], "lag_median_h": cand[perm[i]]["lag_median_h"], "retention_median": cand[perm[i]]["retention_median"],
-                     "hour_hist": cand[perm[i]]["hour_hist"]} for i in range(len(cand))]
+        draw = rng.sample(pool, len(cand))     # null: behaviour of random clients of the same bank, tokens kept
+        shuffled = [{**cand[i], "lag_median_h": draw[i]["lag_median_h"], "retention_median": draw[i]["retention_median"],
+                     "hour_hist": draw[i]["hour_hist"]} for i in range(len(cand))]
         base.append(len(_pairs(shuffled, cfg)))
     baseline = sum(base) / len(base)
     lift = len(real) / (baseline + 1.0)

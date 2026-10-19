@@ -13,7 +13,9 @@ legal basis for sharing.
 from __future__ import annotations
 
 import hashlib
+import os
 import secrets
+from concurrent.futures import ProcessPoolExecutor
 
 P = int(
     "FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DD"
@@ -26,6 +28,43 @@ P = int(
 )
 Q = (P - 1) // 2
 HEX_LEN = 512  # 2048 bits
+EXP_BITS = 256        # secret exponent size: NIST SP 800-56A / RFC 3526 allow short exponents for the 2048-bit group (>= 224 bits for 112-bit security)
+PARALLEL_MIN = 2000   # below this many elements the process pool costs more than it saves
+_POOL: ProcessPoolExecutor | None = None
+
+
+def _jacobi(a: int, n: int) -> int:
+    """Jacobi symbol (a|n) for odd n > 0. For the safe prime P, (x|P) = 1 exactly when x lies in the prime-order subgroup."""
+    a %= n
+    result = 1
+    while a:
+        while a % 2 == 0:
+            a //= 2
+            if n % 8 in (3, 5):
+                result = -result
+        a, n = n, a
+        if a % 4 == 3 and n % 4 == 3:
+            result = -result
+        a %= n
+    return result if n == 1 else 0
+
+
+def _pow_chunk(args: tuple[list[int], int]) -> list[int]:
+    bases, k = args
+    return [pow(b, k, P) for b in bases]
+
+
+def modexp_many(bases: list[int], k: int) -> list[int]:
+    """[b^k mod P for b in bases], spread over CPU cores for large batches (same results as the serial loop)."""
+    global _POOL
+    workers = os.cpu_count() or 1
+    if len(bases) < PARALLEL_MIN or workers < 2:
+        return [pow(b, k, P) for b in bases]
+    if _POOL is None:
+        _POOL = ProcessPoolExecutor(max_workers=workers)
+    size = -(-len(bases) // workers)
+    chunks = [(bases[i:i + size], k) for i in range(0, len(bases), size)]
+    return [v for part in _POOL.map(_pow_chunk, chunks) for v in part]
 
 
 def hash_to_group(token: str, domain: str) -> int:
@@ -44,7 +83,7 @@ def _enc(x: int) -> str:
 
 def _dec(s: str) -> int:
     x = int(s, 16)
-    if not 1 < x < P - 1 or pow(x, Q, P) != 1:
+    if not 1 < x < P - 1 or _jacobi(x, P) != 1:
         raise ValueError("element not in the prime-order subgroup")
     return x
 
@@ -61,20 +100,20 @@ class PsiParty:
     def __init__(self, tokens: list[str], domain: str) -> None:
         self.tokens = list(dict.fromkeys(tokens))
         self.domain = domain
-        self._k = secrets.randbelow(Q - 2) + 2
+        self._k = secrets.randbits(EXP_BITS) | (1 << (EXP_BITS - 1))   # fresh per session
         self._rng = secrets.SystemRandom()
         self._perm: list[int] = []
         self._peer_double: set[int] = set()
 
     def blind(self) -> list[str]:
         """Round 1: shuffled H(x)^k for own tokens. The permutation is kept locally."""
-        vals = [pow(hash_to_group(t, self.domain), self._k, P) for t in self.tokens]
+        vals = modexp_many([hash_to_group(t, self.domain) for t in self.tokens], self._k)
         out, self._perm = _shuffled(vals, self._rng)
         return [_enc(v) for v in out]
 
     def respond(self, incoming: list[str], cardinality_only: bool = False) -> tuple[list[str], list[str]]:
         """Responder: raise the initiator's elements to k (same order, or shuffled for cardinality-only) and send own blinded set."""
-        double = [pow(_dec(e), self._k, P) for e in incoming]
+        double = modexp_many([_dec(e) for e in incoming], self._k)
         self._peer_double = set(double)
         if cardinality_only:
             self._rng.shuffle(double)
@@ -82,7 +121,7 @@ class PsiParty:
 
     def finish(self, double_blinded_mine: list[str], other_blinded: list[str], cardinality_only: bool = False) -> tuple[set[str] | int, list[str]]:
         """Initiator: intersect. Returns (tokens | cardinality, own double-blinding of the responder's set in received order)."""
-        theirs_double = [pow(_dec(e), self._k, P) for e in other_blinded]
+        theirs_double = modexp_many([_dec(e) for e in other_blinded], self._k)
         lookup = set(theirs_double)
         mine = [_dec(e) for e in double_blinded_mine]
         back = [_enc(v) for v in theirs_double]

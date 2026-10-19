@@ -1,0 +1,2253 @@
+{
+  "synthetic": true,
+  "dataset": "IBM AMLworld HI-Small (Altman et al., NeurIPS 2023 Datasets & Benchmarks), Kaggle ealtman2019/ibm-transactions-for-anti-money-laundering-aml",
+  "note": "Generic laundering patterns from the AMLworld generator, NOT Czech money-mule schemes. Placeholder FX table. Hand-set weights.",
+  "generated_at_utc": "2026-10-19T17:33:33+00:00",
+  "config_path": "config/ibm.yaml",
+  "config_sha256": "e4fb7cf63916c2cef3ac81f707b7512404951c6b633874c4f6a595f6c087d73e",
+  "split": {
+    "calibration": {
+      "start": "2022-09-01",
+      "end": "2022-09-10"
+    },
+    "heldout": {
+      "start": "2022-09-10",
+      "end": "2022-09-19"
+    },
+    "full": {
+      "start": "2022-09-01",
+      "end": "2022-09-19"
+    },
+    "rule": "labels of the calibration window are used for exactly one choice (the flag threshold); weights are hand-set; the held-out window was never used for any choice; 'full' contains the calibration days and is labelled so",
+    "features_per_window": "features are computed only from rows inside the window"
+  },
+  "ingest": {
+    "source_rows": 5078345,
+    "self_transfers_dropped": 591212,
+    "accounts_in_source": 515088,
+    "tail_days_2022_09_11_to_18": {
+      "rows": 1108,
+      "laundering": 655
+    },
+    "laundering_self_transfers_dropped": 11,
+    "accounts_labelled_only_via_self_transfers": 0,
+    "canonical_rows": 8974266,
+    "accounts": 422734,
+    "ibm_banks": 30528,
+    "laundering_accounts_non_self": 6357,
+    "pattern_lines": 3209,
+    "pattern_lines_matched_to_transactions": 3209,
+    "attempts": 370,
+    "attempts_per_type": {
+      "bipartite": 49,
+      "cycle": 54,
+      "fan-in": 40,
+      "fan-out": 48,
+      "gather-scatter": 51,
+      "random": 41,
+      "scatter-gather": 44,
+      "stack": 43
+    },
+    "simulated_banks": {
+      "B1": {
+        "rows": 2084316,
+        "accounts": 95469
+      },
+      "B2": {
+        "rows": 1891019,
+        "accounts": 91934
+      },
+      "B3": {
+        "rows": 1473821,
+        "accounts": 77778
+      },
+      "B4": {
+        "rows": 1949582,
+        "accounts": 76479
+      },
+      "B5": {
+        "rows": 1575528,
+        "accounts": 81074
+      }
+    },
+    "seconds": 4.5
+  },
+  "fx_placeholder_check": {
+    "Australian Dollar": {
+      "placeholder": 0.68,
+      "dataset_implied_median": 0.707814,
+      "n_rows": 147,
+      "relative_deviation": -0.039
+    },
+    "Bitcoin": {
+      "placeholder": 20000.0,
+      "dataset_implied_median": 11881.623158,
+      "n_rows": 13,
+      "relative_deviation": 0.683
+    },
+    "Brazil Real": {
+      "placeholder": 0.19,
+      "dataset_implied_median": 0.177101,
+      "n_rows": 81,
+      "relative_deviation": 0.073
+    },
+    "Canadian Dollar": {
+      "placeholder": 0.75,
+      "dataset_implied_median": 0.757978,
+      "n_rows": 560,
+      "relative_deviation": -0.011
+    },
+    "Euro": {
+      "placeholder": 1.0,
+      "dataset_implied_median": 1.171783,
+      "n_rows": 11060,
+      "relative_deviation": -0.147
+    },
+    "Mexican Peso": {
+      "placeholder": 0.05,
+      "dataset_implied_median": 0.047297,
+      "n_rows": 292,
+      "relative_deviation": 0.057
+    },
+    "Ruble": {
+      "placeholder": 0.0165,
+      "dataset_implied_median": 0.012853,
+      "n_rows": 170,
+      "relative_deviation": 0.284
+    },
+    "Rupee": {
+      "placeholder": 0.0125,
+      "dataset_implied_median": 0.013616,
+      "n_rows": 803,
+      "relative_deviation": -0.082
+    },
+    "Saudi Riyal": {
+      "placeholder": 0.266,
+      "dataset_implied_median": 0.266588,
+      "n_rows": 64,
+      "relative_deviation": -0.002
+    },
+    "Shekel": {
+      "placeholder": 0.29,
+      "dataset_implied_median": 0.296121,
+      "n_rows": 47,
+      "relative_deviation": -0.021
+    },
+    "Swiss Franc": {
+      "placeholder": 1.03,
+      "dataset_implied_median": 1.092896,
+      "n_rows": 220,
+      "relative_deviation": -0.058
+    },
+    "UK Pound": {
+      "placeholder": 1.15,
+      "dataset_implied_median": 1.291656,
+      "n_rows": 1772,
+      "relative_deviation": -0.11
+    },
+    "Yen": {
+      "placeholder": 0.007,
+      "dataset_implied_median": 0.009488,
+      "n_rows": 1045,
+      "relative_deviation": -0.262
+    },
+    "Yuan": {
+      "placeholder": 0.144,
+      "dataset_implied_median": 0.149307,
+      "n_rows": 6675,
+      "relative_deviation": -0.036
+    }
+  },
+  "psi_benchmark": {
+    "n_tokens": 300,
+    "seconds": 4.077,
+    "ms_per_token_per_pair_session": 13.59
+  },
+  "threshold": {
+    "threshold": -2.9369,
+    "calibration_f1": 0.0464,
+    "calibration_precision": 0.0248,
+    "calibration_recall": 0.3647,
+    "calibration_flagged": 78604,
+    "grid_size": 306,
+    "rule": "argmax pooled account-level F1 of the isolated mode on the calibration window; ties -> higher threshold",
+    "calibration_average_precision": 0.0268,
+    "calibration_accounts": 419212,
+    "calibration_laundering_accounts": 5339,
+    "fitted_reference_calibration_average_precision": 0.0522
+  },
+  "engine": {
+    "name": "IBM-scale vectorised variant of D1 flow-through+ / D5 rare-exit concentration (own design)",
+    "weights": {
+      "bias": -7.0,
+      "drain_24h": 2.0,
+      "flow_ratio": 1.5,
+      "low_retention": 0.5,
+      "rare_out_share": 1.0,
+      "log_n_rare_cp": 0.5,
+      "log_deg_in": 0.5,
+      "log10_max_in_24h": 0.15,
+      "neighbour": 2.0
+    },
+    "features": [
+      "n_in",
+      "n_out",
+      "sum_in",
+      "sum_out",
+      "deg_in",
+      "deg_out",
+      "max_in_24h",
+      "drain_24h",
+      "lag_h",
+      "flow_ratio",
+      "retention",
+      "rare_out_share",
+      "n_rare_cp",
+      "nbr"
+    ]
+  },
+  "radar_config": {
+    "candidate_offset": 1.5,
+    "token_max_degree": 3,
+    "tokens_per_candidate": 4,
+    "max_tokens_per_bank": 1500,
+    "workers": 10,
+    "cluster_boost": 2.0,
+    "epoch_key": "ibm-eval-epoch-1",
+    "bank_secret_prefix": "ibm-secret-",
+    "guards_from": "config/thresholds.yaml"
+  },
+  "guards": {
+    "min_set_size": 5,
+    "max_tokens": 5000,
+    "max_sessions_per_hour": 20,
+    "max_unscored_share": 0.2
+  },
+  "fitted_reference_model": {
+    "columns": [
+      "drain_24h",
+      "flow_ratio",
+      "lowret",
+      "rare_out_share",
+      "l_rare",
+      "l_deg_in",
+      "l_max24",
+      "nbr",
+      "l_n_in",
+      "l_n_out",
+      "l_deg_out"
+    ],
+    "standardised_weights": [
+      -4.7452,
+      0.0329,
+      0.0946,
+      0.1215,
+      0.3523,
+      -0.7259,
+      1.4232,
+      0.2753,
+      0.0727,
+      -0.4799,
+      -0.6316,
+      0.9323
+    ],
+    "note": "evaluation-only; fitted on calibration labels; not used for any flag"
+  },
+  "windows": {
+    "heldout": {
+      "window": {
+        "start": "2022-09-10",
+        "end": "2022-09-19"
+      },
+      "rows": 409298,
+      "flagged_share_isolated": 0.0693,
+      "source_transactions_non_self": 204649,
+      "accounts": 148181,
+      "laundering_accounts": 1304,
+      "laundering_transactions_non_self": 1093,
+      "accounts_per_bank": {
+        "B1": 35003,
+        "B2": 32949,
+        "B3": 26276,
+        "B4": 26125,
+        "B5": 27828
+      },
+      "laundering_accounts_per_bank": {
+        "B1": 303,
+        "B2": 318,
+        "B3": 236,
+        "B4": 228,
+        "B5": 219
+      },
+      "modes": {
+        "isolated": {
+          "overall": {
+            "tp": 246,
+            "fp": 10024,
+            "fn": 1058,
+            "flagged": 10270,
+            "positives": 1304,
+            "precision": 0.024,
+            "recall": 0.1887,
+            "f1": 0.0425
+          },
+          "average_precision": 0.037,
+          "precision_at_k": {
+            "50": 0.46,
+            "100": 0.31,
+            "500": 0.116,
+            "1000": 0.072
+          },
+          "tx_level": {
+            "tp": 629,
+            "fp": 70759,
+            "fn": 464,
+            "precision": 0.0088,
+            "recall": 0.5755,
+            "f1": 0.0174
+          },
+          "per_bank": {
+            "B1": {
+              "tp": 51,
+              "fp": 2549,
+              "fn": 252,
+              "flagged": 2600,
+              "positives": 303,
+              "precision": 0.0196,
+              "recall": 0.1683,
+              "f1": 0.0351,
+              "accounts": 35003,
+              "average_precision": 0.0289,
+              "rows": 94998
+            },
+            "B2": {
+              "tp": 63,
+              "fp": 2157,
+              "fn": 255,
+              "flagged": 2220,
+              "positives": 318,
+              "precision": 0.0284,
+              "recall": 0.1981,
+              "f1": 0.0496,
+              "accounts": 32949,
+              "average_precision": 0.0421,
+              "rows": 86105
+            },
+            "B3": {
+              "tp": 50,
+              "fp": 1703,
+              "fn": 186,
+              "flagged": 1753,
+              "positives": 236,
+              "precision": 0.0285,
+              "recall": 0.2119,
+              "f1": 0.0503,
+              "accounts": 26276,
+              "average_precision": 0.0424,
+              "rows": 67898
+            },
+            "B4": {
+              "tp": 43,
+              "fp": 1796,
+              "fn": 185,
+              "flagged": 1839,
+              "positives": 228,
+              "precision": 0.0234,
+              "recall": 0.1886,
+              "f1": 0.0416,
+              "accounts": 26125,
+              "average_precision": 0.0386,
+              "rows": 88025
+            },
+            "B5": {
+              "tp": 39,
+              "fp": 1819,
+              "fn": 180,
+              "flagged": 1858,
+              "positives": 219,
+              "precision": 0.021,
+              "recall": 0.1781,
+              "f1": 0.0376,
+              "accounts": 27828,
+              "average_precision": 0.0428,
+              "rows": 72272
+            }
+          },
+          "best_single_bank": "B3",
+          "best_single_bank_f1": 0.0503,
+          "mean_bank_precision": 0.0242,
+          "mean_bank_recall": 0.189,
+          "mean_bank_f1": 0.0428,
+          "per_pattern": {
+            "fan-out": {
+              "accounts": 113,
+              "accounts_flagged": 15,
+              "account_recall": 0.1327,
+              "attempts": 17,
+              "attempts_with_a_flagged_account": 10,
+              "attempt_recall": 0.5882
+            },
+            "fan-in": {
+              "accounts": 112,
+              "accounts_flagged": 13,
+              "account_recall": 0.1161,
+              "attempts": 16,
+              "attempts_with_a_flagged_account": 8,
+              "attempt_recall": 0.5
+            },
+            "gather-scatter": {
+              "accounts": 327,
+              "accounts_flagged": 41,
+              "account_recall": 0.1254,
+              "attempts": 31,
+              "attempts_with_a_flagged_account": 24,
+              "attempt_recall": 0.7742
+            },
+            "scatter-gather": {
+              "accounts": 154,
+              "accounts_flagged": 40,
+              "account_recall": 0.2597,
+              "attempts": 20,
+              "attempts_with_a_flagged_account": 11,
+              "attempt_recall": 0.55
+            },
+            "cycle": {
+              "accounts": 86,
+              "accounts_flagged": 65,
+              "account_recall": 0.7558,
+              "attempts": 17,
+              "attempts_with_a_flagged_account": 14,
+              "attempt_recall": 0.8235
+            },
+            "random": {
+              "accounts": 76,
+              "accounts_flagged": 44,
+              "account_recall": 0.5789,
+              "attempts": 14,
+              "attempts_with_a_flagged_account": 11,
+              "attempt_recall": 0.7857
+            },
+            "bipartite": {
+              "accounts": 83,
+              "accounts_flagged": 7,
+              "account_recall": 0.0843,
+              "attempts": 12,
+              "attempts_with_a_flagged_account": 5,
+              "attempt_recall": 0.4167
+            },
+            "stack": {
+              "accounts": 114,
+              "accounts_flagged": 17,
+              "account_recall": 0.1491,
+              "attempts": 18,
+              "attempts_with_a_flagged_account": 12,
+              "attempt_recall": 0.6667
+            },
+            "unattributed": {
+              "accounts": 291,
+              "accounts_flagged": 33,
+              "account_recall": 0.1134,
+              "note": "laundering accounts whose laundering transactions are not listed in the patterns file"
+            }
+          },
+          "exposure": {
+            "raw_records_exposed": 0,
+            "bytes_exchanged": 0
+          },
+          "engine_seconds": 0.24
+        },
+        "staj_psi": {
+          "overall": {
+            "tp": 246,
+            "fp": 10024,
+            "fn": 1058,
+            "flagged": 10270,
+            "positives": 1304,
+            "precision": 0.024,
+            "recall": 0.1887,
+            "f1": 0.0425
+          },
+          "average_precision": 0.0509,
+          "precision_at_k": {
+            "50": 0.72,
+            "100": 0.47,
+            "500": 0.134,
+            "1000": 0.075
+          },
+          "tx_level": {
+            "tp": 629,
+            "fp": 70759,
+            "fn": 464,
+            "precision": 0.0088,
+            "recall": 0.5755,
+            "f1": 0.0174
+          },
+          "per_pattern": {
+            "fan-out": {
+              "accounts": 113,
+              "accounts_flagged": 15,
+              "account_recall": 0.1327,
+              "attempts": 17,
+              "attempts_with_a_flagged_account": 10,
+              "attempt_recall": 0.5882
+            },
+            "fan-in": {
+              "accounts": 112,
+              "accounts_flagged": 13,
+              "account_recall": 0.1161,
+              "attempts": 16,
+              "attempts_with_a_flagged_account": 8,
+              "attempt_recall": 0.5
+            },
+            "gather-scatter": {
+              "accounts": 327,
+              "accounts_flagged": 41,
+              "account_recall": 0.1254,
+              "attempts": 31,
+              "attempts_with_a_flagged_account": 24,
+              "attempt_recall": 0.7742
+            },
+            "scatter-gather": {
+              "accounts": 154,
+              "accounts_flagged": 40,
+              "account_recall": 0.2597,
+              "attempts": 20,
+              "attempts_with_a_flagged_account": 11,
+              "attempt_recall": 0.55
+            },
+            "cycle": {
+              "accounts": 86,
+              "accounts_flagged": 65,
+              "account_recall": 0.7558,
+              "attempts": 17,
+              "attempts_with_a_flagged_account": 14,
+              "attempt_recall": 0.8235
+            },
+            "random": {
+              "accounts": 76,
+              "accounts_flagged": 44,
+              "account_recall": 0.5789,
+              "attempts": 14,
+              "attempts_with_a_flagged_account": 11,
+              "attempt_recall": 0.7857
+            },
+            "bipartite": {
+              "accounts": 83,
+              "accounts_flagged": 7,
+              "account_recall": 0.0843,
+              "attempts": 12,
+              "attempts_with_a_flagged_account": 5,
+              "attempt_recall": 0.4167
+            },
+            "stack": {
+              "accounts": 114,
+              "accounts_flagged": 17,
+              "account_recall": 0.1491,
+              "attempts": 18,
+              "attempts_with_a_flagged_account": 12,
+              "attempt_recall": 0.6667
+            },
+            "unattributed": {
+              "accounts": 291,
+              "accounts_flagged": 33,
+              "account_recall": 0.1134,
+              "note": "laundering accounts whose laundering transactions are not listed in the patterns file"
+            }
+          },
+          "exposure": {
+            "raw_records_exposed": 0,
+            "blinded_elements": 60000,
+            "bytes_exchanged": 15360000,
+            "match_rows_to_coordinator": 271,
+            "plaintext_tokens_in_wire": 0,
+            "psi_wall_seconds": 35.59,
+            "psi_sequential_seconds": 330.88
+          },
+          "radar": {
+            "refused": {},
+            "pairs": [
+              {
+                "pair": "B1:B2",
+                "seconds": 32.73,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              },
+              {
+                "pair": "B1:B3",
+                "seconds": 32.41,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              },
+              {
+                "pair": "B1:B4",
+                "seconds": 33.14,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              },
+              {
+                "pair": "B1:B5",
+                "seconds": 32.95,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              },
+              {
+                "pair": "B2:B3",
+                "seconds": 33.47,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              },
+              {
+                "pair": "B2:B4",
+                "seconds": 33.28,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              },
+              {
+                "pair": "B2:B5",
+                "seconds": 33.44,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              },
+              {
+                "pair": "B3:B4",
+                "seconds": 32.78,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              },
+              {
+                "pair": "B3:B5",
+                "seconds": 33.67,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              },
+              {
+                "pair": "B4:B5",
+                "seconds": 33.01,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              }
+            ],
+            "clusters_total": 105,
+            "clusters_disclosed": 18,
+            "matched_tokens": 126,
+            "boosted_accounts": 63,
+            "boosted_laundering": 36,
+            "newly_flagged_by_radar": 0,
+            "newly_flagged_laundering": 0,
+            "candidates_in_band": {
+              "B1": 5464,
+              "B2": 4820,
+              "B3": 3718,
+              "B4": 3964,
+              "B5": 4001
+            },
+            "candidates_submitted": {
+              "B1": 575,
+              "B2": 593,
+              "B3": 583,
+              "B4": 577,
+              "B5": 578
+            },
+            "submitted_candidates_laundering_share": 0.0379,
+            "tokens_submitted": {
+              "B1": 1500,
+              "B2": 1500,
+              "B3": 1500,
+              "B4": 1500,
+              "B5": 1500
+            },
+            "disclosed_cluster_sizes": [
+              6,
+              6,
+              4,
+              4,
+              4,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3
+            ],
+            "disclosed_cluster_laundering_share": [
+              0.833,
+              0.833,
+              0.75,
+              1.0,
+              1.0,
+              1.0,
+              0.0,
+              1.0,
+              0.0,
+              0.0,
+              0.0,
+              1.0,
+              1.0,
+              1.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "failures": {
+            "worst_false_positives": [
+              {
+                "client_id": "01665:800761870",
+                "bank_id": "B1",
+                "score": 1.883,
+                "n_in": 2,
+                "n_out": 7,
+                "sum_in": 15697.37,
+                "sum_out": 15428.47,
+                "deg_in": 1,
+                "deg_out": 3,
+                "max_in_24h": 15697.37,
+                "drain_24h": 1.0,
+                "lag_h": 1.6,
+                "flow_ratio": 0.983,
+                "retention": 0.017,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 4,
+                "nbr": 0.064
+              },
+              {
+                "client_id": "00513:8003FB970",
+                "bank_id": "B4",
+                "score": 1.631,
+                "n_in": 3,
+                "n_out": 4,
+                "sum_in": 13048.87,
+                "sum_out": 12825.72,
+                "deg_in": 1,
+                "deg_out": 2,
+                "max_in_24h": 13048.87,
+                "drain_24h": 1.0,
+                "lag_h": 6.967,
+                "flow_ratio": 0.983,
+                "retention": 0.017,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 3,
+                "nbr": 0.0
+              },
+              {
+                "client_id": "01688:8006E2C50",
+                "bank_id": "B4",
+                "score": 1.589,
+                "n_in": 2,
+                "n_out": 6,
+                "sum_in": 200641.83,
+                "sum_out": 240026.91,
+                "deg_in": 1,
+                "deg_out": 2,
+                "max_in_24h": 200641.83,
+                "drain_24h": 1.0,
+                "lag_h": 2.167,
+                "flow_ratio": 0.836,
+                "retention": 0.0,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 3,
+                "nbr": 0.0
+              },
+              {
+                "client_id": "012:80043B820",
+                "bank_id": "B1",
+                "score": 1.517,
+                "n_in": 2,
+                "n_out": 1,
+                "sum_in": 895.18,
+                "sum_out": 917.18,
+                "deg_in": 1,
+                "deg_out": 1,
+                "max_in_24h": 895.18,
+                "drain_24h": 1.0,
+                "lag_h": 0.833,
+                "flow_ratio": 0.976,
+                "retention": 0.0,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 2,
+                "nbr": 0.107
+              },
+              {
+                "client_id": "024:80431BD70",
+                "bank_id": "B2",
+                "score": 1.282,
+                "n_in": 5,
+                "n_out": 1,
+                "sum_in": 377.953,
+                "sum_out": 494.613,
+                "deg_in": 2,
+                "deg_out": 1,
+                "max_in_24h": 377.953,
+                "drain_24h": 1.0,
+                "lag_h": 0.433,
+                "flow_ratio": 0.764,
+                "retention": 0.0,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 3,
+                "nbr": 0.003
+              },
+              {
+                "client_id": "022345:8065FB560",
+                "bank_id": "B2",
+                "score": 1.229,
+                "n_in": 1,
+                "n_out": 3,
+                "sum_in": 3105.14,
+                "sum_out": 4037.6,
+                "deg_in": 1,
+                "deg_out": 2,
+                "max_in_24h": 3105.14,
+                "drain_24h": 1.0,
+                "lag_h": 11.55,
+                "flow_ratio": 0.769,
+                "retention": 0.0,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 3,
+                "nbr": 0.006
+              },
+              {
+                "client_id": "001411:800CC5050",
+                "bank_id": "B4",
+                "score": 1.195,
+                "n_in": 1,
+                "n_out": 4,
+                "sum_in": 260.6,
+                "sum_out": 255.86,
+                "deg_in": 1,
+                "deg_out": 1,
+                "max_in_24h": 260.6,
+                "drain_24h": 0.982,
+                "lag_h": 10.883,
+                "flow_ratio": 0.982,
+                "retention": 0.018,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 2,
+                "nbr": 0.0
+              },
+              {
+                "client_id": "024132:80B454930",
+                "bank_id": "B4",
+                "score": 1.086,
+                "n_in": 2,
+                "n_out": 2,
+                "sum_in": 393.21,
+                "sum_out": 453.33,
+                "deg_in": 1,
+                "deg_out": 1,
+                "max_in_24h": 393.21,
+                "drain_24h": 1.0,
+                "lag_h": 18.133,
+                "flow_ratio": 0.867,
+                "retention": 0.0,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 2,
+                "nbr": 0.0
+              }
+            ],
+            "missed_laundering_accounts_most_laundering_tx": [
+              {
+                "client_id": "0011128:80465E020",
+                "bank_id": "B2",
+                "score": -3.093,
+                "n_in": 22,
+                "n_out": 0,
+                "sum_in": 1832497.089,
+                "sum_out": 0.0,
+                "deg_in": 16,
+                "deg_out": 0,
+                "max_in_24h": 1776497.163,
+                "drain_24h": 0.0,
+                "lag_h": null,
+                "flow_ratio": 0.0,
+                "retention": 1.0,
+                "rare_out_share": 0.0,
+                "n_rare_cp": 16,
+                "nbr": 0.068,
+                "laundering_tx": 16,
+                "patterns": [
+                  "scatter-gather"
+                ]
+              },
+              {
+                "client_id": "007548:8040AE4F0",
+                "bank_id": "B4",
+                "score": -4.514,
+                "n_in": 0,
+                "n_out": 16,
+                "sum_in": 0.0,
+                "sum_out": 2384753.732,
+                "deg_in": 0,
+                "deg_out": 16,
+                "max_in_24h": 0.0,
+                "drain_24h": 0.0,
+                "lag_h": null,
+                "flow_ratio": 0.0,
+                "retention": null,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 16,
+                "nbr": 0.035,
+                "laundering_tx": 16,
+                "patterns": [
+                  "scatter-gather"
+                ]
+              },
+              {
+                "client_id": "001267:8007C7660",
+                "bank_id": "B3",
+                "score": -4.542,
+                "n_in": 0,
+                "n_out": 15,
+                "sum_in": 0.0,
+                "sum_out": 9691053.867,
+                "deg_in": 0,
+                "deg_out": 15,
+                "max_in_24h": 0.0,
+                "drain_24h": 0.0,
+                "lag_h": null,
+                "flow_ratio": 0.0,
+                "retention": null,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 14,
+                "nbr": 0.052,
+                "laundering_tx": 14,
+                "patterns": [
+                  "scatter-gather"
+                ]
+              },
+              {
+                "client_id": "0117:80F219920",
+                "bank_id": "B1",
+                "score": -3.14,
+                "n_in": 22,
+                "n_out": 0,
+                "sum_in": 10512436.037,
+                "sum_out": 0.0,
+                "deg_in": 15,
+                "deg_out": 0,
+                "max_in_24h": 10497957.595,
+                "drain_24h": 0.0,
+                "lag_h": null,
+                "flow_ratio": 0.0,
+                "retention": 1.0,
+                "rare_out_share": 0.0,
+                "n_rare_cp": 15,
+                "nbr": 0.017,
+                "laundering_tx": 14,
+                "patterns": [
+                  "scatter-gather"
+                ]
+              },
+              {
+                "client_id": "0019888:8079DDC30",
+                "bank_id": "B2",
+                "score": -3.56,
+                "n_in": 13,
+                "n_out": 0,
+                "sum_in": 134695.02,
+                "sum_out": 0.0,
+                "deg_in": 13,
+                "deg_out": 0,
+                "max_in_24h": 71549.23,
+                "drain_24h": 0.0,
+                "lag_h": null,
+                "flow_ratio": 0.0,
+                "retention": 1.0,
+                "rare_out_share": 0.0,
+                "n_rare_cp": 13,
+                "nbr": 0.037,
+                "laundering_tx": 13,
+                "patterns": [
+                  "fan-in"
+                ]
+              },
+              {
+                "client_id": "004403:80F962B10",
+                "bank_id": "B2",
+                "score": -4.679,
+                "n_in": 0,
+                "n_out": 14,
+                "sum_in": 0.0,
+                "sum_out": 108782.076,
+                "deg_in": 0,
+                "deg_out": 14,
+                "max_in_24h": 0.0,
+                "drain_24h": 0.0,
+                "lag_h": null,
+                "flow_ratio": 0.0,
+                "retention": null,
+                "rare_out_share": 0.993,
+                "n_rare_cp": 13,
+                "nbr": 0.004,
+                "laundering_tx": 13,
+                "patterns": [
+                  "fan-out"
+                ]
+              },
+              {
+                "client_id": "01601:80340DCF0",
+                "bank_id": "B5",
+                "score": -3.402,
+                "n_in": 16,
+                "n_out": 0,
+                "sum_in": 162890.94,
+                "sum_out": 0.0,
+                "deg_in": 14,
+                "deg_out": 0,
+                "max_in_24h": 133931.7,
+                "drain_24h": 0.0,
+                "lag_h": null,
+                "flow_ratio": 0.0,
+                "retention": 1.0,
+                "rare_out_share": 0.0,
+                "n_rare_cp": 14,
+                "nbr": 0.06,
+                "laundering_tx": 13,
+                "patterns": [
+                  "scatter-gather"
+                ]
+              },
+              {
+                "client_id": "0225263:80E6BFD50",
+                "bank_id": "B3",
+                "score": -3.601,
+                "n_in": 13,
+                "n_out": 0,
+                "sum_in": 136412.32,
+                "sum_out": 0.0,
+                "deg_in": 13,
+                "deg_out": 0,
+                "max_in_24h": 49883.11,
+                "drain_24h": 0.0,
+                "lag_h": null,
+                "flow_ratio": 0.0,
+                "retention": 1.0,
+                "rare_out_share": 0.0,
+                "n_rare_cp": 13,
+                "nbr": 0.027,
+                "laundering_tx": 13,
+                "patterns": [
+                  "fan-in"
+                ]
+              }
+            ]
+          }
+        },
+        "naive_raw_sharing": {
+          "overall": {
+            "tp": 215,
+            "fp": 9987,
+            "fn": 1089,
+            "flagged": 10202,
+            "positives": 1304,
+            "precision": 0.0211,
+            "recall": 0.1649,
+            "f1": 0.0374
+          },
+          "average_precision": 0.0388,
+          "precision_at_k": {
+            "50": 0.5,
+            "100": 0.38,
+            "500": 0.108,
+            "1000": 0.068
+          },
+          "tx_level": {
+            "tp": 573,
+            "fp": 70875,
+            "fn": 520,
+            "precision": 0.008,
+            "recall": 0.5242,
+            "f1": 0.0158
+          },
+          "per_pattern": {
+            "fan-out": {
+              "accounts": 113,
+              "accounts_flagged": 11,
+              "account_recall": 0.0973,
+              "attempts": 17,
+              "attempts_with_a_flagged_account": 10,
+              "attempt_recall": 0.5882
+            },
+            "fan-in": {
+              "accounts": 112,
+              "accounts_flagged": 8,
+              "account_recall": 0.0714,
+              "attempts": 16,
+              "attempts_with_a_flagged_account": 7,
+              "attempt_recall": 0.4375
+            },
+            "gather-scatter": {
+              "accounts": 327,
+              "accounts_flagged": 40,
+              "account_recall": 0.1223,
+              "attempts": 31,
+              "attempts_with_a_flagged_account": 24,
+              "attempt_recall": 0.7742
+            },
+            "scatter-gather": {
+              "accounts": 154,
+              "accounts_flagged": 18,
+              "account_recall": 0.1169,
+              "attempts": 20,
+              "attempts_with_a_flagged_account": 8,
+              "attempt_recall": 0.4
+            },
+            "cycle": {
+              "accounts": 86,
+              "accounts_flagged": 62,
+              "account_recall": 0.7209,
+              "attempts": 17,
+              "attempts_with_a_flagged_account": 14,
+              "attempt_recall": 0.8235
+            },
+            "random": {
+              "accounts": 76,
+              "accounts_flagged": 42,
+              "account_recall": 0.5526,
+              "attempts": 14,
+              "attempts_with_a_flagged_account": 11,
+              "attempt_recall": 0.7857
+            },
+            "bipartite": {
+              "accounts": 83,
+              "accounts_flagged": 7,
+              "account_recall": 0.0843,
+              "attempts": 12,
+              "attempts_with_a_flagged_account": 5,
+              "attempt_recall": 0.4167
+            },
+            "stack": {
+              "accounts": 114,
+              "accounts_flagged": 16,
+              "account_recall": 0.1404,
+              "attempts": 18,
+              "attempts_with_a_flagged_account": 11,
+              "attempt_recall": 0.6111
+            },
+            "unattributed": {
+              "accounts": 291,
+              "accounts_flagged": 33,
+              "account_recall": 0.1134,
+              "note": "laundering accounts whose laundering transactions are not listed in the patterns file"
+            }
+          },
+          "exposure": {
+            "raw_records_exposed": 409298,
+            "raw_source_transactions": 204649,
+            "bytes_exchanged_parquet": 9903738,
+            "bytes_in_memory_arrow": 38661176,
+            "serialize_seconds": 0.09
+          },
+          "engine_seconds": 0.26
+        }
+      },
+      "baselines": {
+        "k_equals_isolated_flagged": 10270,
+        "tx_count_topk": {
+          "tp": 205,
+          "fp": 10065,
+          "fn": 1099,
+          "flagged": 10270,
+          "positives": 1304,
+          "precision": 0.02,
+          "recall": 0.1572,
+          "f1": 0.0354,
+          "average_precision": 0.0248
+        },
+        "distinct_counterparties_topk": {
+          "tp": 328,
+          "fp": 9942,
+          "fn": 976,
+          "flagged": 10270,
+          "positives": 1304,
+          "precision": 0.0319,
+          "recall": 0.2515,
+          "f1": 0.0567,
+          "average_precision": 0.0407
+        },
+        "random_topk_seeded": {
+          "tp": 83,
+          "fp": 10187,
+          "fn": 1221,
+          "flagged": 10270,
+          "positives": 1304,
+          "precision": 0.0081,
+          "recall": 0.0637,
+          "f1": 0.0143,
+          "average_precision": 0.009
+        },
+        "prevalence": 0.0088,
+        "tx_count_precision_at_k": {
+          "50": 0.2,
+          "100": 0.23,
+          "500": 0.116,
+          "1000": 0.077
+        },
+        "distinct_counterparties_precision_at_k": {
+          "50": 0.2,
+          "100": 0.22,
+          "500": 0.176,
+          "1000": 0.123
+        },
+        "random_precision_at_k": {
+          "50": 0.02,
+          "100": 0.01,
+          "500": 0.008,
+          "1000": 0.007
+        },
+        "fitted_reference_isolated": {
+          "what": "EVALUATION-ONLY logistic regression on the same isolated-mode features, fitted on calibration-window labels; not in the decision path",
+          "average_precision": 0.0711,
+          "precision_at_k": {
+            "50": 0.36,
+            "100": 0.3,
+            "500": 0.222,
+            "1000": 0.175
+          }
+        }
+      },
+      "seconds": 37.0
+    },
+    "full": {
+      "window": {
+        "start": "2022-09-01",
+        "end": "2022-09-19"
+      },
+      "rows": 8974266,
+      "flagged_share_isolated": 0.1885,
+      "source_transactions_non_self": 4487133,
+      "accounts": 422734,
+      "laundering_accounts": 6357,
+      "laundering_transactions_non_self": 5166,
+      "accounts_per_bank": {
+        "B1": 95469,
+        "B2": 91934,
+        "B3": 77778,
+        "B4": 76479,
+        "B5": 81074
+      },
+      "laundering_accounts_per_bank": {
+        "B1": 1513,
+        "B2": 1483,
+        "B3": 1118,
+        "B4": 1142,
+        "B5": 1101
+      },
+      "modes": {
+        "isolated": {
+          "overall": {
+            "tp": 2329,
+            "fp": 77354,
+            "fn": 4028,
+            "flagged": 79683,
+            "positives": 6357,
+            "precision": 0.0292,
+            "recall": 0.3664,
+            "f1": 0.0541
+          },
+          "average_precision": 0.0309,
+          "precision_at_k": {
+            "50": 0.36,
+            "100": 0.19,
+            "500": 0.076,
+            "1000": 0.06
+          },
+          "tx_level": {
+            "tp": 3996,
+            "fp": 3438487,
+            "fn": 1170,
+            "precision": 0.0012,
+            "recall": 0.7735,
+            "f1": 0.0023
+          },
+          "per_bank": {
+            "B1": {
+              "tp": 543,
+              "fp": 18604,
+              "fn": 970,
+              "flagged": 19147,
+              "positives": 1513,
+              "precision": 0.0284,
+              "recall": 0.3589,
+              "f1": 0.0526,
+              "accounts": 95469,
+              "average_precision": 0.0284,
+              "rows": 2084316
+            },
+            "B2": {
+              "tp": 534,
+              "fp": 16891,
+              "fn": 949,
+              "flagged": 17425,
+              "positives": 1483,
+              "precision": 0.0306,
+              "recall": 0.3601,
+              "f1": 0.0565,
+              "accounts": 91934,
+              "average_precision": 0.0291,
+              "rows": 1891019
+            },
+            "B3": {
+              "tp": 400,
+              "fp": 12703,
+              "fn": 718,
+              "flagged": 13103,
+              "positives": 1118,
+              "precision": 0.0305,
+              "recall": 0.3578,
+              "f1": 0.0563,
+              "accounts": 77778,
+              "average_precision": 0.0299,
+              "rows": 1473821
+            },
+            "B4": {
+              "tp": 486,
+              "fp": 15467,
+              "fn": 656,
+              "flagged": 15953,
+              "positives": 1142,
+              "precision": 0.0305,
+              "recall": 0.4256,
+              "f1": 0.0569,
+              "accounts": 76479,
+              "average_precision": 0.0454,
+              "rows": 1949582
+            },
+            "B5": {
+              "tp": 366,
+              "fp": 13689,
+              "fn": 735,
+              "flagged": 14055,
+              "positives": 1101,
+              "precision": 0.026,
+              "recall": 0.3324,
+              "f1": 0.0483,
+              "accounts": 81074,
+              "average_precision": 0.0244,
+              "rows": 1575528
+            }
+          },
+          "best_single_bank": "B4",
+          "best_single_bank_f1": 0.0569,
+          "mean_bank_precision": 0.0292,
+          "mean_bank_recall": 0.367,
+          "mean_bank_f1": 0.0541,
+          "per_pattern": {
+            "fan-out": {
+              "accounts": 359,
+              "accounts_flagged": 117,
+              "account_recall": 0.3259,
+              "attempts": 48,
+              "attempts_with_a_flagged_account": 44,
+              "attempt_recall": 0.9167
+            },
+            "fan-in": {
+              "accounts": 338,
+              "accounts_flagged": 128,
+              "account_recall": 0.3787,
+              "attempts": 40,
+              "attempts_with_a_flagged_account": 39,
+              "attempt_recall": 0.975
+            },
+            "gather-scatter": {
+              "accounts": 685,
+              "accounts_flagged": 219,
+              "account_recall": 0.3197,
+              "attempts": 51,
+              "attempts_with_a_flagged_account": 51,
+              "attempt_recall": 1.0
+            },
+            "scatter-gather": {
+              "accounts": 369,
+              "accounts_flagged": 196,
+              "account_recall": 0.5312,
+              "attempts": 44,
+              "attempts_with_a_flagged_account": 42,
+              "attempt_recall": 0.9545
+            },
+            "cycle": {
+              "accounts": 271,
+              "accounts_flagged": 199,
+              "account_recall": 0.7343,
+              "attempts": 54,
+              "attempts_with_a_flagged_account": 50,
+              "attempt_recall": 0.9259
+            },
+            "random": {
+              "accounts": 211,
+              "accounts_flagged": 142,
+              "account_recall": 0.673,
+              "attempts": 41,
+              "attempts_with_a_flagged_account": 40,
+              "attempt_recall": 0.9756
+            },
+            "bipartite": {
+              "accounts": 491,
+              "accounts_flagged": 198,
+              "account_recall": 0.4033,
+              "attempts": 49,
+              "attempts_with_a_flagged_account": 48,
+              "attempt_recall": 0.9796
+            },
+            "stack": {
+              "accounts": 663,
+              "accounts_flagged": 331,
+              "account_recall": 0.4992,
+              "attempts": 43,
+              "attempts_with_a_flagged_account": 41,
+              "attempt_recall": 0.9535
+            },
+            "unattributed": {
+              "accounts": 3187,
+              "accounts_flagged": 951,
+              "account_recall": 0.2984,
+              "note": "laundering accounts whose laundering transactions are not listed in the patterns file"
+            }
+          },
+          "exposure": {
+            "raw_records_exposed": 0,
+            "bytes_exchanged": 0
+          },
+          "engine_seconds": 4.25
+        },
+        "staj_psi": {
+          "overall": {
+            "tp": 2329,
+            "fp": 77354,
+            "fn": 4028,
+            "flagged": 79683,
+            "positives": 6357,
+            "precision": 0.0292,
+            "recall": 0.3664,
+            "f1": 0.0541
+          },
+          "average_precision": 0.0309,
+          "precision_at_k": {
+            "50": 0.34,
+            "100": 0.2,
+            "500": 0.076,
+            "1000": 0.059
+          },
+          "tx_level": {
+            "tp": 3996,
+            "fp": 3438487,
+            "fn": 1170,
+            "precision": 0.0012,
+            "recall": 0.7735,
+            "f1": 0.0023
+          },
+          "per_pattern": {
+            "fan-out": {
+              "accounts": 359,
+              "accounts_flagged": 117,
+              "account_recall": 0.3259,
+              "attempts": 48,
+              "attempts_with_a_flagged_account": 44,
+              "attempt_recall": 0.9167
+            },
+            "fan-in": {
+              "accounts": 338,
+              "accounts_flagged": 128,
+              "account_recall": 0.3787,
+              "attempts": 40,
+              "attempts_with_a_flagged_account": 39,
+              "attempt_recall": 0.975
+            },
+            "gather-scatter": {
+              "accounts": 685,
+              "accounts_flagged": 219,
+              "account_recall": 0.3197,
+              "attempts": 51,
+              "attempts_with_a_flagged_account": 51,
+              "attempt_recall": 1.0
+            },
+            "scatter-gather": {
+              "accounts": 369,
+              "accounts_flagged": 196,
+              "account_recall": 0.5312,
+              "attempts": 44,
+              "attempts_with_a_flagged_account": 42,
+              "attempt_recall": 0.9545
+            },
+            "cycle": {
+              "accounts": 271,
+              "accounts_flagged": 199,
+              "account_recall": 0.7343,
+              "attempts": 54,
+              "attempts_with_a_flagged_account": 50,
+              "attempt_recall": 0.9259
+            },
+            "random": {
+              "accounts": 211,
+              "accounts_flagged": 142,
+              "account_recall": 0.673,
+              "attempts": 41,
+              "attempts_with_a_flagged_account": 40,
+              "attempt_recall": 0.9756
+            },
+            "bipartite": {
+              "accounts": 491,
+              "accounts_flagged": 198,
+              "account_recall": 0.4033,
+              "attempts": 49,
+              "attempts_with_a_flagged_account": 48,
+              "attempt_recall": 0.9796
+            },
+            "stack": {
+              "accounts": 663,
+              "accounts_flagged": 331,
+              "account_recall": 0.4992,
+              "attempts": 43,
+              "attempts_with_a_flagged_account": 41,
+              "attempt_recall": 0.9535
+            },
+            "unattributed": {
+              "accounts": 3187,
+              "accounts_flagged": 951,
+              "account_recall": 0.2984,
+              "note": "laundering accounts whose laundering transactions are not listed in the patterns file"
+            }
+          },
+          "exposure": {
+            "raw_records_exposed": 0,
+            "blinded_elements": 60000,
+            "bytes_exchanged": 15360000,
+            "match_rows_to_coordinator": 181,
+            "plaintext_tokens_in_wire": 0,
+            "psi_wall_seconds": 35.54,
+            "psi_sequential_seconds": 324.76
+          },
+          "radar": {
+            "refused": {},
+            "pairs": [
+              {
+                "pair": "B1:B2",
+                "seconds": 32.41,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              },
+              {
+                "pair": "B1:B3",
+                "seconds": 32.33,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              },
+              {
+                "pair": "B1:B4",
+                "seconds": 32.33,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              },
+              {
+                "pair": "B1:B5",
+                "seconds": 31.83,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              },
+              {
+                "pair": "B2:B3",
+                "seconds": 33.01,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              },
+              {
+                "pair": "B2:B4",
+                "seconds": 33.48,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              },
+              {
+                "pair": "B2:B5",
+                "seconds": 32.96,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              },
+              {
+                "pair": "B3:B4",
+                "seconds": 32.37,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              },
+              {
+                "pair": "B3:B5",
+                "seconds": 31.45,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              },
+              {
+                "pair": "B4:B5",
+                "seconds": 32.59,
+                "n_tokens": [
+                  1500,
+                  1500
+                ],
+                "refused": {},
+                "bytes": 1536000
+              }
+            ],
+            "clusters_total": 87,
+            "clusters_disclosed": 4,
+            "matched_tokens": 90,
+            "boosted_accounts": 12,
+            "boosted_laundering": 1,
+            "newly_flagged_by_radar": 0,
+            "newly_flagged_laundering": 0,
+            "candidates_in_band": {
+              "B1": 37602,
+              "B2": 35484,
+              "B3": 27852,
+              "B4": 31215,
+              "B5": 29656
+            },
+            "candidates_submitted": {
+              "B1": 387,
+              "B2": 390,
+              "B3": 388,
+              "B4": 411,
+              "B5": 388
+            },
+            "submitted_candidates_laundering_share": 0.0555,
+            "tokens_submitted": {
+              "B1": 1500,
+              "B2": 1500,
+              "B3": 1500,
+              "B4": 1500,
+              "B5": 1500
+            },
+            "disclosed_cluster_sizes": [
+              3,
+              3,
+              3,
+              3
+            ],
+            "disclosed_cluster_laundering_share": [
+              0.0,
+              0.333,
+              0.0,
+              0.0
+            ]
+          },
+          "failures": {
+            "worst_false_positives": [
+              {
+                "client_id": "00701:80119B0C0",
+                "bank_id": "B4",
+                "score": 2.909,
+                "n_in": 18,
+                "n_out": 16,
+                "sum_in": 30030.75,
+                "sum_out": 70019.0,
+                "deg_in": 2,
+                "deg_out": 3,
+                "max_in_24h": 7060.38,
+                "drain_24h": 1.0,
+                "lag_h": 15.583,
+                "flow_ratio": 0.429,
+                "retention": 0.0,
+                "rare_out_share": 0.957,
+                "n_rare_cp": 3,
+                "nbr": 0.995
+              },
+              {
+                "client_id": "013554:80219A0F0",
+                "bank_id": "B5",
+                "score": 2.735,
+                "n_in": 17,
+                "n_out": 23,
+                "sum_in": 106558.09,
+                "sum_out": 107701.35,
+                "deg_in": 2,
+                "deg_out": 2,
+                "max_in_24h": 72879.07,
+                "drain_24h": 1.0,
+                "lag_h": 0.8,
+                "flow_ratio": 0.989,
+                "retention": 0.0,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 4,
+                "nbr": 0.334
+              },
+              {
+                "client_id": "004523:80A6C1080",
+                "bank_id": "B2",
+                "score": 2.662,
+                "n_in": 19,
+                "n_out": 70,
+                "sum_in": 74156.93,
+                "sum_out": 122088.8,
+                "deg_in": 5,
+                "deg_out": 2,
+                "max_in_24h": 26997.93,
+                "drain_24h": 1.0,
+                "lag_h": 11.05,
+                "flow_ratio": 0.607,
+                "retention": 0.0,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 7,
+                "nbr": 0.325
+              },
+              {
+                "client_id": "01688:800904590",
+                "bank_id": "B4",
+                "score": 2.661,
+                "n_in": 13,
+                "n_out": 145,
+                "sum_in": 9707691.97,
+                "sum_out": 9190424.25,
+                "deg_in": 2,
+                "deg_out": 9,
+                "max_in_24h": 4847915.51,
+                "drain_24h": 1.0,
+                "lag_h": 0.533,
+                "flow_ratio": 0.947,
+                "retention": 0.053,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 10,
+                "nbr": 0.995
+              },
+              {
+                "client_id": "023:80037D780",
+                "bank_id": "B4",
+                "score": 2.602,
+                "n_in": 18,
+                "n_out": 113,
+                "sum_in": 549871.05,
+                "sum_out": 560872.44,
+                "deg_in": 3,
+                "deg_out": 6,
+                "max_in_24h": 523806.82,
+                "drain_24h": 1.0,
+                "lag_h": 0.083,
+                "flow_ratio": 0.98,
+                "retention": 0.0,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 8,
+                "nbr": 0.991
+              },
+              {
+                "client_id": "01467:8003ADF40",
+                "bank_id": "B2",
+                "score": 2.489,
+                "n_in": 26,
+                "n_out": 70,
+                "sum_in": 226031.11,
+                "sum_out": 943880.01,
+                "deg_in": 10,
+                "deg_out": 9,
+                "max_in_24h": 71199.62,
+                "drain_24h": 1.0,
+                "lag_h": 4.583,
+                "flow_ratio": 0.239,
+                "retention": 0.0,
+                "rare_out_share": 0.973,
+                "n_rare_cp": 15,
+                "nbr": 0.172
+              },
+              {
+                "client_id": "023344:8020902E0",
+                "bank_id": "B3",
+                "score": 2.402,
+                "n_in": 35,
+                "n_out": 67,
+                "sum_in": 26241.45,
+                "sum_out": 29434.85,
+                "deg_in": 3,
+                "deg_out": 4,
+                "max_in_24h": 6310.06,
+                "drain_24h": 1.0,
+                "lag_h": 6.467,
+                "flow_ratio": 0.892,
+                "retention": 0.0,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 6,
+                "nbr": 0.164
+              },
+              {
+                "client_id": "025981:806C4DD20",
+                "bank_id": "B4",
+                "score": 2.397,
+                "n_in": 28,
+                "n_out": 8,
+                "sum_in": 164352.21,
+                "sum_out": 196024.78,
+                "deg_in": 6,
+                "deg_out": 1,
+                "max_in_24h": 161895.39,
+                "drain_24h": 1.0,
+                "lag_h": 2.783,
+                "flow_ratio": 0.838,
+                "retention": 0.0,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 5,
+                "nbr": 0.995
+              }
+            ],
+            "missed_laundering_accounts_most_laundering_tx": [
+              {
+                "client_id": "023691:8021353D0",
+                "bank_id": "B4",
+                "score": -3.136,
+                "n_in": 50,
+                "n_out": 20,
+                "sum_in": 219809.01,
+                "sum_out": 164003.29,
+                "deg_in": 3,
+                "deg_out": 1,
+                "max_in_24h": 49822.86,
+                "drain_24h": 0.0,
+                "lag_h": null,
+                "flow_ratio": 0.746,
+                "retention": 0.254,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 1,
+                "nbr": 0.0,
+                "laundering_tx": 47,
+                "patterns": [
+                  "bipartite",
+                  "cycle",
+                  "fan-in",
+                  "fan-out",
+                  "gather-scatter",
+                  "random",
+                  "scatter-gather",
+                  "stack"
+                ]
+              },
+              {
+                "client_id": "0150240:812D22980",
+                "bank_id": "B5",
+                "score": -3.15,
+                "n_in": 54,
+                "n_out": 24,
+                "sum_in": 38826467.432,
+                "sum_out": 258678.736,
+                "deg_in": 5,
+                "deg_out": 3,
+                "max_in_24h": 38689193.475,
+                "drain_24h": 0.001,
+                "lag_h": 2.883,
+                "flow_ratio": 0.007,
+                "retention": 0.993,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 4,
+                "nbr": 0.0,
+                "laundering_tx": 36,
+                "patterns": [
+                  "cycle",
+                  "fan-in",
+                  "fan-out",
+                  "gather-scatter",
+                  "random",
+                  "scatter-gather",
+                  "stack"
+                ]
+              },
+              {
+                "client_id": "0119:812A09CF0",
+                "bank_id": "B2",
+                "score": -3.206,
+                "n_in": 18,
+                "n_out": 19,
+                "sum_in": 152679.044,
+                "sum_out": 124117.787,
+                "deg_in": 1,
+                "deg_out": 2,
+                "max_in_24h": 33674.055,
+                "drain_24h": 0.0,
+                "lag_h": null,
+                "flow_ratio": 0.813,
+                "retention": 0.187,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 2,
+                "nbr": 0.0,
+                "laundering_tx": 33,
+                "patterns": [
+                  "bipartite",
+                  "cycle",
+                  "fan-in",
+                  "fan-out",
+                  "gather-scatter",
+                  "random",
+                  "scatter-gather",
+                  "stack"
+                ]
+              },
+              {
+                "client_id": "0019888:8079DDC30",
+                "bank_id": "B2",
+                "score": -3.207,
+                "n_in": 16,
+                "n_out": 1,
+                "sum_in": 181262.75,
+                "sum_out": 798.51,
+                "deg_in": 16,
+                "deg_out": 1,
+                "max_in_24h": 71549.23,
+                "drain_24h": 0.0,
+                "lag_h": null,
+                "flow_ratio": 0.004,
+                "retention": 0.996,
+                "rare_out_share": 0.0,
+                "n_rare_cp": 15,
+                "nbr": 0.128,
+                "laundering_tx": 16,
+                "patterns": [
+                  "fan-in"
+                ]
+              },
+              {
+                "client_id": "007548:8040AE4F0",
+                "bank_id": "B4",
+                "score": -4.491,
+                "n_in": 0,
+                "n_out": 17,
+                "sum_in": 0.0,
+                "sum_out": 2385124.502,
+                "deg_in": 0,
+                "deg_out": 17,
+                "max_in_24h": 0.0,
+                "drain_24h": 0.0,
+                "lag_h": null,
+                "flow_ratio": 0.0,
+                "retention": null,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 16,
+                "nbr": 0.046,
+                "laundering_tx": 16,
+                "patterns": [
+                  "scatter-gather"
+                ]
+              },
+              {
+                "client_id": "021174:800737690",
+                "bank_id": "B5",
+                "score": -3.941,
+                "n_in": 0,
+                "n_out": 16,
+                "sum_in": 0.0,
+                "sum_out": 5871710.599,
+                "deg_in": 0,
+                "deg_out": 16,
+                "max_in_24h": 0.0,
+                "drain_24h": 0.0,
+                "lag_h": null,
+                "flow_ratio": 0.0,
+                "retention": null,
+                "rare_out_share": 0.997,
+                "n_rare_cp": 15,
+                "nbr": 0.338,
+                "laundering_tx": 16,
+                "patterns": [
+                  "fan-out"
+                ]
+              },
+              {
+                "client_id": "0112931:805D4C850",
+                "bank_id": "B3",
+                "score": -3.342,
+                "n_in": 21,
+                "n_out": 1,
+                "sum_in": 155140.742,
+                "sum_out": 1113.663,
+                "deg_in": 15,
+                "deg_out": 1,
+                "max_in_24h": 104069.345,
+                "drain_24h": 0.0,
+                "lag_h": null,
+                "flow_ratio": 0.007,
+                "retention": 0.993,
+                "rare_out_share": 0.0,
+                "n_rare_cp": 15,
+                "nbr": 0.061,
+                "laundering_tx": 15,
+                "patterns": [
+                  "scatter-gather"
+                ]
+              },
+              {
+                "client_id": "021745:803366440",
+                "bank_id": "B1",
+                "score": -4.504,
+                "n_in": 0,
+                "n_out": 15,
+                "sum_in": 0.0,
+                "sum_out": 164259.104,
+                "deg_in": 0,
+                "deg_out": 15,
+                "max_in_24h": 0.0,
+                "drain_24h": 0.0,
+                "lag_h": null,
+                "flow_ratio": 0.0,
+                "retention": null,
+                "rare_out_share": 1.0,
+                "n_rare_cp": 15,
+                "nbr": 0.055,
+                "laundering_tx": 15,
+                "patterns": [
+                  "scatter-gather"
+                ]
+              }
+            ]
+          }
+        },
+        "naive_raw_sharing": {
+          "overall": {
+            "tp": 1962,
+            "fp": 65517,
+            "fn": 4395,
+            "flagged": 67479,
+            "positives": 6357,
+            "precision": 0.0291,
+            "recall": 0.3086,
+            "f1": 0.0531
+          },
+          "average_precision": 0.0294,
+          "precision_at_k": {
+            "50": 0.36,
+            "100": 0.18,
+            "500": 0.058,
+            "1000": 0.05
+          },
+          "tx_level": {
+            "tp": 3452,
+            "fp": 3167475,
+            "fn": 1714,
+            "precision": 0.0011,
+            "recall": 0.6682,
+            "f1": 0.0022
+          },
+          "per_pattern": {
+            "fan-out": {
+              "accounts": 359,
+              "accounts_flagged": 87,
+              "account_recall": 0.2423,
+              "attempts": 48,
+              "attempts_with_a_flagged_account": 41,
+              "attempt_recall": 0.8542
+            },
+            "fan-in": {
+              "accounts": 338,
+              "accounts_flagged": 89,
+              "account_recall": 0.2633,
+              "attempts": 40,
+              "attempts_with_a_flagged_account": 35,
+              "attempt_recall": 0.875
+            },
+            "gather-scatter": {
+              "accounts": 685,
+              "accounts_flagged": 185,
+              "account_recall": 0.2701,
+              "attempts": 51,
+              "attempts_with_a_flagged_account": 48,
+              "attempt_recall": 0.9412
+            },
+            "scatter-gather": {
+              "accounts": 369,
+              "accounts_flagged": 114,
+              "account_recall": 0.3089,
+              "attempts": 44,
+              "attempts_with_a_flagged_account": 43,
+              "attempt_recall": 0.9773
+            },
+            "cycle": {
+              "accounts": 271,
+              "accounts_flagged": 155,
+              "account_recall": 0.572,
+              "attempts": 54,
+              "attempts_with_a_flagged_account": 49,
+              "attempt_recall": 0.9074
+            },
+            "random": {
+              "accounts": 211,
+              "accounts_flagged": 113,
+              "account_recall": 0.5355,
+              "attempts": 41,
+              "attempts_with_a_flagged_account": 36,
+              "attempt_recall": 0.878
+            },
+            "bipartite": {
+              "accounts": 491,
+              "accounts_flagged": 157,
+              "account_recall": 0.3198,
+              "attempts": 49,
+              "attempts_with_a_flagged_account": 47,
+              "attempt_recall": 0.9592
+            },
+            "stack": {
+              "accounts": 663,
+              "accounts_flagged": 263,
+              "account_recall": 0.3967,
+              "attempts": 43,
+              "attempts_with_a_flagged_account": 39,
+              "attempt_recall": 0.907
+            },
+            "unattributed": {
+              "accounts": 3187,
+              "accounts_flagged": 909,
+              "account_recall": 0.2852,
+              "note": "laundering accounts whose laundering transactions are not listed in the patterns file"
+            }
+          },
+          "exposure": {
+            "raw_records_exposed": 8974266,
+            "raw_source_transactions": 4487133,
+            "bytes_exchanged_parquet": 117787452,
+            "bytes_in_memory_arrow": 845823782,
+            "serialize_seconds": 0.86
+          },
+          "engine_seconds": 5.1
+        }
+      },
+      "baselines": {
+        "k_equals_isolated_flagged": 79683,
+        "tx_count_topk": {
+          "tp": 1660,
+          "fp": 78023,
+          "fn": 4697,
+          "flagged": 79683,
+          "positives": 6357,
+          "precision": 0.0208,
+          "recall": 0.2611,
+          "f1": 0.0386,
+          "average_precision": 0.025
+        },
+        "distinct_counterparties_topk": {
+          "tp": 2585,
+          "fp": 77098,
+          "fn": 3772,
+          "flagged": 79683,
+          "positives": 6357,
+          "precision": 0.0324,
+          "recall": 0.4066,
+          "f1": 0.0601,
+          "average_precision": 0.0379
+        },
+        "random_topk_seeded": {
+          "tp": 1198,
+          "fp": 78485,
+          "fn": 5159,
+          "flagged": 79683,
+          "positives": 6357,
+          "precision": 0.015,
+          "recall": 0.1885,
+          "f1": 0.0278,
+          "average_precision": 0.0152
+        },
+        "prevalence": 0.01504,
+        "tx_count_precision_at_k": {
+          "50": 0.34,
+          "100": 0.22,
+          "500": 0.104,
+          "1000": 0.074
+        },
+        "distinct_counterparties_precision_at_k": {
+          "50": 0.38,
+          "100": 0.22,
+          "500": 0.124,
+          "1000": 0.119
+        },
+        "random_precision_at_k": {
+          "50": 0.0,
+          "100": 0.01,
+          "500": 0.008,
+          "1000": 0.01
+        },
+        "fitted_reference_isolated": {
+          "what": "EVALUATION-ONLY logistic regression on the same isolated-mode features, fitted on calibration-window labels; not in the decision path",
+          "average_precision": 0.063,
+          "precision_at_k": {
+            "50": 0.62,
+            "100": 0.39,
+            "500": 0.188,
+            "1000": 0.155
+          }
+        }
+      },
+      "seconds": 50.2
+    }
+  },
+  "total_seconds": 105.3
+}
