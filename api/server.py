@@ -15,6 +15,7 @@ from pydantic import BaseModel
 from api.state import RULE_AUTHOR, STAFF, DemoState, build_state
 from audit.log import verify_chain
 from copilot.bedrock_client import LLM
+from copilot.brief import brief_case
 from copilot.budgets import Budget
 from copilot.explain import explain_case
 from copilot.model_registry import ModelRegistry, load_models
@@ -57,6 +58,24 @@ def create_app(st: DemoState) -> FastAPI:
         return holder["llm"]
 
     narrative_role = models_cfg.get("narrative_role", "agent_primary")
+    briefs: dict[str, dict] = {}
+
+    def make_brief(case_id: str) -> dict:
+        if case_id not in briefs:
+            briefs[case_id] = brief_case(llm(), st.case_json(case_id), Budget(6, 40000, 0.5, 240), role=narrative_role)
+        return briefs[case_id]
+
+    def pregenerate() -> None:
+        """Briefs for the top REVIEW cases are written in the background so that opening a case shows one at once."""
+        top = [cid for cid, c in sorted(st.cases.items(), key=lambda kv: -kv[1].priority) if c.triage.value == "REVIEW"][:40]
+        for cid in top:
+            try:
+                make_brief(cid)
+            except Exception:  # noqa: BLE001 - a failed brief must never take the API down
+                continue
+
+    if os.environ.get("STAJ_PREGENERATE", "1") == "1":
+        threading.Thread(target=pregenerate, daemon=True).start()
 
     def meta_of(case_id: str) -> dict:
         c = st.cases[case_id]
@@ -137,9 +156,14 @@ def create_app(st: DemoState) -> FastAPI:
             nodes.append({"id": tok, "label": tok, "kind": "counterparty_popular" if deg.get(tok, 1) >= st.cfg["features"]["popular_min"] else "counterparty_rare"})
             edges.append({"source": cj["client_ref"] if d == "out" else tok, "target": tok if d == "out" else cj["client_ref"], "amount_czk": amt, "direction": d})
         nodes = list({n["id"]: n for n in nodes}.values())
-        return {**cj, "timeline": tl, "local_graph": {"nodes": nodes, "edges": edges}, "explanation": st.explanations.get(case_id, {}).get("explanation"),
+        return {**cj, "timeline": tl, "local_graph": {"nodes": nodes, "edges": edges}, "brief": briefs.get(case_id), "explanation": st.explanations.get(case_id, {}).get("explanation"),
                 "explanation_violations": st.explanations.get(case_id, {}).get("violations", []), "escalation": esc(case_id),
                 "proposals": st.proposals.get(case_id, []), "decision": st.decisions.get(case_id)}
+
+    @app.post("/api/cases/{case_id}/brief")
+    def brief(case_id: str):
+        get_case(case_id)
+        return make_brief(case_id)
 
     @app.post("/api/cases/{case_id}/explain")
     def explain(case_id: str):
@@ -275,7 +299,7 @@ def create_app(st: DemoState) -> FastAPI:
 
     @app.get("/api/files/{name}", response_class=PlainTextResponse)
     def files(name: str):
-        allowed = {"cnb_sample_30.csv": "eval/out/cnb_sample_30.csv", "finreg_cnb.csv": "eval/out/finreg_cnb.csv", "report.md": "eval/report.md"}
+        allowed = {"cnb_sample_30.csv": "eval/out/cnb_sample_30.csv", "finreg_cnb.csv": "eval/out/finreg_cnb.csv", "report.md": "eval/report.md", "psi_bench.json": "eval/out/psi_bench.json"}
         if name not in allowed or not os.path.exists(allowed[name]):
             raise HTTPException(404, "not available")
         return open(allowed[name], encoding="utf-8").read()

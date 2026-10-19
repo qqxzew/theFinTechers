@@ -223,3 +223,147 @@ export function resolveApiUrl(u: string): string {
   if (/^https?:\/\//.test(u)) return u;
   return USING_MOCKS ? u : `${API_BASE}${u.startsWith('/') ? '' : '/'}${u}`;
 }
+
+// ------------------------------------------------------------------ text helpers (Report, Limits)
+
+/** Split prose at sentence boundaries without breaking "et al.,", "Coll.;" or decimals. */
+export function splitSentences(text: string): string[] {
+  return text
+    .split(/(?<=[.!?])\s+(?=[A-Z0-9ČŘŠŽÚÁÉÍÓÝĎŤŇ("'])/u)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+/** The first `n` sentences of a text, unchanged (used only to shorten, never to rephrase). */
+export function firstSentences(text: string, n: number): string {
+  return splitSentences(text).slice(0, n).join(' ');
+}
+
+export type LimitGroup = 'data' | 'method' | 'deployment' | 'legal';
+
+/** Group limitation strings by what they are about; order is data, method, deployment, legal. */
+export function groupLimitations(items: string[]): { group: LimitGroup; items: string[] }[] {
+  const pick = (x: string): LimitGroup => {
+    if (/legal|high-risk list|FATF|EUR-Lex|AMLR|§|banking-secrecy/i.test(x)) return 'legal';
+    if (/column|dataset|ČNB data contain/i.test(x)) return 'data';
+    if (/\bPSI\b|placeholder|out of scope|production/i.test(x)) return 'deployment';
+    return 'method';
+  };
+  const order: LimitGroup[] = ['data', 'method', 'deployment', 'legal'];
+  return order.map((group) => ({ group, items: items.filter((x) => pick(x) === group) })).filter((g) => g.items.length);
+}
+
+/** "As of ... we did not find in public sources: a; b; c" -> ["a", "b", "c"] (the date lives in the heading). */
+export function splitNotFound(text: string): string[] {
+  const i = text.indexOf(':');
+  if (i < 0) return [text];
+  return text
+    .slice(i + 1)
+    .split(';')
+    .map((s) => s.trim().replace(/\.$/, ''))
+    .filter(Boolean)
+    .map((s) => s.replace(/^(['"‘“]?)(\p{L})/u, (_m, q: string, c: string) => q + c.toUpperCase()));
+}
+
+/** Human-readable label for an evidence reference key ("D1:R03028", "features", "cluster", "case"). */
+export function evidenceKey(ref: string): string {
+  const colon = ref.indexOf(':');
+  if (colon >= 0) {
+    const dot = ref.indexOf('.', colon);
+    return dot < 0 ? ref : ref.slice(0, dot);
+  }
+  return ref.split(/[.[]/)[0];
+}
+
+// ------------------------------------------------------------------ queue slices (Queue + Radar redesign)
+
+export interface QueueSliceParams {
+  triage?: string;
+  route?: string;
+  cluster?: string;
+  limit?: number;
+  offset?: number;
+}
+
+/** GET /api/queue with route/limit/offset. In mock mode the mock queue is filtered and sliced locally. */
+export async function getQueueSlice(p: QueueSliceParams = {}): Promise<QueueResponse> {
+  if (!USING_MOCKS) {
+    const url = `${API_BASE}/api/queue${qs({ ...p })}`;
+    const hit = queueCache.get(url);
+    if (hit && Date.now() - hit.at < 15000) return hit.p;
+    const pr = getJson<QueueResponse>(url);
+    pr.catch(() => queueCache.delete(url));
+    queueCache.set(url, { at: Date.now(), p: pr });
+    return pr;
+  }
+  const all = await getQueue({ triage: p.triage, cluster: p.cluster });
+  const items = all.items.filter((i) => !p.route || i.route === p.route);
+  const off = p.offset ?? 0;
+  return { counts: all.counts, items: items.slice(off, off + (p.limit ?? 500)), total_matching: items.length };
+}
+
+/** Members of several radar clusters, keyed by cluster id (one request per cluster). */
+export async function getClusterMembers(clusterIds: string[]): Promise<Record<string, QueueResponse['items']>> {
+  const res = await Promise.all(clusterIds.map((c) => getQueueSlice({ cluster: c, limit: 2000 })));
+  return Object.fromEntries(clusterIds.map((c, i) => [c, res[i].items]));
+}
+
+// ------------------------------------------------------------------ Grafana (Metrics screen panels)
+/** Grafana instance with the provisioned `staj-eval` dashboard (infra/grafana). Override with VITE_GRAFANA_URL. */
+export const GRAFANA_BASE = ((import.meta.env.VITE_GRAFANA_URL as string | undefined)?.trim() || 'http://127.0.0.1:3000').replace(/\/$/, '');
+
+/** Solo-panel embed URL for one panel of the evaluation dashboard. */
+export function grafanaPanelUrl(panelId: number): string {
+  return `${GRAFANA_BASE}/d-solo/staj-eval/eval?orgId=1&panelId=${panelId}&theme=light&kiosk`;
+}
+
+/** True when Grafana answers. Uses an opaque (no-cors) request, so only reachability is checked. */
+export async function grafanaReachable(timeoutMs = 2500): Promise<boolean> {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), timeoutMs);
+  try {
+    await fetch(`${GRAFANA_BASE}/api/health`, { mode: 'no-cors', cache: 'no-store', signal: ctl.signal });
+    return true;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** Fetch the Markdown export and hand it to the browser as a file (works across the API origin). */
+export async function downloadOpoMarkdown(id: string): Promise<void> {
+  const r = await fetch(opoExportUrl(id));
+  if (!r.ok) throw new ApiError(r.status, `${r.status} ${r.statusText}`);
+  const blob = new Blob([await r.text()], { type: 'text/markdown;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `report_draft_${id}.md`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// ------------------------------------------------------------------ case brief (Case screen)
+/** The short auto-written case summary. Pre-generated for top cases; otherwise written on demand (up to ~60 s). */
+export interface CaseBrief {
+  sentences: Sentence[];
+  violations: (Record<string, unknown> | string)[];
+  model_id?: string;
+  attempts?: number;
+  cached?: boolean;
+}
+
+const briefInflight = new Map<string, Promise<CaseBrief>>();
+
+/** POST /api/cases/{id}/brief, de-duplicated so StrictMode double effects make one model call. */
+export function writeBrief(id: string): Promise<CaseBrief> {
+  if (USING_MOCKS) return Promise.reject(new ApiError(503, 'Summary is not available in mock mode'));
+  const hit = briefInflight.get(id);
+  if (hit) return hit;
+  const p = sendJson<CaseBrief>('POST', `/api/cases/${encodeURIComponent(id)}/brief`).finally(() => briefInflight.delete(id));
+  briefInflight.set(id, p);
+  return p;
+}

@@ -77,6 +77,11 @@ def _inside_valid_signal(ref: str, valid_refs: set[str]) -> bool:
     return len(parts) == 2 and parts[0] in valid_refs and re.split(r"[.\s]+", parts[1])[0] in _SIGNAL_PARTS
 
 
+def _has_name(name: str, text: str) -> bool:
+    """Whole-word, case-insensitive match (a staff name such as 'max' must not fire on 'maximálně')."""
+    return re.search(r'(?<!\w)' + re.escape(name) + r'(?!\w)', text, re.IGNORECASE) is not None
+
+
 def validate_draft(
     draft: dict,
     case: dict,
@@ -91,7 +96,7 @@ def validate_draft(
 
     free_text = draft.get("free_text", "")
     for name in names:
-        if name.lower() in free_text.lower():
+        if _has_name(name, free_text):
             violations.append(
                 {"kind": "analyst_name", "sentence": None, "detail": f"analyst name {name!r} in free_text"}
             )
@@ -129,7 +134,7 @@ def validate_draft(
                 )
 
         for name in names:
-            if name.lower() in lowered:
+            if _has_name(name, text):
                 violations.append(
                     {"kind": "analyst_name", "sentence": i, "detail": f"analyst name {name!r} in text"}
                 )

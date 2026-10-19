@@ -1,367 +1,22 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+// English-only UI strings. Plain, short words; no other languages.
+// Screens call `useI18n()` for `t(key)` and the number formatters; there is no language switching.
 
-const cs = {
+const STR = {
   'app.name': 'Stáj',
-  'app.tagline': 'Radar mul napříč bankami',
-  'nav.queue': 'Fronta alertů',
-  'nav.case': 'Karta případu',
-  'nav.opo': 'Návrh OPO',
-  'nav.radar': 'Radar',
-  'nav.metrics': 'Metriky',
-  'nav.audit': 'Audit',
-  'nav.honesty': 'Poctivost a limity',
-  'nav.main': 'Hlavní navigace',
-  'nav.case_hint': 'otevřete z fronty',
-  'top.lang': 'Jazyk',
-  'top.role': 'Role',
-  'top.name': 'Jméno',
-  'top.name_ph': 'Vaše jméno',
-  'top.identity': 'Demo identita rozhodujícího',
-  'top.theme': 'Tmavý režim',
-  'chip.synthetic': 'SYNTETICKÁ DATA',
-  'chip.fx': 'FX: zástupné kurzy',
-  'chip.matrix': 'Eskalační matice: zástupná',
-  'chip.model': 'Model',
-  'chip.chain_ok': 'Auditní řetězec OK',
-  'chip.chain_bad': 'Auditní řetězec PORUŠEN',
-  'chip.chain_unknown': 'Řetězec: neznámý',
-  'mock.banner': 'MOCK – UI běží nad vymyšlenými daty ze souborů /mock/*.json. Žádné číslo zde není výsledek systému. Nastavte VITE_API_BASE pro skutečné API.',
-  'common.loading': 'Načítám…',
-  'common.error': 'Chyba načtení',
-  'common.na': 'není k dispozici',
-  'common.retry': 'Zkusit znovu',
-  'common.empty': 'Nic k zobrazení.',
-  'common.dataset': 'Dataset',
-  'common.seed': 'Seed',
-  'common.all': 'Vše',
-  'common.reset': 'Zrušit filtry',
-  'common.yes': 'ano',
-  'common.no': 'ne',
-  'common.prev': 'Předchozí',
-  'common.next': 'Další',
-  'common.latest': 'Nejnovější',
-  'common.page': 'Strana',
-  'common.of': 'z',
-  'common.proposal': 'NÁVRH SYSTÉMU',
-  'common.score': 'skóre',
-  'role.analyst_l1': 'Analytik L1',
-  'role.analyst_l2': 'Analytik L2',
-  'role.aml_officer': 'AML officer',
-  'role.mlro': 'MLRO',
-  'triage.FP': 'FP',
-  'triage.REVIEW': 'REVIEW',
-  'route.victim_protection': 'Ochrana oběti',
-  'route.mule_review': 'Prověrka mule',
-  'status.open': 'otevřeno',
-  'status.confirmed': 'potvrzeno',
-  'status.overridden': 'přepsáno',
-  // queue
-  'q.title': 'Fronta alertů',
-  'q.funnel_before': 'alertů před triáží',
-  'q.funnel_cases': 'případů',
-  'q.funnel_review': 'REVIEW po triáži',
-  'q.funnel_fp': 'FP automaticky uzavřeno (návrh)',
-  'q.funnel_victim': 'v trase ochrany oběti',
-  'q.filters': 'Filtry',
-  'q.rule': 'Pravidlo',
-  'q.min_p': 'Priorita od',
-  'q.max_p': 'Priorita do',
-  'q.triage': 'Triáž',
-  'q.cluster': 'Shluk',
-  'q.bank': 'Banka',
-  'q.col_case': 'Případ',
-  'q.col_bank': 'Banka',
-  'q.col_client': 'Klient (pseudonym)',
-  'q.col_priority': 'Priorita',
-  'q.col_triage': 'Návrh triáže',
-  'q.col_rules': 'Pravidla',
-  'q.col_cluster': 'Shluk',
-  'q.col_escalation': 'Eskalace na',
-  'q.col_decision': 'Rozhodnutí',
-  'q.shown': 'zobrazeno',
-  'q.sort_hint': 'Klikněte na záhlaví pro řazení. Enter otevře případ.',
-  'q.fp_note': 'FP = návrh automatického uzavření; potvrzuje člověk.',
-  // case
-  'c.title': 'Karta případu',
-  'c.suspicious': 'Podezřelé signály',
-  'c.exculpatory': 'Vyvracející signály',
-  'c.mom_or_horse': 'Máma, nebo kůň?',
-  'c.mom_or_horse_sub': 'Co mluví pro mule a co proti – vedle sebe.',
-  'c.no_signals': 'Žádné signály.',
-  'c.no_exculpatory': 'Systém nenašel žádný vyvracející signál. To neznamená, že neexistuje.',
-  'c.evidence': 'Důkazní pole',
-  'c.source': 'Zdroj',
-  'c.notes': 'Poznámky',
-  'c.timeline': 'Časová osa toků',
-  'c.timeline_sub': 'Příchozí nad osou, odchozí pod osou (CZK).',
-  'c.graph': 'Lokální graf',
-  'c.graph_sub': 'Klient a jeho protistrany v rámci jedné banky.',
-  'c.cluster': 'Přeshraniční shluk',
-  'c.no_cluster': 'Případ není součástí zveřejněného shluku.',
-  'c.other_banks': 'další banky',
-  'c.other_candidates': 'další kandidáti',
-  'c.lag_ret': 'koncentrace lag/retence',
-  'c.explanation': 'Vysvětlení (LLM)',
-  'c.explanation_none': 'Vysvětlení zatím nebylo vygenerováno.',
-  'c.generate': 'Vygenerovat vysvětlení',
-  'c.regenerate': 'Vygenerovat znovu',
-  'c.generating': 'Generuji vysvětlení…',
-  'c.qa_violations': 'Kontrola kvality (QA) našla problémy',
-  'c.qa_ok': 'QA kontrola bez nálezů.',
-  'c.not_a_mom': 'Proč to není „máma“',
-  'c.triage_justification': 'Zdůvodnění návrhu triáže',
-  'c.refs_hint': 'Štítky odkazují na signály; kliknutím signál zvýrazníte.',
-  'c.model': 'model',
-  'c.cached': 'z mezipaměti',
-  'c.lang_view': 'Jazyk vysvětlení',
-  'c.triage_proposal': 'Návrh triáže',
-  'c.reasons': 'Důvody',
-  'c.escalation': 'Eskalace',
-  'c.escalation_role': 'Cílová role',
-  'c.matrix_row': 'řádek matice',
-  'c.proposals_log': 'Historie návrhů',
-  'c.features': 'Vlastnosti účtu',
-  'c.rule_defs': 'Definice pravidel',
-  'c.action': 'Rozhodnutí člověka',
-  'c.action_sub': 'Systém pouze navrhuje. Rozhodnutím se návrh stane rozhodnutím až po stisku tlačítka pojmenovanou osobou.',
-  'c.confirm': 'Potvrdit návrh',
-  'c.override': 'Přepsat návrh',
-  'c.reason': 'Zdůvodnění',
-  'c.reason_required': 'Při přepsání je zdůvodnění povinné.',
-  'c.reason_ph': 'Popište, proč se odchylujete od návrhu, s odkazem na konkrétní skutečnosti.',
-  'c.decider': 'Rozhoduje',
-  'c.decider_role': 'Role',
-  'c.approver': 'Schvalovatel (čtyři oči)',
-  'c.approver_none': '— vyberte —',
-  'c.four_eyes': 'Priorita ≥ {n}: vyžaduje druhého schvalovatele odlišného od rozhodujícího.',
-  'c.submit': 'Zaznamenat rozhodnutí',
-  'c.submitting': 'Odesílám…',
-  'c.rejected': 'Server rozhodnutí odmítl',
-  'c.accepted': 'Rozhodnutí zaznamenáno a zapsáno do auditního řetězce.',
-  'c.decided': 'Zaznamenané rozhodnutí',
-  'c.open_opo': 'Otevřít návrh OPO',
-  'c.no_name': 'Vyplňte své jméno v horní liště.',
-  'c.overriding_to': 'Přepsání návrhu',
-  'c.matrix_placeholder': 'Eskalační matice je zástupná (placeholder), ne politika banky.',
-  'c.victim_note': 'Trasa ochrany oběti: klient je pravděpodobně poškozený, nikoli mule. Kontakt s klientem řeší ochrana klienta.',
-  'c.not_found': 'Případ v datech není (v mock režimu existuje jen 6 plných karet).',
-  'c.select_case': 'Vyberte případ ve frontě.',
-  'c.in': 'příchozí',
-  'c.out': 'odchozí',
-  'c.remit_out': 'remitence ven',
-  // violations
-  'v.decider_is_relationship_owner': 'Rozhodující je správcem vztahu s klientem (střet zájmů).',
-  'v.decider_is_rule_author': 'Rozhodující je autorem pravidla, které alert spustilo.',
-  'v.decider_is_first_triager': 'Rozhodující provedl první triáž (self-review).',
-  'v.four_eyes_required': 'Je vyžadován druhý schvalovatel odlišný od rozhodujícího.',
-  'v.approver_is_executor': 'Schvalovatel nesmí být vykonavatelem.',
-  'v.override_reason_required': 'Přepsání vyžaduje zdůvodnění.',
-  'v.decider_role_below_escalation_target': 'Role rozhodujícího je nižší než cílová role eskalace.',
-  'v.decider_missing': 'Chybí jméno rozhodujícího.',
-  // opo
-  'o.title': 'Návrh oznámení podezřelého obchodu (OPO) pro FAÚ',
-  'o.banner': 'NÁVRH – syntetická data. Odeslání je výhradně rozhodnutím člověka.',
-  'o.human': 'doplní člověk',
-  'o.human_note': 'Tuto sekci systém záměrně nevyplňuje.',
-  'o.editable': 'upravitelné',
-  'o.sentence': 'Věta',
-  'o.save': 'Uložit sekci V',
-  'o.saving': 'Ukládám…',
-  'o.saved': 'Uloženo.',
-  'o.add_sentence': 'Přidat větu',
-  'o.remove': 'Odebrat',
-  'o.export_md': 'Stáhnout Markdown',
-  'o.contact': 'Kontaktní osoba povinné osoby',
-  'o.contact_sub': 'Samostatný blok nastavení. Jméno analytika se v oznámení nikdy neuvádí.',
-  'o.contact_name': 'Kontaktní osoba (funkce/oddělení)',
-  'o.contact_phone': 'Telefon',
-  'o.contact_email': 'E-mail',
-  'o.violations': 'QA nálezy v sekci V',
-  'o.not_found': 'Pro tento případ návrh OPO neexistuje.',
-  'o.pick': 'Návrhy OPO',
-  'o.refs': 'odkazy',
-  // radar
-  'r.title': 'Radar – co vidí banka sama vs. co vidí Stáj',
-  'r.alone': 'Co vidí každá banka sama',
-  'r.together': 'Co vidí Stáj (přeshraniční shluky)',
-  'r.cases': 'případů',
-  'r.review': 'REVIEW',
-  'r.exported': 'kandidátů exportováno (zaslepeně)',
-  'r.clusters': 'Shluky',
-  'r.disclosed': 'zveřejněn',
-  'r.withheld': 'nezveřejněn',
-  'r.refused_reason': 'důvod',
-  'r.wire': 'Výměna zaslepených zpráv (PSI)',
-  'r.wire_sub': 'Ukázky ze skutečných zpráv: jen šifrový text (hex). Žádné tokeny v čitelné podobě.',
-  'r.step': 'Krok',
-  'r.play': 'Přehrát',
-  'r.pause': 'Pozastavit',
-  'r.session': 'Relace',
-  'r.elements': 'prvků',
-  'r.exposure': 'Co se odhalí – porovnání režimů',
-  'r.mode': 'Režim',
-  'r.raw_records': 'Odhalené surové záznamy',
-  'r.bytes': 'Vyměněné bajty',
-  'r.blinded': 'Zaslepené prvky',
-  'r.match_rows': 'Řádky shody koordinátorovi',
-  'r.rule': 'Pravidlo zveřejnění',
-  'r.psi_note': 'PSI minimalizuje, co si banky sdělí. Není to právní titul ke sdílení – ten musí existovat samostatně.',
-  'r.banks': 'banky',
-  'r.candidates': 'kandidáti',
-  'r.tokens': 'tokeny',
-  'r.same_hand': 'stejná ruka',
-  'mode.isolated': 'Izolovaně',
-  'mode.staj_psi': 'Stáj (PSI)',
-  'mode.naive_raw_sharing': 'Naivní sdílení surových dat',
-  'msg.A->B blind': 'A → B: zaslepené tokeny A',
-  'msg.B->A double_blind': 'B → A: dvojitě zaslepené tokeny A',
-  'msg.B->A blind': 'B → A: zaslepené tokeny B',
-  'msg.A->B back': 'A → B: výsledek zpět',
-  // metrics
-  'm.title': 'Metriky vyhodnocení',
-  'm.modes': 'Porovnání tří režimů',
-  'm.precision': 'Přesnost',
-  'm.recall': 'Záchyt (recall)',
-  'm.f1': 'F1',
-  'm.schemes': 'Detekce podle schématu',
-  'm.personas': 'Míra FP u poctivých person',
-  'm.victims': 'Směrování obětí',
-  'm.ablations': 'Ablace',
-  'm.failures': 'Selhání',
-  'm.worst_fp': 'Nejhorší falešně pozitivní',
-  'm.fn': 'Falešně negativní (minuli jsme)',
-  'm.cnb': 'Sekce ČNB',
-  'm.rule_a_units': 'Pravidlo A – počet alertů podle jednotky',
-  'm.rule_b': 'Alerty pravidla B',
-  'm.rule_c': 'Alerty pravidla C',
-  'm.rule_c_triage': 'Pravidlo C: FP vs REVIEW',
-  'm.hist': 'Rozložení priorit',
-  'm.mom': 'Persona „máma“ – míra FP',
-  'm.sheet': 'Revizní list 30 případů',
-  'm.operating_point': 'Pracovní bod',
-  'm.n': 'n',
-  'm.flagged': 'označeno jako mule',
-  'm.routed_victim': 'do ochrany oběti',
-  'm.rate': 'míra',
-  'm.clients': 'klientů',
-  'm.tx': 'transakcí',
-  'm.ablation_full': 'plný systém',
-  'm.other': 'Ostatní',
-  // audit
-  'a.title': 'Auditní log (hash řetězec)',
-  'a.verify': 'Ověřit řetězec',
-  'a.verifying': 'Ověřuji…',
-  'a.ok': 'Řetězec je neporušený',
-  'a.bad': 'Řetězec porušen na indexu',
-  'a.total': 'záznamů celkem',
-  'a.head': 'hlava',
-  'a.seq': '#',
-  'a.ts': 'Čas',
-  'a.actor': 'Aktér',
-  'a.action': 'Akce',
-  'a.why': 'Proč',
-  'a.model': 'Model',
-  'a.input': 'Vstup',
-  'a.hash': 'Hash',
-  'a.prev': 'Předchozí',
-  // honesty
-  'h.title': 'Poctivost a limity',
-  'h.sources': 'Zdroje dat',
-  'h.planted': 'Co je v datech záměrně zasazeno',
-  'h.limitations': 'Známá omezení',
-  'h.legal': 'Právní základ',
-  'h.not_found': 'Co jsme ve veřejných zdrojích nenašli',
-  'kind.real-synthetic': 'syntetické',
-  'kind.planted': 'zasazené',
-  'kind.generic': 'obecné',
-  "v.override_requires_written_reason": "Přepsání vyžaduje písemné zdůvodnění (alespoň 10 znaků).",
-  "v.role_below_escalation_target": "Role rozhodujícího je nižší než cílová role eskalace.",
-  "v.unknown_action": "Neznámá akce.",
-  "v.unknown_role": "Neznámá role.",
-  "c.reason_min": "Server vyžaduje alespoň 10 znaků.",
-  "c.drops": "Účty za dropy",
-  "c.drops_note": "Čitelně jen u banky, která účet vede; radar viděl pouze klíčované identifikátory. Zjištění majitele účtu je vlastní prací banky, mimo Stáj.",
-  "c.ask": "Zeptat se na pravidlo",
-  "c.ask_sub": "Odpověď vychází jen z dat případu, definic pravidel a nastavených prahů. Může trvat až minutu.",
-  "c.ask_ph": "Např. Proč se spustilo pravidlo C?",
-  "c.ask_btn": "Zeptat se",
-  "c.asking": "Čekám na odpověď…",
-  "c.ask_suggest": "Návrhy otázek",
-  "c.attempts": "pokusů",
-  "c.glossary": "Význam",
-  "c.template": "šablona",
-  "q.capped": "Server vrátil {n} z {total} odpovídajících případů (limit serveru). Zužte filtry.",
-  "q.only_review": "Jen REVIEW",
-  "o.loading": "Jazykový model připravuje návrh sekce V. Při prvním otevření to trvá 1–2 minuty.",
-  "o.elapsed": "uplynulo",
-  "o.show_all": "Zobrazit vše",
-  "o.show_less": "Zobrazit méně",
-  "o.v_fallback": "Text sekce ze serveru",
-  "r.coordinator": "Banky → koordinátor: řádky shody",
-  "r.coordinator_sub": "Klíčované identifikátory tokenů a pseudonymy kandidátů. Žádné surové záznamy.",
-  "r.truncated": "zkráceno",
-  "msg.B->A double": "B → A: dvojitě zaslepené tokeny A",
-  "msg.match rows": "Banky → koordinátor: řádky shody",
-  "m.ap": "AP",
-  "m.patk": "P@K",
-  "m.any_priority": "bez prahu priority",
-  "m.per_bank": "Izolovaně – po bankách",
-  "m.best_bank": "nejlepší F1 jedné banky",
-  "m.mean_bank": "průměrné F1 bank",
-  "m.alerts_by_type": "Alerty podle pravidla",
-  "m.signals_by_detector": "Signály podle detektoru",
-  "m.actionable": "REVIEW nad pracovním bodem",
-  "m.cnb_triage": "Triáž případů",
-  "m.sheet_path": "Soubor na serveru (API ho nevystavuje):",
-  "m.extra_threshold": "Křivka prahu (průměr held-out)",
-  "m.extra_ring": "Citlivost na velikost kruhu",
-  "m.extra_headline": "Hlavní výsledky (průměr held-out)",
-  "m.delta_ref": "ΔF1 vůči Stáj (PSI)",
-  'w.title': 'Slabé důkazy radaru (předregistrováno)',
-  'w.caption': 'ghost_ring = zasazený kruh bez použitelného lokálního signálu, přidaný až poté, co první běh neukázal žádnou rezervu; PSI není právní titul; cena soukromí je skutečná.',
-  'w.prereg': 'Předregistrace',
-  'w.frozen': 'Zmrazená konfigurace',
-  'w.chart': 'Cena soukromí',
-  'w.chart_sub': 'x = průměr exportovaných tokenů na svět (log), y = průměrný záchyt s radarem; plná čára held-out, čárkovaná dev',
-  'w.x': 'exportované tokeny na svět (log)',
-  'w.tokens': 'exportované tokeny',
-  'w.ghost': 'záchyt ghost_ring',
-  'w.original': 'záchyt původních schémat',
-  'w.non_mule': 'zveřejnění kandidáti, kteří nejsou mule',
-  'w.table': 'baseline vs weak_0.05 – held-out seedy',
-  'w.table_noghost': 'baseline vs weak_0.05 – dev bez ghost_ring (cena bez přínosu)',
-  'w.ratio': 'poměr',
-  "a.extra": "Detail",
-} as const;
-
-export type I18nKey = keyof typeof cs;
-
-const en: Record<I18nKey, string> = {
-  'app.name': 'Stáj',
-  'app.tagline': 'Cross-bank money-mule radar',
-  'nav.queue': 'Alert queue',
-  'nav.case': 'Case card',
-  'nav.opo': 'STR draft (OPO)',
-  'nav.radar': 'Radar',
-  'nav.metrics': 'Metrics',
-  'nav.audit': 'Audit',
-  'nav.honesty': 'Honesty & limits',
+  'nav.queue': "Queue",
+  'nav.case': "Case",
+  'nav.opo': "Report",
+  'nav.radar': "Radar",
+  'nav.metrics': "Metrics",
+  'nav.honesty': "Limits",
   'nav.main': 'Main navigation',
-  'nav.case_hint': 'open from the queue',
-  'top.lang': 'Language',
+  'nav.case_hint': "open from the queue",
   'top.role': 'Role',
   'top.name': 'Name',
   'top.name_ph': 'Your name',
-  'top.identity': 'Demo decider identity',
-  'top.theme': 'Dark mode',
-  'chip.synthetic': 'SYNTHETIC DATA',
-  'chip.fx': 'FX: placeholder',
-  'chip.matrix': 'Escalation matrix: placeholder',
-  'chip.model': 'Model',
-  'chip.chain_ok': 'Audit chain OK',
-  'chip.chain_bad': 'Audit chain BROKEN',
-  'chip.chain_unknown': 'Chain: unknown',
-  'mock.banner': 'MOCK – the UI is running on invented data from /mock/*.json files. No number here is a system result. Set VITE_API_BASE for the real API.',
+  'top.identity': "Acting as",
+  'chip.synthetic': "Synthetic data",
+  'mock.banner': "Mock data. The UI is not connected to the API, so no number here is a system result.",
   'common.loading': 'Loading…',
   'common.error': 'Failed to load',
   'common.na': 'not available',
@@ -375,7 +30,7 @@ const en: Record<I18nKey, string> = {
   'common.no': 'no',
   'common.prev': 'Previous',
   'common.next': 'Next',
-  'common.latest': 'Latest',
+  'a.ts': 'Time',
   'common.page': 'Page',
   'common.of': 'of',
   'common.proposal': 'SYSTEM PROPOSAL',
@@ -391,7 +46,7 @@ const en: Record<I18nKey, string> = {
   'status.open': 'open',
   'status.confirmed': 'confirmed',
   'status.overridden': 'overridden',
-  'q.title': 'Alert queue',
+  'q.title': "Queue",
   'q.funnel_before': 'alerts before triage',
   'q.funnel_cases': 'cases',
   'q.funnel_review': 'REVIEW after triage',
@@ -416,11 +71,11 @@ const en: Record<I18nKey, string> = {
   'q.shown': 'shown',
   'q.sort_hint': 'Click a header to sort. Enter opens the case.',
   'q.fp_note': 'FP = proposed auto-close; a human confirms it.',
-  'c.title': 'Case card',
+  'c.title': "Case",
   'c.suspicious': 'Suspicious signals',
   'c.exculpatory': 'Exculpatory signals',
-  'c.mom_or_horse': 'Mom, or mule?',
-  'c.mom_or_horse_sub': 'What speaks for a mule and what against it – side by side.',
+  'c.mom_or_horse': "Mule or not?",
+  'c.mom_or_horse_sub': "What points to a mule and what points away from it.",
   'c.no_signals': 'No signals.',
   'c.no_exculpatory': 'The system found no exculpatory signal. That does not mean none exists.',
   'c.evidence': 'Evidence fields',
@@ -447,7 +102,6 @@ const en: Record<I18nKey, string> = {
   'c.refs_hint': 'Chips refer to signals; click to highlight the signal.',
   'c.model': 'model',
   'c.cached': 'cached',
-  'c.lang_view': 'Explanation language',
   'c.triage_proposal': 'Triage proposal',
   'c.reasons': 'Reasons',
   'c.escalation': 'Escalation',
@@ -491,7 +145,7 @@ const en: Record<I18nKey, string> = {
   'v.override_reason_required': 'An override requires a reason.',
   'v.decider_role_below_escalation_target': 'The decider role is below the escalation target role.',
   'v.decider_missing': 'Decider name is missing.',
-  'o.title': 'Suspicious transaction report (OPO) draft for FAÚ',
+  'o.title': "Report draft for the FIU",
   'o.banner': 'DRAFT – synthetic data. Submitting is solely a human decision.',
   'o.human': 'left for the human',
   'o.human_note': 'The system deliberately does not fill this section.',
@@ -502,7 +156,7 @@ const en: Record<I18nKey, string> = {
   'o.saved': 'Saved.',
   'o.add_sentence': 'Add sentence',
   'o.remove': 'Remove',
-  'o.export_md': 'Download Markdown',
+  'o.export_md': "Download Markdown",
   'o.contact': 'Obliged entity contact person',
   'o.contact_sub': 'Separate settings block. The analyst name is never included in the report.',
   'o.contact_name': 'Contact person (function/department)',
@@ -577,23 +231,7 @@ const en: Record<I18nKey, string> = {
   'm.tx': 'transactions',
   'm.ablation_full': 'full system',
   'm.other': 'Other',
-  'a.title': 'Audit log (hash chain)',
-  'a.verify': 'Verify chain',
-  'a.verifying': 'Verifying…',
-  'a.ok': 'Chain is intact',
-  'a.bad': 'Chain broken at index',
-  'a.total': 'entries in total',
-  'a.head': 'head',
-  'a.seq': '#',
-  'a.ts': 'Time',
-  'a.actor': 'Actor',
-  'a.action': 'Action',
-  'a.why': 'Why',
-  'a.model': 'Model',
-  'a.input': 'Input',
-  'a.hash': 'Hash',
-  'a.prev': 'Previous',
-  'h.title': 'Honesty & limits',
+  'h.title': "Limits",
   'h.sources': 'Data sources',
   'h.planted': 'What is deliberately planted in the data',
   'h.limitations': 'Known limitations',
@@ -659,67 +297,40 @@ const en: Record<I18nKey, string> = {
   'w.table': 'baseline vs weak_0.05 – held-out seeds',
   'w.table_noghost': 'baseline vs weak_0.05 – dev without ghost_ring (cost without benefit)',
   'w.ratio': 'ratio',
-  "a.extra": "Detail",
-};
+} as const;
 
-export type Lang = 'cs' | 'en';
-const DICTS: Record<Lang, Record<I18nKey, string>> = { cs, en };
+export type I18nKey = keyof typeof STR;
+export type Lang = 'en';
 
-interface I18nCtx {
-  lang: Lang;
-  setLang: (l: Lang) => void;
-  t: (k: I18nKey, vars?: Record<string, string | number>) => string;
-  /** Translate a dynamic key if present, else return fallback (or the raw key). */
-  tx: (k: string, fallback?: string) => string;
-  num: (n: number, digits?: number) => string;
-  pct: (n: number, digits?: number) => string;
+const LOCALE = 'en-GB';
+
+export function t(k: I18nKey, vars?: Record<string, string | number>): string {
+  let s: string = STR[k] ?? k;
+  if (vars) for (const [vk, vv] of Object.entries(vars)) s = s.replace(`{${vk}}`, String(vv));
+  return s;
 }
 
-const Ctx = createContext<I18nCtx | null>(null);
-
-function readLang(): Lang {
-  try {
-    const v = localStorage.getItem('staj.lang');
-    return v === 'en' ? 'en' : 'cs';
-  } catch {
-    return 'cs';
-  }
+/** Look up a key built at runtime (e.g. a server code); falls back when unknown. */
+export function tx(k: string, fallback?: string): string {
+  return k in STR ? STR[k as I18nKey] : fallback ?? k;
 }
 
-export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(readLang);
-  useEffect(() => {
-    document.documentElement.lang = lang;
-  }, [lang]);
-  const setLang = useCallback((l: Lang) => {
-    setLangState(l);
-    try {
-      localStorage.setItem('staj.lang', l);
-    } catch {
-      /* ignore */
-    }
-  }, []);
-  const value = useMemo<I18nCtx>(() => {
-    const d = DICTS[lang];
-    const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
-    return {
-      lang,
-      setLang,
-      t: (k, vars) => {
-        let s = d[k] ?? k;
-        if (vars) for (const [vk, vv] of Object.entries(vars)) s = s.replace(`{${vk}}`, String(vv));
-        return s;
-      },
-      tx: (k, fallback) => (k in d ? d[k as I18nKey] : fallback ?? k),
-      num: (n, digits = 0) => new Intl.NumberFormat(locale, { maximumFractionDigits: digits, minimumFractionDigits: digits }).format(n),
-      pct: (n, digits = 1) => new Intl.NumberFormat(locale, { style: 'percent', maximumFractionDigits: digits, minimumFractionDigits: digits }).format(n),
-    };
-  }, [lang, setLang]);
-  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+export function num(n: number, digits = 0): string {
+  return new Intl.NumberFormat(LOCALE, { maximumFractionDigits: digits, minimumFractionDigits: digits }).format(n);
 }
 
-export function useI18n(): I18nCtx {
-  const c = useContext(Ctx);
-  if (!c) throw new Error('useI18n outside provider');
-  return c;
+export function pct(n: number, digits = 1): string {
+  return new Intl.NumberFormat(LOCALE, { style: 'percent', maximumFractionDigits: digits, minimumFractionDigits: digits }).format(n);
+}
+
+export function fmtDate(iso: string, withTime = true): string {
+  const d = new Date(iso);
+  return withTime ? d.toLocaleString(LOCALE) : d.toLocaleDateString(LOCALE, { day: 'numeric', month: 'short' });
+}
+
+const API = { lang: 'en' as Lang, t, tx, num, pct, fmtDate };
+
+/** Kept as a hook so screens stay unchanged; it returns static helpers. */
+export function useI18n() {
+  return API;
 }

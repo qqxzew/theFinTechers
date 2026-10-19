@@ -84,7 +84,9 @@ def build_state(world: str = "data/redteam/seed707", audit_path: str = "eval/out
     if fresh and os.path.exists(audit_path):
         os.remove(audit_path)
     audit = AuditLog(audit_path)
-    radar = run_radar([to_bank_node(r) for r in results.values()], Guards(cfg["radar_guards"]), epoch_key=EPOCH_KEY, audit=audit)
+    rc = cfg["radar"]
+    radar = run_radar([to_bank_node(r) for r in results.values()], Guards(cfg["radar_guards"]), epoch_key=EPOCH_KEY, audit=audit,
+                       min_significance=rc["min_significance"] if rc["use_significance"] else None, significance_cap=rc["significance_cap"])
     cases, feats, case_bank = {}, {}, {}
     for b, r in results.items():
         for c in apply_clusters(r, radar.clusters):

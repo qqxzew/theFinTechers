@@ -1,0 +1,1135 @@
+{
+  "uid": "staj-eval",
+  "title": "Evaluation",
+  "tags": [
+    "staj"
+  ],
+  "timezone": "utc",
+  "editable": false,
+  "graphTooltip": 0,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {
+    "hidden": true
+  },
+  "refresh": "",
+  "schemaVersion": 41,
+  "version": 1,
+  "liveNow": false,
+  "fiscalYearStartMonth": 0,
+  "annotations": {
+    "list": []
+  },
+  "templating": {
+    "list": []
+  },
+  "links": [],
+  "panels": [
+    {
+      "id": 1,
+      "type": "barchart",
+      "title": "",
+      "description": "",
+      "transparent": true,
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "staj-api"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "staj-api"
+          },
+          "type": "json",
+          "source": "url",
+          "format": "table",
+          "parser": "backend",
+          "url": "/api/metrics",
+          "url_options": {
+            "method": "GET",
+            "data": ""
+          },
+          "root_selector": "($h := headline_held_out_mean; $map([\"precision\",\"recall\",\"f1\"], function($m){ {\"metric\": $m = \"f1\" ? \"Overall score\" : $m = \"precision\" ? \"Alerts that were right\" : \"Mules found\", \"isolated\": $lookup($h.isolated, $m), \"naive_raw_sharing\": $lookup($h.naive_raw_sharing, $m), \"staj_psi\": $lookup($h.staj_psi, $m)} }))",
+          "columns": [
+            {
+              "selector": "metric",
+              "text": "Metric",
+              "type": "string"
+            },
+            {
+              "selector": "isolated",
+              "text": "Banks alone",
+              "type": "number"
+            },
+            {
+              "selector": "naive_raw_sharing",
+              "text": "All data pooled (privacy cost)",
+              "type": "number"
+            },
+            {
+              "selector": "staj_psi",
+              "text": "With Stáj",
+              "type": "number"
+            }
+          ],
+          "filters": []
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 0,
+          "min": 0,
+          "max": 1.06,
+          "custom": {
+            "axisLabel": "Share (average over test worlds)",
+            "axisPlacement": "left",
+            "fillOpacity": 100,
+            "lineWidth": 0,
+            "gradientMode": "none",
+            "axisGridShow": true,
+            "axisBorderShow": false
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Banks alone"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#8A8F98"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "All data pooled (privacy cost)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#C9A227"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "With Stáj"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#1F3A5F"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Metric"
+            },
+            "properties": [
+              {
+                "id": "custom.axisGridShow",
+                "value": false
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": ""
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "orientation": "vertical",
+        "xField": "Metric",
+        "groupWidth": 0.7,
+        "barWidth": 0.85,
+        "barRadius": 0,
+        "showValue": "always",
+        "stacking": "none",
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "text": {
+          "valueSize": 11
+        },
+        "fullHighlight": false
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "Metric": 0,
+              "Banks alone": 1,
+              "All data pooled (privacy cost)": 2,
+              "With Stáj": 3
+            },
+            "excludeByName": {},
+            "renameByName": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "trend",
+      "title": "",
+      "description": "",
+      "transparent": true,
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "staj-api"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "staj-api"
+          },
+          "type": "json",
+          "source": "url",
+          "format": "table",
+          "parser": "backend",
+          "url": "/api/metrics",
+          "url_options": {
+            "method": "GET",
+            "data": ""
+          },
+          "root_selector": "($t := threshold_curve_held_out_mean; $map($sort($keys($t.staj_psi), function($a, $b){ $number($a) > $number($b) }), function($k){ {\"threshold\": $number($k), \"isolated\": $lookup($t.isolated, $k).tp, \"naive_raw_sharing\": $lookup($t.naive_raw_sharing, $k).tp, \"staj_psi\": $lookup($t.staj_psi, $k).tp} }))",
+          "columns": [
+            {
+              "selector": "threshold",
+              "text": "Priority cut-off",
+              "type": "number"
+            },
+            {
+              "selector": "isolated",
+              "text": "Banks alone",
+              "type": "number"
+            },
+            {
+              "selector": "naive_raw_sharing",
+              "text": "All data pooled (privacy cost)",
+              "type": "number"
+            },
+            {
+              "selector": "staj_psi",
+              "text": "With Stáj",
+              "type": "number"
+            }
+          ],
+          "filters": []
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "min": 0,
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1.5,
+            "pointSize": 5,
+            "showPoints": "always",
+            "lineInterpolation": "linear",
+            "fillOpacity": 0,
+            "axisLabel": "Found (mules, average)",
+            "axisGridShow": true,
+            "axisBorderShow": false,
+            "spanNulls": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Banks alone"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#8A8F98"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "All data pooled (privacy cost)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#C9A227"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "With Stáj"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#1F3A5F"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Priority cut-off"
+            },
+            "properties": [
+              {
+                "id": "custom.axisLabel",
+                "value": "Priority cut-off"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "min",
+                "value": null
+              },
+              {
+                "id": "custom.axisGridShow",
+                "value": false
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "xField": "Priority cut-off",
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "Priority cut-off": 0,
+              "Banks alone": 1,
+              "All data pooled (privacy cost)": 2,
+              "With Stáj": 3
+            },
+            "excludeByName": {},
+            "renameByName": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "trend",
+      "title": "",
+      "description": "",
+      "transparent": true,
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "staj-api"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 10,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "staj-api"
+          },
+          "type": "json",
+          "source": "url",
+          "format": "table",
+          "parser": "backend",
+          "url": "/api/metrics",
+          "url_options": {
+            "method": "GET",
+            "data": ""
+          },
+          "root_selector": "($w := weak_evidence_experiment; $append(($s := $lookup($w, \"held_out\"); $seeds := $keys($s); $map([\"baseline\",\"weak_0.05\",\"weak_0.10\",\"weak_0.20\",\"weak_0.40\"], function($v){ {\"variant\": $v, \"split\": \"held_out\", \"exported\": $average($map($seeds, function($k){ $lookup($lookup($s, $k), $v).exported_candidates })), \"heldout\": $average($map($seeds, function($k){ $lookup($lookup($s, $k), $v).staj_psi.ghost_recall })), \"dev\": null } })), ($s := $lookup($w, \"dev\"); $seeds := $keys($s); $map([\"baseline\",\"weak_0.05\",\"weak_0.10\",\"weak_0.20\",\"weak_0.40\"], function($v){ {\"variant\": $v, \"split\": \"dev\", \"exported\": $average($map($seeds, function($k){ $lookup($lookup($s, $k), $v).exported_candidates })), \"dev\": $average($map($seeds, function($k){ $lookup($lookup($s, $k), $v).staj_psi.ghost_recall })), \"heldout\": null } }))))",
+          "columns": [
+            {
+              "selector": "exported",
+              "text": "Accounts exported to the radar (log scale)",
+              "type": "number"
+            },
+            {
+              "selector": "heldout",
+              "text": "Test worlds",
+              "type": "number"
+            },
+            {
+              "selector": "dev",
+              "text": "Tuning worlds",
+              "type": "number"
+            },
+            {
+              "selector": "variant",
+              "text": "Variant",
+              "type": "string"
+            }
+          ],
+          "filters": []
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 0,
+          "min": 0,
+          "max": 1,
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1.5,
+            "pointSize": 6,
+            "showPoints": "always",
+            "lineInterpolation": "linear",
+            "fillOpacity": 0,
+            "spanNulls": true,
+            "axisLabel": "Hidden ring found (share of test worlds)",
+            "axisPlacement": "right",
+            "axisGridShow": true,
+            "axisBorderShow": false
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Accounts exported to the radar (log scale)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "short"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "min",
+                "value": null
+              },
+              {
+                "id": "max",
+                "value": null
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "Accounts exported to the radar (log scale)"
+              },
+              {
+                "id": "custom.axisGridShow",
+                "value": false
+              },
+              {
+                "id": "custom.scaleDistribution",
+                "value": {
+                  "type": "log",
+                  "log": 10
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Test worlds"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#1F3A5F"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Tuning worlds"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#8A8F98"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "xField": "Accounts exported to the radar (log scale)",
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "Accounts exported to the radar (log scale)": 0,
+              "Test worlds": 1,
+              "Tuning worlds": 2,
+              "Variant": 3
+            },
+            "excludeByName": {},
+            "renameByName": {}
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Accounts exported to the radar (log scale)",
+                "desc": false
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Variant": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "",
+      "description": "",
+      "transparent": true,
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "staj-api"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 10,
+        "w": 12,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "staj-api"
+          },
+          "type": "json",
+          "source": "url",
+          "format": "table",
+          "parser": "backend",
+          "url": "/api/metrics",
+          "url_options": {
+            "method": "GET",
+            "data": ""
+          },
+          "root_selector": "($h := headline_held_out_mean; [{\"staj_psi\": $h.staj_psi.raw_records_exposed, \"naive_raw_sharing\": $h.naive_raw_sharing.raw_records_exposed}])",
+          "columns": [
+            {
+              "selector": "staj_psi",
+              "text": "With Stáj",
+              "type": "number"
+            },
+            {
+              "selector": "naive_raw_sharing",
+              "text": "All data pooled (privacy cost)",
+              "type": "number"
+            }
+          ],
+          "filters": []
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "locale",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#1F3A5F"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "With Stáj"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "With Stáj: raw records shared"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "All data pooled (privacy cost)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "All data pooled (privacy cost): raw records shared"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#C9A227"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "vertical",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 14,
+          "valueSize": 30
+        }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "With Stáj": 0,
+              "All data pooled (privacy cost)": 1
+            },
+            "excludeByName": {},
+            "renameByName": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "barchart",
+      "title": "",
+      "description": "",
+      "transparent": true,
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "staj-api"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "staj-api"
+          },
+          "type": "json",
+          "source": "url",
+          "format": "table",
+          "parser": "backend",
+          "url": "/api/metrics",
+          "url_options": {
+            "method": "GET",
+            "data": ""
+          },
+          "root_selector": "($b := breakdown; $names := {\"same_hand\": \"Same operator\", \"same_hand_stealth\": \"Same operator, small amounts\", \"ghost_ring\": \"Hidden ring\", \"day_zero\": \"Brand-new account\", \"fixed_skim\": \"Fixed commission\", \"invoice_mule\": \"Fake invoices\"}; $map($filter($keys($b), function($k){ $substringBefore($k, \":\") = \"scheme\" }), function($k){ ($id := $substringAfter($k, \":\"); $nm := $lookup($names, $id); $f := $lookup($b, $k).flagged_as_mule_case; $n := $lookup($b, $k).n; {\"group\": ($nm ? $nm : $id) & \"   \" & $string($f) & \" of \" & $string($n) & \" (\" & $string($round(100 * $f / $n)) & \"%)\", \"value\": $f / $n}) }))",
+          "columns": [
+            {
+              "selector": "group",
+              "text": "Group",
+              "type": "string"
+            },
+            {
+              "selector": "value",
+              "text": "Planted mules caught, with Stáj",
+              "type": "number"
+            }
+          ],
+          "filters": []
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 0,
+          "min": 0,
+          "max": 1,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#1F3A5F"
+          },
+          "custom": {
+            "axisLabel": "Planted mules caught, with Stáj",
+            "fillOpacity": 100,
+            "lineWidth": 0,
+            "axisPlacement": "hidden",
+            "axisBorderShow": false,
+            "axisGridShow": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Group"
+            },
+            "properties": [
+              {
+                "id": "custom.axisGridShow",
+                "value": false
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "Planted mules caught, with Stáj"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "orientation": "horizontal",
+        "xField": "Group",
+        "groupWidth": 0.6,
+        "barWidth": 0.9,
+        "showValue": "never",
+        "stacking": "none",
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "text": {
+          "valueSize": 11
+        },
+        "fullHighlight": false
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "Group": 0,
+              "Planted mules caught, with Stáj": 1
+            },
+            "excludeByName": {},
+            "renameByName": {}
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Planted mules caught, with Stáj",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "barchart",
+      "title": "",
+      "description": "",
+      "transparent": true,
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "staj-api"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 20,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "staj-api"
+          },
+          "type": "json",
+          "source": "url",
+          "format": "table",
+          "parser": "backend",
+          "url": "/api/metrics",
+          "url_options": {
+            "method": "GET",
+            "data": ""
+          },
+          "root_selector": "($b := breakdown; $names := {\"migrant_remit\": \"Migrant sending money home\", \"students_rent\": \"Students splitting rent\", \"second_hand_seller\": \"Second-hand seller\", \"group_collection\": \"Group collection\", \"middleman_cohost\": \"Fixed-fee middleman\", \"freelancer\": \"Freelancer\", \"fundraiser\": \"Fundraiser\"}; $map($filter($keys($b), function($k){ $substringBefore($k, \":\") = \"persona\" }), function($k){ ($id := $substringAfter($k, \":\"); $nm := $lookup($names, $id); $f := $lookup($b, $k).flagged_as_mule_case; $n := $lookup($b, $k).n; {\"group\": ($nm ? $nm : $id) & \"   \" & $string($f) & \" of \" & $string($n) & \" (\" & $string($round(100 * $f / $n)) & \"%)\", \"value\": $f / $n}) }))",
+          "columns": [
+            {
+              "selector": "group",
+              "text": "Group",
+              "type": "string"
+            },
+            {
+              "selector": "value",
+              "text": "Honest look-alikes wrongly flagged, with Stáj",
+              "type": "number"
+            }
+          ],
+          "filters": []
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 0,
+          "min": 0,
+          "max": 1,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#1F3A5F"
+          },
+          "custom": {
+            "axisLabel": "Honest look-alikes wrongly flagged, with Stáj",
+            "fillOpacity": 100,
+            "lineWidth": 0,
+            "axisPlacement": "hidden",
+            "axisBorderShow": false,
+            "axisGridShow": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Group"
+            },
+            "properties": [
+              {
+                "id": "custom.axisGridShow",
+                "value": false
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "Honest look-alikes wrongly flagged, with Stáj"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "orientation": "horizontal",
+        "xField": "Group",
+        "groupWidth": 0.6,
+        "barWidth": 0.9,
+        "showValue": "never",
+        "stacking": "none",
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "text": {
+          "valueSize": 11
+        },
+        "fullHighlight": false
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "Group": 0,
+              "Honest look-alikes wrongly flagged, with Stáj": 1
+            },
+            "excludeByName": {},
+            "renameByName": {}
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Honest look-alikes wrongly flagged, with Stáj",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "table",
+      "title": "",
+      "description": "",
+      "transparent": true,
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "staj-api"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 29,
+        "w": 24,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "staj-api"
+          },
+          "type": "json",
+          "source": "url",
+          "format": "table",
+          "parser": "backend",
+          "url": "/api/metrics",
+          "url_options": {
+            "method": "GET",
+            "data": ""
+          },
+          "root_selector": "($S := {\"R-A\": \"volume above the stated profile\", \"R-B\": \"payment linked to a high-risk country or a PEP\", \"R-C\": \"money passed straight through\", \"D1\": \"fast pass-through pattern\", \"D2\": \"new account emptied at once\", \"D3\": \"volume far above the stated profile\", \"D4\": \"many new unknown senders\", \"D5\": \"money leaves to rarely used recipients\", \"D6\": \"same operator as other suspects\", \"D7\": \"fixed commission skimmed\", \"D8\": \"amounts just under a limit\", \"X\": \"linked to suspects at other banks\"}; $E := {\"E1\": \"regular money sent home\", \"E2\": \"everyday spending\", \"E3\": \"own salary\", \"E4\": \"payers are institutions\", \"E5\": \"two-way payments\", \"E6\": \"one-off group collection\", \"E7\": \"fixed-fee middleman\", \"E8\": \"freelance income\"}; $P := {\"migrant_remit\": \"Migrant sending money home\", \"students_rent\": \"Students splitting rent\", \"second_hand_seller\": \"Second-hand seller\", \"group_collection\": \"Group collection\", \"middleman_cohost\": \"Fixed-fee middleman\", \"freelancer\": \"Freelancer\", \"fundraiser\": \"Fundraiser\"}; $C := {\"same_hand\": \"Same operator\", \"same_hand_stealth\": \"Same operator, small amounts\", \"ghost_ring\": \"Hidden ring\", \"day_zero\": \"Brand-new account\", \"fixed_skim\": \"Fixed commission\", \"invoice_mule\": \"Fake invoices\"}; $f := failures; $append($map($f.worst_false_positives, function($r){ ($bk := $substringBefore($r.reasons[0], \"-\"); $why := $map($filter($r.reasons, function($x){ $not($contains($x, \" priority \")) }), function($x){ ($body := $substringAfter($x, \": \"); $sig := $substringBefore($body, \":\"); $s := $lookup($S, $sig); $ex := $substringBefore($substringAfter($body, \" explained by \"), \":\"); $e := $lookup($E, $ex); ($s ? $s : $sig) & ($contains($body, \" explained by \") ? \" (but \" & ($e ? $e : $ex) & \")\" : \"\")) }); $grp := $r.persona ? $lookup($P, $r.persona) : $lookup($C, $r.scheme); {\"client_id\": $r.client_id, \"bank\": $bk ? \"Bank \" & $substring($bk, 1) : \"\", \"priority\": $r.priority, \"why\": \"False alarm\" & ($grp ? \" (\" & $grp & \")\" : \"\") & \": \" & ($count($why) > 0 ? $join($why, \"; \") : \"no signal strong enough\")}) }), $map($f.false_negatives, function($r){ ($bk := $substringBefore($r.reasons[0], \"-\"); $why := $map($filter($r.reasons, function($x){ $not($contains($x, \" priority \")) }), function($x){ ($body := $substringAfter($x, \": \"); $sig := $substringBefore($body, \":\"); $s := $lookup($S, $sig); $ex := $substringBefore($substringAfter($body, \" explained by \"), \":\"); $e := $lookup($E, $ex); ($s ? $s : $sig) & ($contains($body, \" explained by \") ? \" (but \" & ($e ? $e : $ex) & \")\" : \"\")) }); $grp := $r.persona ? $lookup($P, $r.persona) : $lookup($C, $r.scheme); {\"client_id\": $r.client_id, \"bank\": $bk ? \"Bank \" & $substring($bk, 1) : \"\", \"priority\": $r.priority, \"why\": \"Missed mule\" & ($grp ? \" (\" & $grp & \")\" : \"\") & \": \" & ($count($why) > 0 ? $join($why, \"; \") : \"no signal strong enough\")}) })))",
+          "columns": [
+            {
+              "selector": "client_id",
+              "text": "Client",
+              "type": "string"
+            },
+            {
+              "selector": "bank",
+              "text": "Bank",
+              "type": "string"
+            },
+            {
+              "selector": "priority",
+              "text": "Priority",
+              "type": "number"
+            },
+            {
+              "selector": "why",
+              "text": "Why",
+              "type": "string"
+            }
+          ],
+          "filters": []
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "left",
+            "cellOptions": {
+              "type": "auto",
+              "wrapText": true
+            },
+            "wrapText": true,
+            "inspect": false,
+            "filterable": false
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#1F3A5F"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Client"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 90
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Bank"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 80
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Priority"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 80
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "fields": ""
+        },
+        "sortBy": [
+          {
+            "displayName": "Priority",
+            "desc": true
+          }
+        ]
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "Client": 0,
+              "Bank": 1,
+              "Priority": 2,
+              "Why": 3
+            },
+            "excludeByName": {},
+            "renameByName": {}
+          }
+        }
+      ]
+    }
+  ],
+  "description": "Stáj evaluation numbers served by the FastAPI backend (/api/metrics). Synthetic data."
+}

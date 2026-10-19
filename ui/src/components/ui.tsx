@@ -1,190 +1,334 @@
-import type { ReactNode } from 'react';
-import { useI18n } from '../i18n';
-import type { DecisionStatus, Route, Triage } from '../types';
+/*
+ * Stáj UI primitives. Rules: light only, no borders (shadow delimits), colour only for meaning
+ * (ink text, grey secondary, one ink-blue accent, amber for rare warnings), tabular numbers,
+ * monospace only for ids and hashes. See ui/README.md "Primitives".
+ */
+import { useRef, type ButtonHTMLAttributes, type KeyboardEvent, type ReactNode } from 'react';
 
-type Tone = 'neutral' | 'teal' | 'navy' | 'warn' | 'bad' | 'good' | 'violet' | 'outline';
+const cx = (...c: (string | false | null | undefined)[]) => c.filter(Boolean).join(' ');
 
-const TONES: Record<Tone, string> = {
-  neutral: 'bg-paper text-muted border-line',
-  teal: 'bg-tealsoft text-teal border-teal/30',
-  navy: 'bg-navy/10 text-navy border-navy/25',
-  warn: 'bg-warnsoft text-warn border-warn/35',
-  bad: 'bg-badsoft text-bad border-bad/30',
-  good: 'bg-goodsoft text-good border-good/30',
-  violet: 'bg-violetsoft text-violet border-violet/30',
-  outline: 'bg-transparent text-ink border-line',
-};
+/* ------------------------------------------------------------------ layout */
 
-export function Chip({ tone = 'neutral', children, title, className = '', mono = false }: { tone?: Tone; children: ReactNode; title?: string; className?: string; mono?: boolean }) {
+/** Page wrapper: max content width, vertical rhythm between sections. */
+export function Page({ children, className }: { children: ReactNode; className?: string }) {
+  return <div className={cx('mx-auto w-full max-w-content space-y-10 pb-16', className)}>{children}</div>;
+}
+
+/** Page title with optional one-line description and right-aligned actions. */
+export function PageTitle({ title, description, actions }: { title: ReactNode; description?: ReactNode; actions?: ReactNode }) {
   return (
-    <span
-      title={title}
-      className={`inline-flex items-center gap-1 whitespace-nowrap rounded border px-1.5 py-[1px] text-[11px] font-medium leading-4 ${mono ? 'font-mono' : ''} ${TONES[tone]} ${className}`}
-    >
+    <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+      <div className="min-w-0">
+        <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">{title}</h1>
+        {description && <p className="mt-1 max-w-2xl text-[15px] text-muted">{description}</p>}
+      </div>
+      {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+    </header>
+  );
+}
+
+/** A titled block of the page. `explain` is one plain line saying what this is. */
+export function Section({
+  title,
+  explain,
+  actions,
+  children,
+  id,
+  className,
+}: {
+  title: ReactNode;
+  explain?: ReactNode;
+  actions?: ReactNode;
+  children: ReactNode;
+  id?: string;
+  className?: string;
+}) {
+  return (
+    <section aria-labelledby={id ? `${id}-h` : undefined} className={cx('space-y-4', className)}>
+      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+        <div className="min-w-0">
+          <h2 id={id ? `${id}-h` : undefined} className="text-[17px] font-semibold tracking-tight text-ink">
+            {title}
+          </h2>
+          {explain && <p className="mt-0.5 max-w-3xl text-[14px] text-muted">{explain}</p>}
+        </div>
+        {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+      </div>
       {children}
-    </span>
+    </section>
   );
 }
 
-/** Thin horizontal bar for priority (0..100) or score (0..1). */
-export function Bar({ value, max = 1, tone = 'navy', label, width = 'w-20' }: { value: number; max?: number; tone?: 'navy' | 'warn' | 'teal' | 'bad' | 'good'; label?: string; width?: string }) {
-  const pct = Math.max(0, Math.min(1, value / max)) * 100;
-  const color = { navy: 'bg-navy', warn: 'bg-warn', teal: 'bg-teal', bad: 'bg-bad', good: 'bg-good' }[tone];
+/** White surface lifted by a soft shadow. `title`/`sub`/`right` make an optional header. */
+export function Card({
+  title,
+  sub,
+  right,
+  children,
+  className,
+  id,
+  interactive = false,
+  padded = true,
+}: {
+  title?: ReactNode;
+  sub?: ReactNode;
+  right?: ReactNode;
+  children: ReactNode;
+  className?: string;
+  id?: string;
+  interactive?: boolean;
+  padded?: boolean;
+}) {
   return (
-    <span className="inline-flex items-center gap-2" aria-label={label}>
-      <span className={`relative h-1.5 ${width} overflow-hidden rounded-full bg-line`} aria-hidden="true">
-        <span className={`absolute inset-y-0 left-0 ${color}`} style={{ width: `${pct}%` }} />
-      </span>
-    </span>
-  );
-}
-
-export function PriorityBar({ p }: { p: number }) {
-  const tone = p >= 85 ? 'bad' : p >= 70 ? 'warn' : p >= 40 ? 'navy' : 'teal';
-  return (
-    <span className="inline-flex items-center gap-2">
-      <span className="tnum w-7 text-right text-sm font-semibold">{p}</span>
-      <Bar value={p} max={100} tone={tone} width="w-16" label={`priority ${p}`} />
-    </span>
-  );
-}
-
-export function TriageChip({ triage }: { triage: Triage | string }) {
-  return (
-    <Chip tone={triage === 'FP' ? 'good' : 'navy'} title={triage === 'FP' ? 'proposed auto-close' : 'proposed human review'}>
-      {triage}
-    </Chip>
-  );
-}
-
-export function RouteChip({ route }: { route: Route | string }) {
-  const { t } = useI18n();
-  if (route !== 'victim_protection') return null;
-  return <Chip tone="violet">{t('route.victim_protection')}</Chip>;
-}
-
-export function StatusChip({ status }: { status: DecisionStatus }) {
-  const { t } = useI18n();
-  const tone: Tone = status === 'open' ? 'outline' : status === 'confirmed' ? 'teal' : 'warn';
-  return <Chip tone={tone}>{t(`status.${status}`)}</Chip>;
-}
-
-export function RuleChip({ rule, title }: { rule: string; title?: string }) {
-  const tone: Tone = rule === 'X' ? 'warn' : rule.startsWith('R-') ? 'neutral' : 'outline';
-  return (
-    <Chip tone={tone} mono title={title}>
-      {rule}
-    </Chip>
-  );
-}
-
-export function ClusterBadge({ id }: { id: string | null }) {
-  if (!id) return <span className="text-muted">–</span>;
-  return (
-    <Chip tone="warn" mono>
-      ◆ {id}
-    </Chip>
-  );
-}
-
-export function Card({ title, sub, right, children, className = '', id }: { title?: ReactNode; sub?: ReactNode; right?: ReactNode; children: ReactNode; className?: string; id?: string }) {
-  return (
-    <section className={`card ${className}`} aria-labelledby={id ? `${id}-h` : undefined}>
+    <section
+      className={cx('card', interactive && 'transition-shadow duration-150 hover:shadow-raise', className)}
+      aria-labelledby={id && title ? `${id}-h` : undefined}
+    >
       {(title || right) && (
-        <header className="flex flex-wrap items-start justify-between gap-2 border-b border-line px-4 py-3">
+        <header className="flex flex-wrap items-start justify-between gap-3 px-6 pt-5">
           <div className="min-w-0">
             {title && (
-              <h2 id={id ? `${id}-h` : undefined} className="card-h">
+              <h3 id={id ? `${id}-h` : undefined} className="card-h">
                 {title}
-              </h2>
+              </h3>
             )}
             {sub && <p className="card-sub mt-0.5">{sub}</p>}
           </div>
           {right && <div className="flex flex-wrap items-center gap-2">{right}</div>}
         </header>
       )}
-      <div className="p-4">{children}</div>
+      <div className={padded ? 'px-6 pb-6 pt-4' : ''}>{children}</div>
     </section>
   );
 }
 
-export function Loading() {
-  const { t } = useI18n();
+/* ------------------------------------------------------------------ controls */
+
+type ButtonVariant = 'primary' | 'secondary' | 'quiet';
+
+export function Button({ variant = 'secondary', className, ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: ButtonVariant }) {
+  return <button {...rest} className={cx(`btn-${variant}`, className)} />;
+}
+
+/** Neutral label. Emphasis is by weight, never by colour; `warn` (amber text) is for rare real warnings. */
+export function Tag({
+  children,
+  tone = 'default',
+  mono = false,
+  title,
+  className,
+}: {
+  children: ReactNode;
+  tone?: 'default' | 'strong' | 'muted' | 'warn';
+  mono?: boolean;
+  title?: string;
+  className?: string;
+}) {
   return (
-    <div role="status" className="flex items-center gap-2 p-6 text-sm text-muted">
-      <span className="h-3 w-3 animate-spin rounded-full border-2 border-line border-t-teal" aria-hidden="true" />
-      {t('common.loading')}
+    <span
+      title={title}
+      className={cx(
+        'inline-flex items-center whitespace-nowrap rounded-md bg-sunken px-1.5 py-[1px] text-[12px] leading-5',
+        mono && 'font-mono text-[11.5px]',
+        tone === 'strong' && 'font-semibold text-ink',
+        tone === 'default' && 'font-medium text-ink/80',
+        tone === 'muted' && 'text-muted',
+        tone === 'warn' && 'bg-ambersoft font-semibold text-amber',
+        className,
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+
+/** Big number with a one-line label. */
+export function Stat({ value, label, hint, emphasis = false }: { value: ReactNode; label: ReactNode; hint?: ReactNode; emphasis?: boolean }) {
+  return (
+    <div className="min-w-0">
+      <div className={cx('tnum text-[30px] font-semibold leading-none tracking-tight', emphasis ? 'text-accent' : 'text-ink')}>{value}</div>
+      <div className="mt-2 text-[13px] text-muted">{label}</div>
+      {hint && <div className="mt-0.5 text-[12px] text-faint">{hint}</div>}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ table */
+
+export interface Column<T> {
+  key: string;
+  header: ReactNode;
+  render: (row: T) => ReactNode;
+  align?: 'left' | 'right';
+  sortable?: boolean;
+  width?: string;
+}
+
+/**
+ * Clean data table: sticky header, row hover lift, keyboard navigation
+ * (Tab into a row, Arrow Up/Down to move, Enter to open).
+ */
+export function Table<T>({
+  columns,
+  rows,
+  rowKey,
+  onRowClick,
+  rowLabel,
+  sort,
+  onSort,
+  caption,
+  maxHeight = '70vh',
+  empty,
+}: {
+  columns: Column<T>[];
+  rows: T[];
+  rowKey: (r: T) => string;
+  onRowClick?: (r: T) => void;
+  rowLabel?: (r: T) => string;
+  sort?: { key: string; dir: 1 | -1 };
+  onSort?: (key: string) => void;
+  caption?: string;
+  maxHeight?: string;
+  empty?: ReactNode;
+}) {
+  const body = useRef<HTMLTableSectionElement>(null);
+  const move = (e: KeyboardEvent<HTMLTableRowElement>, r: T) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onRowClick?.(r);
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const sib = (e.key === 'ArrowDown' ? e.currentTarget.nextElementSibling : e.currentTarget.previousElementSibling) as HTMLElement | null;
+      sib?.focus();
+    }
+  };
+  if (!rows.length) return <>{empty ?? <EmptyState title="Nothing to show" />}</>;
+  return (
+    <div className="card overflow-auto" style={{ maxHeight }}>
+      <table className="w-full border-collapse text-sm">
+        {caption && <caption className="sr-only">{caption}</caption>}
+        <thead className="sticky top-0 z-10 bg-surface" style={{ boxShadow: '0 1px 0 rgb(22 24 29 / 0.06)' }}>
+          <tr>
+            {columns.map((c) => {
+              const active = sort?.key === c.key;
+              return (
+                <th
+                  key={c.key}
+                  scope="col"
+                  style={c.width ? { width: c.width } : undefined}
+                  className={cx('th', c.align === 'right' && 'text-right')}
+                  aria-sort={active ? (sort!.dir === 1 ? 'ascending' : 'descending') : undefined}
+                >
+                  {c.sortable && onSort ? (
+                    <button className={cx('inline-flex items-center gap-1 rounded hover:text-ink', active && 'text-ink')} onClick={() => onSort(c.key)}>
+                      {c.header}
+                      <span aria-hidden="true" className="text-[10px] text-faint">
+                        {active ? (sort!.dir === 1 ? '↑' : '↓') : ''}
+                      </span>
+                    </button>
+                  ) : (
+                    c.header
+                  )}
+                </th>
+              );
+            })}
+          </tr>
+        </thead>
+        <tbody ref={body}>
+          {rows.map((r) => (
+            <tr
+              key={rowKey(r)}
+              tabIndex={onRowClick ? 0 : undefined}
+              aria-label={rowLabel?.(r)}
+              onClick={onRowClick ? () => onRowClick(r) : undefined}
+              onKeyDown={onRowClick ? (e) => move(e, r) : undefined}
+              className={cx(onRowClick && 'cursor-pointer transition-colors hover:bg-paper focus-visible:bg-accentsoft/60')}
+            >
+              {columns.map((c) => (
+                <td key={c.key} className={cx('td', c.align === 'right' && 'text-right')}>
+                  {c.render(r)}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ data marks */
+
+/** Thin monochrome bar (0..max). `warn` turns it amber; use only for a real threshold. */
+export function Bar({ value, max = 1, tone, label, width = 'w-20' }: { value: number; max?: number; tone?: string; label?: string; width?: string }) {
+  const pctv = Math.max(0, Math.min(1, value / max)) * 100;
+  const amber = tone === 'warn' || tone === 'bad';
+  return (
+    <span className={cx('relative inline-block h-1 overflow-hidden rounded-full bg-sunken align-middle', width)} role="img" aria-label={label ?? `${value}`}>
+      <span className={cx('absolute inset-y-0 left-0 rounded-full', amber ? 'bg-amber' : 'bg-ink/70')} style={{ width: `${pctv}%` }} />
+    </span>
+  );
+}
+
+/** Priority 0..100: ink number plus thin ink bar; the bar turns amber only at or above `threshold`. */
+export function PriorityBar({ p, threshold = 90 }: { p: number; threshold?: number }) {
+  const hot = p >= threshold;
+  return (
+    <span className="inline-flex items-center gap-2.5">
+      <span className="tnum w-7 text-right text-sm font-semibold text-ink">{p}</span>
+      <Bar value={p} max={100} tone={hot ? 'warn' : undefined} width="w-14" label={`priority ${p}`} />
+    </span>
+  );
+}
+
+/* ------------------------------------------------------------------ states */
+
+export function EmptyState({ title, hint, action }: { title: ReactNode; hint?: ReactNode; action?: ReactNode }) {
+  return (
+    <div className="card flex flex-col items-start gap-1 px-6 py-8">
+      <p className="text-[15px] font-medium text-ink">{title}</p>
+      {hint && <p className="text-sm text-muted">{hint}</p>}
+      {action && <div className="mt-3">{action}</div>}
+    </div>
+  );
+}
+
+export function Loading({ label = 'Loading…' }: { label?: string }) {
+  return (
+    <div role="status" className="flex items-center gap-3 px-1 py-6 text-sm text-muted">
+      <span className="relative h-1 w-16 overflow-hidden rounded-full bg-sunken" aria-hidden="true">
+        <span className="absolute inset-y-0 left-0 w-2/5 animate-pulsebar rounded-full bg-accent/70" />
+      </span>
+      {label}
     </div>
   );
 }
 
 export function ErrorBox({ error, onRetry, message }: { error: string; onRetry?: () => void; message?: string }) {
-  const { t } = useI18n();
   return (
-    <div role="alert" className="rounded-md border border-bad/30 bg-badsoft p-4 text-sm text-bad">
-      <p className="font-semibold">{message ?? t('common.error')}</p>
-      <p className="mono mt-1 break-all opacity-80">{error}</p>
+    <div role="alert" className="card px-6 py-5 text-sm">
+      <p className="font-semibold text-amber">{message ?? 'Could not load this.'}</p>
+      <p className="mono mt-1 break-all text-muted">{error}</p>
       {onRetry && (
-        <button className="btn-secondary mt-3" onClick={onRetry}>
-          {t('common.retry')}
-        </button>
+        <Button className="mt-3" onClick={onRetry}>
+          Try again
+        </Button>
       )}
     </div>
   );
 }
 
 export function NA() {
-  const { t } = useI18n();
-  return <span className="text-sm italic text-muted">{t('common.na')}</span>;
+  return <span className="text-sm text-faint">not available</span>;
 }
 
-export function SyntheticBadge() {
-  const { t } = useI18n();
-  return <Chip tone="warn">{t('chip.synthetic')}</Chip>;
-}
-
-export function DatasetLine({ dataset, seed }: { dataset?: string; seed?: number }) {
-  const { t } = useI18n();
-  return (
-    <span className="inline-flex flex-wrap items-center gap-1.5 text-[11px] text-muted">
-      <SyntheticBadge />
-      <span>
-        {t('common.dataset')}: <span className="mono text-ink">{dataset ?? t('common.na')}</span>
-      </span>
-      <span>
-        · {t('common.seed')}: <span className="mono tnum text-ink">{seed ?? t('common.na')}</span>
-      </span>
-    </span>
-  );
-}
-
-export function PageHeader({ title, children }: { title: string; children?: ReactNode }) {
-  return (
-    <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-      <h1 className="text-xl font-semibold tracking-tight text-ink">{title}</h1>
-      {children && <div className="flex flex-wrap items-center gap-2">{children}</div>}
-    </div>
-  );
-}
-
-export const short = (h: string | null | undefined, n = 10) => (!h ? '–' : h.length <= n + 1 ? h : `${h.slice(0, n)}…`);
-
-export function fmtScalar(v: unknown, num: (n: number, d?: number) => string): string {
-  if (v === null || v === undefined) return '–';
-  if (typeof v === 'number') return Number.isInteger(v) ? num(v) : num(v, Math.abs(v) < 1 ? 2 : 1);
-  if (typeof v === 'boolean') return v ? 'true' : 'false';
-  if (Array.isArray(v)) return v.map((x) => fmtScalar(x, num)).join(', ');
-  if (typeof v === 'object') return JSON.stringify(v);
-  return String(v);
-}
-
-/** Generic renderer for violation objects the server returns; never hides any field. */
+/** Server findings (QA, rule violations). Never hidden; shown as a quiet amber panel. */
 export function ViolationList({ items, title, total }: { items: unknown[]; title: string; total?: number }) {
   if (!items.length) return null;
   return (
-    <div role="alert" className="rounded-md border border-warn/40 bg-warnsoft p-3 text-sm">
-      <p className="font-semibold text-warn">
-        {title} ({total ?? items.length})
+    <div role="alert" className="rounded-lg bg-ambersoft px-4 py-3 text-sm">
+      <p className="font-semibold text-amber">
+        {title} <span className="tnum font-normal">({total ?? items.length})</span>
       </p>
       <ul className="mt-2 space-y-1.5">
         {items.map((v, i) => (
@@ -204,5 +348,92 @@ export function ViolationList({ items, title, total }: { items: unknown[]; title
         ))}
       </ul>
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ helpers */
+
+export const short = (h: string | null | undefined, n = 10) => (!h ? '–' : h.length <= n + 1 ? h : `${h.slice(0, n)}…`);
+
+export function fmtScalar(v: unknown, num: (n: number, d?: number) => string): string {
+  if (v === null || v === undefined) return '–';
+  if (typeof v === 'number') return Number.isInteger(v) ? num(v) : num(v, Math.abs(v) < 1 ? 2 : 1);
+  if (typeof v === 'boolean') return v ? 'yes' : 'no';
+  if (Array.isArray(v)) return v.map((x) => fmtScalar(x, num)).join(', ');
+  if (typeof v === 'object') return JSON.stringify(v);
+  return String(v);
+}
+
+/* ------------------------------------------------------------------
+ * Compatibility layer for screens written before the redesign.
+ * These keep old call sites compiling but render with the new neutral look.
+ * New code should use Tag / PageTitle / Stat directly.
+ * ------------------------------------------------------------------ */
+
+type LegacyTone = 'neutral' | 'teal' | 'navy' | 'warn' | 'bad' | 'good' | 'violet' | 'outline';
+
+/** @deprecated use Tag */
+export function Chip({ tone = 'neutral', children, title, className, mono = false }: { tone?: LegacyTone; children: ReactNode; title?: string; className?: string; mono?: boolean }) {
+  return (
+    <Tag tone={tone === 'bad' ? 'warn' : tone === 'navy' ? 'strong' : 'default'} mono={mono} title={title} className={className}>
+      {children}
+    </Tag>
+  );
+}
+
+/** @deprecated use PageTitle */
+export function PageHeader({ title, children }: { title: string; children?: ReactNode }) {
+  return (
+    <div className="mb-8">
+      <PageTitle title={title} actions={children} />
+    </div>
+  );
+}
+
+export function TriageChip({ triage }: { triage: string }) {
+  return <Tag tone={triage === 'REVIEW' ? 'strong' : 'muted'}>{triage === 'REVIEW' ? 'Review' : triage === 'FP' ? 'Close (FP)' : triage}</Tag>;
+}
+
+export function RouteChip({ route }: { route: string }) {
+  if (route !== 'victim_protection') return null;
+  return <Tag tone="strong">Victim protection</Tag>;
+}
+
+export function StatusChip({ status }: { status: string }) {
+  if (status === 'open') return <span className="text-sm text-faint">open</span>;
+  return <span className="text-sm font-medium text-ink">{status}</span>;
+}
+
+export function RuleChip({ rule, title }: { rule: string; title?: string }) {
+  return (
+    <span title={title} className={cx('font-mono text-[12px]', rule === 'X' ? 'font-semibold text-ink' : 'text-muted')}>
+      {rule}
+    </span>
+  );
+}
+
+export function ClusterBadge({ id }: { id: string | null }) {
+  if (!id) return <span className="text-faint">–</span>;
+  return <span className="font-mono text-[12px] text-ink">{short(id, 8)}</span>;
+}
+
+/** The data label now lives in one quiet place per page; this renders nothing. */
+export function SyntheticBadge() {
+  return null;
+}
+
+/** Quiet provenance line: synthetic data, dataset, seed. */
+export function DatasetLine({ dataset, seed }: { dataset?: string; seed?: number }) {
+  return (
+    <span className="text-[12px] text-faint">
+      Synthetic data
+      {dataset && (
+        <>
+          {' '}
+          · <span className="font-mono">{dataset}</span>
+        </>
+      )}
+      {seed !== undefined && <> · seed {seed}</>}
+    </span>
   );
 }

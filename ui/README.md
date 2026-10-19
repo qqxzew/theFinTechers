@@ -1,76 +1,68 @@
 # Stáj UI
 
-Analyst front-end for Stáj. Built with Vite, React 18, TypeScript, Tailwind CSS 3, Cytoscape.js and Recharts. Czech is the default language, with an English toggle in the top bar. All versions are pinned in `package.json`.
+The analyst front-end for Stáj, in English only. Built with Vite, React 18, TypeScript, Tailwind CSS 3, Cytoscape.js and Recharts, with all versions pinned in `package.json`.
 
-## Run against mocks (no backend)
-
-```bash
-cd ui
-npm install
-npm run dev          # http://localhost:5173
-```
-
-If `VITE_API_BASE` is not set, `src/api.ts` reads static files from `public/mock/*.json`. A **MOCK** banner is shown on every screen in this mode. Every number in the mocks is invented for layout only.
-
-The write endpoints (decision, section V save, explain, ask) are simulated in memory and reset on page reload. The mock decision check copies the server rules: relationship owner, rule author, first triager, four-eyes at priority >= 70, role below the escalation target, and an override reason shorter than 10 characters. The real server is the authority on all of these.
-
-Regenerate the mocks deterministically with:
+## Run
 
 ```bash
-node scripts/gen-mocks.mjs
-```
-
-Mock cases with full cards: `B1-R00123` (cluster K1, high priority, with an "ask" answer), `B2-R00087` (K1, real-backend-style template ids, no explanation yet, so you can test "Generate"), `B1-R00311` (FP "mom" case with E1/E3), `B3-R00045` (victim protection), `B2-R00210` (PEP), `B3-R00167` (already decided, with QA violations). OPO drafts exist for `B1-R00123` and `B2-R00210`.
-
-Demo conflict: the default identity "Eva Horáková" is the relationship owner of `B2-R00087`, so a decision there is rejected with `decider_is_relationship_owner`.
-
-## Run against the real API
-
-```bash
+cd ui && npm install
+# against the real API
 VITE_API_BASE=http://127.0.0.1:8000 npm run dev -- --host 127.0.0.1 --port 5173
 # PowerShell: $env:VITE_API_BASE="http://127.0.0.1:8000"; npm run dev -- --host 127.0.0.1 --port 5173
+# against mocks (public/mock/*.json, regenerate with: node scripts/gen-mocks.mjs)
+npm run dev
+npm run build        # typecheck + production build
 ```
 
-The backend must allow CORS from the dev origin. It can also serve `dist/` after you run `npm run build`.
+In mock mode a quiet amber note says the data is mock. In real-API mode nothing is shown. The write endpoints are simulated in memory in mock mode.
 
-A decision rejected with HTTP 4xx is still shown correctly, as long as the JSON body contains `violations`.
+Routes and navigation:
 
-Slow calls, all with a visible loading state:
+| Nav label | Route | Notes |
+|---|---|---|
+| Queue | `/` | |
+| Case | `/case/:id` | In the nav only once a case has been opened |
+| Radar | `/radar` | |
+| Metrics | `/metrics` | |
+| Report | `/report/:id` | The FIU report (OPO) draft. Old `/opo/:id` links redirect here. |
+| Limits | `/limits` | Formerly "Honesty"; `/honesty` redirects here |
 
-- **First open of `/opo/:id`** runs an LLM draft on the server, which takes about 1–2 minutes. The screen shows the elapsed time. Only the OPO screen triggers it, and concurrent requests are de-duplicated (React StrictMode would otherwise send two). The Markdown export button stays disabled until the draft exists, because `export.md` would otherwise start a second draft.
-- **"Generate explanation"** and **"Ask about a rule"** on the case card only run when a person clicks them. "Ask" can take up to about 1 minute.
+The Audit screen has been removed.
 
-Note: every call to `POST /decision` writes to the audit chain, including rejected decisions (`decision_rejected`), and so does `POST /ask` (`rule_question`).
+## Design foundation
 
-Screenshots from the run against real data (1440x900) are in `screenshots/`.
+These rules are hard requirements:
 
-## Checks
+- **Theme:** light only; there is no dark mode.
+- **Surfaces:** the page is `#F6F5F2` and surfaces are white.
+- **No borders anywhere:** `index.css` zeroes every border. Elements are separated by layered soft shadows (`shadow-rest`, `shadow-raise` on hover/active, `shadow-inset` for inputs, `shadow-focus` for the focus ring) and by spacing on an 8px grid.
+- **Fonts:** Bricolage Grotesque (variable, self-hosted) for text. JetBrains Mono only for ids and hashes. Numbers use tabular figures.
+- **Colour means something:** ink text, grey secondary (`muted`, `faint`), one deep ink-blue `accent` for primary actions and selection, and `amber` for warnings, used rarely. There are no icons, no emoji, no gradients and no coloured chips. Legacy colour names (navy, teal, good, bad, violet) map onto this palette.
+- **Layout:** a text-only left rail, a slim top bar holding only the demo identity (name and role), and content capped at `max-w-content` (1240px).
+- **Strings:** all UI text is in `src/i18n.tsx`, English only. `useI18n()` returns `t`, `num`, `pct` and `fmtDate`.
 
-```bash
-npm run typecheck    # tsc --noEmit
-npm run build        # typecheck + production build to dist/
-```
+## Primitives (`src/components/ui.tsx`)
 
-## How the UI reads the contract
+- **`Page` / `PageTitle`:** the page wrapper with vertical rhythm; a title with an optional one-line description and actions on the right.
+- **`Section`:** a heading, an optional one-line `explain` saying what the block is, and optional actions.
+- **`Card`:** a white surface with a resting shadow and an optional `title`/`sub`/`right` header. `interactive` lifts it on hover.
+- **`Button`:** `variant` is `primary` (accent), `secondary` (shadow) or `quiet` (text only).
+- **`Tag`:** a neutral label that shows emphasis by font weight (`default` / `strong` / `muted`). `warn` gives amber text, for rare cases only.
+- **`Stat`:** a big tabular number, a one-line label, and an optional hint.
+- **`Table`:** takes `columns` and `rows`. It has a sticky header, a hover tint on rows, and keyboard support (Tab into a row, ↑/↓ to move, Enter to open). Sorting is set through `sort` and `onSort`.
+- **`PriorityBar`:** an ink number with a thin ink bar. The bar turns amber only at or above `threshold` (default 90). `Bar` is the plain version.
+- **`EmptyState` / `Loading` / `ErrorBox`:** the calm empty, loading and error states. `ViolationList` shows server findings and never hides them.
+- **Legacy wrappers:** `Chip`, `PageHeader`, `TriageChip`, `RuleChip` and the others only keep old screens compiling, rendered in the neutral look. New code should not use them.
 
-- **Metrics `breakdown`:** keys are grouped by prefix. `scheme:*` is detection per scheme, `persona:*` is the FP rate for honest personas, `victim:*` is victim routing, and `other:*` (or no prefix) is listed under "Other".
-- **Metrics modes:** for each mode the UI shows `rank.average_precision` (AP) and `rank.precision_at_k` (P@K, with K). `overall_any_priority` appears as a sub-row. The isolated mode's `per_bank`, `best_single_bank_f1` and `mean_bank_f1` get their own block.
-- **Ablations:** ΔF1 is measured against `ablations.full` when it exists. Otherwise it is measured against `modes.staj_psi.overall`.
-- **Optional metric sections:** `headline_held_out_mean`, `threshold_curve_held_out_mean` and `ring_size_sweep` are rendered generically when present (array of objects, object of objects, or key/value) and skipped when absent.
-- **`weak_evidence_experiment` (optional):** when present, Metrics shows a "Weak-evidence radar (pre-registered)" section (`src/components/WeakEvidence.tsx`):
-  - **Header:** the honest caption, the pre-registration text and the frozen config.
-  - **"Privacy cost" chart:** mean exported tokens per world on a log x-axis against mean `staj_psi` ghost recall and original-scheme recall. Dev seeds are dashed and held-out seeds solid. The variants plotted are baseline and weak_0.05 to weak_0.40.
-  - **Comparison table:** baseline vs weak_0.05 on held-out seeds, with ×-ratios for tokens, bytes and disclosed non-mule candidates computed in the UI. A second table for `dev_without_ghost_ring` appears if present.
-  - **Averaging:** every value is a mean over the seeds of its split. The mock numbers are MOCK; only their shape is meant to match.
-- **`cnb`:** shown with its own `dataset` label. If `sample_sheet_url` is not an http(s) URL or an absolute path, it is shown as a server file path rather than a link.
-- **Signal sentence:** if `Signal.template` contains `{evidence_key}` placeholders, they are filled in from `evidence`. If it is a bare id (e.g. `d5_rare_exit_concentration`), `rule_definitions[detector_id]` is shown as the plain sentence, with the template id underneath.
-- **Evidence and features:** numeric arrays of 8 or more values (e.g. `hour_hist`) are drawn as a mini histogram, and string arrays as chips. Feature descriptions come from `feature_glossary`.
-- **Refs:** refs on explanation, ask and OPO sentences are clickable. These forms work:
-  - `D5:R03035`, which highlights that signal
-  - `D6:R03035.evidence`, which also highlights the signal
-  - `features.x` or `feature:x`, which open the feature list
-  - `cluster:*` or `X:*`, which scroll to the cluster card
-- **Case card:** "Účty za dropy / Accounts behind the drops" lists `cluster.matched_exit_accounts`. These are plaintext only at the owning bank, and Stáj does not resolve who owns them.
-- **Radar `wire`:** sessions shaped `A:B` (or `AxB`) are animated as hex ciphertext, truncated to 96 hex characters with the full value in the tooltip. The `coordinator` session carries match-row objects and is shown as a table.
-- **Queue:** the server caps `items` at 500 and reports `total_matching`. When the list is capped, the UI says so and offers a "REVIEW only" filter.
-- **Staff:** the decider and approver lists come from `meta.staff` when the server sends it. Otherwise a local demo list is used (`src/state.tsx`).
+## Data-viz rules for new charts
+
+- **One idea per chart.** If there are two measures on different scales, draw two charts. Never use a second y-axis.
+- **Label lines and bars directly** instead of using a legend box. Keep any number of series small.
+- **No gridline clutter:** at most faint horizontal guides and no chart border.
+- **Colour:** use the ink palette (`--c-out`, `--c-remit`, `--muted`) plus the single `accent` for the series that matters. Use amber only for a real threshold.
+- **Numbers and units:** use tabular numbers and spell out units on the axes ("CZK", "exported tokens per world", "%").
+- **Text colour:** text stays in ink or grey and is never painted in the series colour.
+
+## Contract notes
+
+`src/api.ts` is the single fetch layer and `src/types.ts` mirrors the API, which is the authority. Slow LLM calls (the first Report draft, Generate explanation, Ask) run only when a person triggers them, and they show their elapsed time.

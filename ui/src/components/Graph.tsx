@@ -1,6 +1,5 @@
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape';
 import { useEffect, useRef } from 'react';
-import { useApp } from '../state';
 import type { LocalGraph } from '../types';
 
 const cssColor = (name: string) => {
@@ -21,7 +20,6 @@ interface Props {
 export default function Graph({ graph, height = 280, layout = 'concentric', ariaLabel, showAmounts = false }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const cyRef = useRef<Core | null>(null);
-  const { dark } = useApp();
 
   useEffect(() => {
     if (!ref.current) return;
@@ -111,14 +109,14 @@ export default function Graph({ graph, height = 280, layout = 'concentric', aria
       cy.destroy();
       cyRef.current = null;
     };
-  }, [graph, layout, showAmounts, dark]);
+  }, [graph, layout, showAmounts]);
 
   return (
     <div
       ref={ref}
       role="img"
       aria-label={ariaLabel}
-      className="w-full rounded-md border border-line bg-paper/60"
+      className="w-full rounded-lg bg-paper"
       style={{ height }}
     />
   );

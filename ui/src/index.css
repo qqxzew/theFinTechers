@@ -2,50 +2,58 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Stáj design foundation: light only, no borders, shadow-delimited surfaces.
+ * Colour carries meaning only: ink text, grey secondary, one ink-blue accent, one amber warning.
+ * Legacy token names (navy, teal, good, bad, violet, ...) are kept so older screens compile,
+ * but they all resolve to the same calm palette.
+ */
 :root {
-  --paper: 248 247 243;
-  --surface: 255 255 255;
-  --line: 222 221 214;
-  --ink: 24 31 42;
-  --muted: 88 96 108;
-  --navy: 22 50 92;
-  --teal: 14 110 106;
-  --tealsoft: 226 240 238;
-  --warn: 166 92 0;
-  --warnsoft: 252 239 216;
-  --bad: 166 38 38;
-  --badsoft: 250 229 227;
-  --good: 30 112 64;
-  --goodsoft: 224 241 229;
-  --violet: 92 64 160;
-  --violetsoft: 236 231 248;
-  --c-in: 0 143 130;
-  --c-out: 166 92 0;
-  --c-remit: 92 64 160;
+  --paper: 246 245 242;      /* page */
+  --surface: 255 255 255;    /* cards */
+  --sunken: 240 239 235;     /* inputs, wells, bar tracks */
+  --ink: 22 24 29;           /* primary text */
+  --muted: 104 107 115;      /* secondary text */
+  --faint: 152 154 160;      /* tertiary text */
+  --accent: 30 56 102;       /* deep ink blue: primary action, selection */
+  --accentsoft: 233 237 244;
+  --amber: 150 88 0;         /* warning, used rarely */
+  --ambersoft: 248 239 222;
+
+  /* legacy aliases -> calm palette */
+  --line: var(--sunken);
+  --navy: var(--accent);
+  --teal: var(--accent);
+  --tealsoft: var(--accentsoft);
+  --warn: var(--amber);
+  --warnsoft: var(--ambersoft);
+  --bad: var(--amber);
+  --badsoft: var(--ambersoft);
+  --good: var(--ink);
+  --goodsoft: var(--sunken);
+  --violet: var(--muted);
+  --violetsoft: var(--sunken);
+
+  /* chart series: ink palette + single accent */
+  --c-in: var(--accent);
+  --c-out: 120 124 132;
+  --c-remit: 176 178 184;
+
+  /* layered shadows (the only way elements are delimited) */
+  --sh-rest: 0 0 0 1px rgb(22 24 29 / 0.035), 0 1px 2px rgb(22 24 29 / 0.05), 0 2px 8px rgb(22 24 29 / 0.035);
+  --sh-raise: 0 0 0 1px rgb(22 24 29 / 0.05), 0 2px 4px rgb(22 24 29 / 0.07), 0 8px 20px rgb(22 24 29 / 0.07);
+  --sh-press: 0 0 0 1px rgb(22 24 29 / 0.06), 0 1px 1px rgb(22 24 29 / 0.08);
+  --sh-inset: inset 0 1px 2px rgb(22 24 29 / 0.07), inset 0 0 0 1px rgb(22 24 29 / 0.035);
+  --sh-focus: 0 0 0 3px rgb(30 56 102 / 0.28);
   color-scheme: light;
 }
 
-.dark {
-  --paper: 17 21 28;
-  --surface: 25 30 39;
-  --line: 52 60 72;
-  --ink: 228 232 238;
-  --muted: 156 165 178;
-  --navy: 140 175 230;
-  --teal: 92 196 186;
-  --tealsoft: 24 52 54;
-  --warn: 240 170 80;
-  --warnsoft: 60 44 20;
-  --bad: 240 130 125;
-  --badsoft: 64 30 30;
-  --good: 120 205 150;
-  --goodsoft: 24 52 36;
-  --violet: 186 166 240;
-  --violetsoft: 44 36 70;
-  --c-in: 26 156 141;
-  --c-out: 201 131 48;
-  --c-remit: 143 118 214;
-  color-scheme: dark;
+/* Hard rule: no borders anywhere. Separation comes from shadow and spacing. */
+*,
+::before,
+::after {
+  border-width: 0 !important;
+  border-style: none !important;
 }
 
 html,
@@ -55,60 +63,95 @@ body,
 }
 
 body {
-  @apply bg-paper text-ink font-sans antialiased;
-  font-feature-settings: 'cv11', 'ss01';
+  @apply bg-paper font-sans text-ink antialiased;
+  font-size: 15px;
+  line-height: 1.5;
+  font-variation-settings: 'wdth' 100;
+}
+
+/* Numbers line up everywhere. */
+table,
+.tnum,
+input[type='number'] {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: none;
+  box-shadow: var(--sh-focus) !important;
+  border-radius: 6px;
 }
 
 .grid > * {
   min-width: 0;
 }
 
-.tnum {
-  font-variant-numeric: tabular-nums;
-}
-
-:focus-visible {
-  outline: 2px solid rgb(var(--teal));
-  outline-offset: 2px;
-  border-radius: 4px;
+/* Quiet row separation inside tables (a shadow hairline, not a border). */
+tbody tr + tr {
+  box-shadow: inset 0 1px 0 rgb(22 24 29 / 0.05);
 }
 
 @layer components {
   .card {
-    @apply bg-surface border border-line rounded-lg;
+    @apply rounded-xl bg-surface;
+    box-shadow: var(--sh-rest);
   }
   .card-h {
-    @apply text-sm font-semibold tracking-tight text-ink;
+    @apply text-[15px] font-semibold tracking-tight text-ink;
   }
   .card-sub {
-    @apply text-xs text-muted;
+    @apply text-[13px] text-muted;
   }
   .label {
-    @apply text-xs font-medium text-muted;
+    @apply text-[12px] font-medium text-muted;
   }
   .input {
-    @apply bg-surface border border-line rounded-md px-2.5 py-1.5 text-sm text-ink placeholder:text-muted/70 focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/30;
+    @apply rounded-lg bg-sunken px-3 py-1.5 text-sm text-ink placeholder:text-faint;
+    box-shadow: var(--sh-inset);
+  }
+  .input:focus {
+    @apply bg-surface;
+    box-shadow: var(--sh-focus), var(--sh-rest) !important;
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium border transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-1.5 text-sm font-medium transition-[box-shadow,background-color,transform] duration-150 disabled:cursor-not-allowed disabled:opacity-45;
+  }
+  .btn:active:not(:disabled) {
+    transform: translateY(1px);
   }
   .btn-primary {
-    @apply btn bg-navy text-white border-navy hover:bg-navy/90 dark:text-paper;
+    @apply btn bg-accent text-white;
+    box-shadow: 0 1px 2px rgb(22 24 29 / 0.18), 0 4px 10px rgb(30 56 102 / 0.22);
+  }
+  .btn-primary:hover:not(:disabled) {
+    box-shadow: 0 2px 4px rgb(22 24 29 / 0.2), 0 8px 18px rgb(30 56 102 / 0.3);
   }
   .btn-secondary {
-    @apply btn bg-surface text-ink border-line hover:bg-paper;
+    @apply btn bg-surface text-ink;
+    box-shadow: var(--sh-rest);
   }
+  .btn-secondary:hover:not(:disabled) {
+    box-shadow: var(--sh-raise);
+  }
+  .btn-quiet {
+    @apply btn bg-transparent text-muted hover:bg-sunken hover:text-ink;
+  }
+  /* legacy name, same look as secondary */
   .btn-warn {
-    @apply btn bg-warnsoft text-warn border-warn/40 hover:bg-warnsoft/70;
+    @apply btn bg-surface text-amber;
+    box-shadow: var(--sh-rest);
   }
   .th {
-    @apply text-left text-xs font-medium text-muted px-3 py-2 whitespace-nowrap;
+    @apply whitespace-nowrap px-4 py-2.5 text-left text-[12px] font-medium text-muted;
   }
   .td {
-    @apply px-3 py-2 text-sm align-middle;
+    @apply px-4 py-2.5 align-middle text-sm;
   }
   .mono {
-    @apply font-mono text-[12px];
+    @apply font-mono text-[12px] tracking-tight;
   }
   td.mono {
     @apply whitespace-nowrap;

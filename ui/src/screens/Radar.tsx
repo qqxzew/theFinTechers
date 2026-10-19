@@ -1,320 +1,172 @@
-import { useEffect, useMemo, useState } from 'react';
-import { getRadar } from '../api';
-import Graph from '../components/Graph';
-import { Card, Chip, ErrorBox, Loading, PageHeader, SyntheticBadge } from '../components/ui';
-import { useI18n, type I18nKey } from '../i18n';
+import { useCallback, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAsync } from '../state';
-import type { RadarResponse, WireMsg } from '../types';
+import { useI18n } from '../i18n';
+import BubbleMap, { type BubbleNode } from '../components/BubbleMap';
+import { rememberCase } from '../components/Layout';
+import { loadNetworks, type NetworkData } from '../components/radar/networks';
+import { NetworkPanel } from '../components/radar/NetworkPanel';
+import { Card, ErrorBox, Loading, Page, PageTitle, Section, Table, type Column } from '../components/ui';
+
+function fmtBytes(b: number, num: (n: number, d?: number) => string) {
+  if (b >= 1e6) return `${num(b / 1e6, 1)} MB`;
+  if (b >= 1e3) return `${num(Math.round(b / 1e3))} KB`;
+  return `${num(b)} B`;
+}
 
 export default function RadarScreen() {
-  const { t } = useI18n();
-  const r = useAsync(getRadar, []);
-  return (
-    <div className="space-y-5">
-      <PageHeader title={t('r.title')}>
-        <SyntheticBadge />
-      </PageHeader>
-      {r.loading && !r.data ? <Loading /> : r.error ? <ErrorBox error={r.error} onRetry={r.reload} /> : r.data ? <RadarView d={r.data} /> : null}
-    </div>
+  const { num } = useI18n();
+  const nav = useNavigate();
+  const [sp, setSp] = useSearchParams();
+  const q = useAsync(loadNetworks, []);
+  const onBubble = useCallback(
+    (n: BubbleNode) => {
+      rememberCase(n.id);
+      nav(`/case/${n.id}`);
+    },
+    [nav],
   );
-}
+  const onGroup = useCallback((g: string) => setSp({ network: g }, { replace: true }), [setSp]);
 
-function RadarView({ d }: { d: RadarResponse }) {
-  const { t, num } = useI18n();
+  if (q.loading) return <Page><PageTitle title="Radar" /><Loading label="Loading the radar…" /></Page>;
+  if (q.error || !q.data) return <Page><PageTitle title="Radar" /><ErrorBox error={q.error ?? 'no data'} onRetry={q.reload} /></Page>;
+  const d = q.data;
+  const selId = sp.get('network') ?? d.networks[0]?.cluster.cluster_id ?? null;
+  const sel = d.networks.find((n) => n.cluster.cluster_id === selId) ?? d.networks[0];
+  const banks = d.radar.banks.map((b) => b.bank_id);
+  const nAccounts = d.networks.reduce((s, n) => s + n.members.length, 0);
+
   return (
-    <>
-      <section aria-labelledby="alone-h">
-        <h2 id="alone-h" className="mb-2 text-base font-semibold">
-          {t('r.alone')}
-        </h2>
-        <div className="grid gap-4 md:grid-cols-3">
-          {d.banks.map((b) => (
-            <Card key={b.bank_id} title={<span className="mono">{b.bank_id}</span>}>
-              <div className="mb-3 flex flex-wrap gap-4">
-                <Stat n={num(b.n_cases)} l={t('r.cases')} />
-                <Stat n={num(b.n_review)} l={t('r.review')} />
-                <Stat n={num(b.n_candidates_exported)} l={t('r.exported')} />
-              </div>
-              <Graph graph={b.local_graph} height={230} layout="concentric" ariaLabel={`${b.bank_id} local graph`} />
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      <div className="grid gap-5 xl:grid-cols-5">
-        <Card title={t('r.together')} className="xl:col-span-3" sub={`${t('r.rule')}: ${d.disclosure_rule}`}>
-          <Graph graph={d.cluster_graph} height={380} layout="cose" ariaLabel={t('r.together')} />
-          <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="h-2.5 w-4 rounded-sm bg-navy" aria-hidden="true" />
-              bank
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full border-2 border-navy" aria-hidden="true" />
-              {t('r.candidates')}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="h-2 w-2 rotate-45 bg-warn" aria-hidden="true" />
-              {t('r.tokens')} (blinded)
-            </span>
-          </div>
-        </Card>
-        <Card title={t('r.clusters')} className="xl:col-span-2">
-          <ul className="space-y-3">
-            {d.clusters.map((c) => (
-              <li key={c.cluster_id} className={`rounded-md border p-3 ${c.disclosed ? 'border-warn/40 bg-warnsoft/40' : 'border-line'}`}>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Chip tone={c.disclosed ? 'warn' : 'neutral'} mono>
-                    ◆ {c.cluster_id}
-                  </Chip>
-                  <Chip tone={c.disclosed ? 'warn' : 'outline'}>{c.disclosed ? t('r.disclosed') : t('r.withheld')}</Chip>
-                  {c.same_hand_global && <Chip tone="navy">{t('r.same_hand')}</Chip>}
-                  <span className="ml-auto text-xs text-muted">
-                    score <span className="tnum font-semibold text-ink">{num(c.score, 2)}</span>
-                  </span>
-                </div>
-                <p className="mt-1.5 text-xs text-muted tnum">
-                  {c.banks.join(', ')} · {c.banks.length} {t('r.banks')} · {c.n_candidates} {t('r.candidates')} · {c.tokens} {t('r.tokens')}
-                  {c.lag_ret_concentration !== null && ` · lag/ret ${num(c.lag_ret_concentration, 2)}`}
-                </p>
-                {d.refused[c.cluster_id] && (
-                  <p className="mt-1 text-xs">
-                    <span className="text-muted">{t('r.refused_reason')}:</span> {d.refused[c.cluster_id]}
-                  </p>
-                )}
-              </li>
-            ))}
-          </ul>
-          <p className="mt-3 rounded-md bg-paper p-2.5 text-xs text-muted">
-            <span className="font-semibold text-ink">{t('r.rule')}:</span> {d.disclosure_rule}
+    <Page>
+      <header>
+        <PageTitle title="Radar" />
+        <div className="mt-2 max-w-3xl space-y-1 text-[15px] text-muted">
+          <p>Banks compare only encrypted fingerprints of exit accounts. No customer data leaves a bank.</p>
+          <p>
+            It found <span className="font-semibold text-ink">{d.networks.length} networks</span> across{' '}
+            <span className="font-semibold text-ink">{banks.length} banks</span>: {num(nAccounts)} accounts that pay out to the same exit accounts.
           </p>
-        </Card>
-      </div>
+          <p>For each network you get your own clients in it and the evidence that links them.</p>
+        </div>
+      </header>
 
-      <WirePanel wire={d.wire} />
+      <Section
+        id="map"
+        title="Networks"
+        explain="Each dot is one client, shaded by bank and sized by priority. Lines lead to the exit accounts the network shares. Scroll to zoom, drag to move, click a network for details."
+      >
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <Card padded={false}>
+            <div className="p-2">
+              <BubbleMap
+                nodes={d.nodes}
+                links={d.links}
+                groups={d.groups}
+                size={{ height: 560 }}
+                onSelect={onBubble}
+                onSelectGroup={onGroup}
+                selectedGroup={sel?.cluster.cluster_id ?? null}
+                tooltip={(n) => n.label}
+                zoomable
+                radiusRange={[5, 13]}
+                bankLabelMin={5}
+                ariaLabel="Zoomable map of cross-bank networks"
+              />
+            </div>
+          </Card>
+          {sel && <NetworkPanel nw={sel} />}
+        </div>
+      </Section>
 
-      <ExposureTable d={d} />
-
-      <p role="note" className="rounded-md border border-line bg-surface px-4 py-3 text-sm text-muted">
-        {t('r.psi_note')}
-      </p>
-    </>
+      <AloneVsStaj d={d} />
+      <Shared d={d} />
+    </Page>
   );
 }
 
-function Stat({ n, l }: { n: string; l: string }) {
+function AloneVsStaj({ d }: { d: NetworkData }) {
+  const { num } = useI18n();
+  const rows = d.radar.banks.map((b) => {
+    const mine = d.networks.flatMap((n) => n.members.filter((m) => m.bank_id === b.bank_id));
+    const flaggedInNet = mine.filter((m) => m.triage === 'REVIEW').length;
+    const notFlagged = mine.length - flaggedInNet;
+    const nets = d.networks.filter((n) => n.members.some((m) => m.bank_id === b.bank_id));
+    const others = new Set(nets.flatMap((n) => n.cluster.banks)).size - 1;
+    const linked = nets.reduce((s, n) => s + n.members.filter((m) => m.bank_id !== b.bank_id).length, 0);
+    return { b, mine: mine.length, flaggedInNet, notFlagged, nets: nets.length, others, linked };
+  });
   return (
-    <div className="min-w-0">
-      <div className="tnum text-lg font-semibold">{n}</div>
-      <div className="text-[11px] leading-tight text-muted">{l}</div>
-    </div>
-  );
-}
-
-function WirePanel({ wire }: { wire: WireMsg[] }) {
-  const { t, tx, num } = useI18n();
-  // Bank-to-bank PSI messages carry hex ciphertext; the coordinator session carries match rows (objects).
-  const isPair = (w: WireMsg) => /^[^:x×-]+[:x×-][^:x×-]+$/.test(w.session) && w.sample.every((s) => typeof s === 'string');
-  const pairWire = useMemo(() => wire.filter(isPair), [wire]);
-  const coordWire = useMemo(() => wire.filter((w) => !isPair(w)), [wire]);
-  const sessions = useMemo(() => [...new Set(pairWire.map((w) => w.session))], [pairWire]);
-  const [session, setSession] = useState(sessions[0] ?? '');
-  const msgs = pairWire.filter((w) => w.session === session);
-  const [step, setStep] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  useEffect(() => setStep(0), [session]);
-  useEffect(() => {
-    if (!playing) return;
-    const h = window.setInterval(() => setStep((s) => (s + 1) % Math.max(1, msgs.length)), 2000);
-    return () => window.clearInterval(h);
-  }, [playing, msgs.length]);
-
-  if (!wire.length) return null;
-  const m = msgs[step];
-  const [a, b] = session.split(/[:x×-]/);
-  const fromA = m ? m.from === a : true;
-
-  return (
-    <Card
-      title={t('r.wire')}
-      sub={t('r.wire_sub')}
-      right={
-        <>
-          <label className="sr-only" htmlFor="sess">
-            {t('r.session')}
-          </label>
-          <select id="sess" className="input py-1 text-xs" value={session} onChange={(e) => setSession(e.target.value)}>
-            {sessions.map((s) => (
-              <option key={s}>{s}</option>
-            ))}
-          </select>
-          <button className="btn-secondary py-1 text-xs" onClick={() => setPlaying((p) => !p)} aria-pressed={playing}>
-            {playing ? t('r.pause') : t('r.play')}
-          </button>
-        </>
-      }
+    <Section
+      id="alone"
+      title="What each bank sees alone vs. what Stáj sees"
+      explain="Alone, a bank sees a list of suspicious clients. With Stáj it learns which of them belong to the same network at other banks."
     >
-      <ol className="mb-4 flex flex-wrap gap-2" aria-label={t('r.step')}>
-        {msgs.map((w, i) => (
-          <li key={i}>
-            <button
-              className={`rounded-md border px-2.5 py-1.5 text-left text-xs ${i === step ? 'border-navy bg-navy/10 text-navy' : 'border-line text-muted hover:text-ink'}`}
-              aria-current={i === step ? 'step' : undefined}
-              onClick={() => {
-                setPlaying(false);
-                setStep(i);
-              }}
-            >
-              <span className="tnum font-semibold">{i + 1}.</span> {tx(`msg.${w.msg}`, w.msg)}
-            </button>
-          </li>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {rows.map((r) => (
+          <Card key={r.b.bank_id} title={`Bank ${r.b.bank_id}`}>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-[12px] font-medium text-muted">Alone</p>
+                <p className="tnum mt-1 text-[28px] font-semibold leading-none text-ink">{num(r.b.n_review)}</p>
+                <p className="mt-1.5 text-[13px] text-muted">clients flagged, no link to other banks</p>
+              </div>
+              <div>
+                <p className="text-[12px] font-medium text-accent">With Stáj</p>
+                <p className="tnum mt-1 text-[28px] font-semibold leading-none text-accent">{num(r.flaggedInNet)}</p>
+                <p className="mt-1.5 text-[13px] text-muted">
+                  of them in {r.nets} network{r.nets === 1 ? '' : 's'}, linked to {num(r.linked)} accounts at {r.others} other bank{r.others === 1 ? '' : 's'}
+                </p>
+              </div>
+            </div>
+            {r.notFlagged > 0 && <p className="mt-3 text-[12.5px] text-amber">{r.notFlagged} network accounts were not flagged by the bank alone.</p>}
+          </Card>
         ))}
-      </ol>
-      {m && (
-        <div className="grid items-center gap-4 md:grid-cols-[110px_1fr_110px]">
-          <BankBox id={a} active={fromA} />
-          <div className="min-w-0">
-            <div className="mb-2 flex items-center gap-2 text-xs text-muted" aria-live="polite">
-              <span className="mono">{m.from}</span>
-              <span aria-hidden="true">{fromA ? '→' : '←'}</span>
-              <span className="mono">{fromA ? b : a}</span>
-              <span>·</span>
-              <span className="mono">{m.msg}</span>
-              <span>·</span>
-              <span className="tnum">
-                {num(m.n)} {t('r.elements')}
-              </span>
-            </div>
-            <div className="relative h-1 overflow-hidden rounded-full bg-line" aria-hidden="true">
-              <span key={`${session}-${step}`} className={`absolute inset-y-0 w-1/4 rounded-full bg-warn motion-safe:animate-[wire_1.8s_ease-in-out_infinite] ${fromA ? '' : '[animation-direction:reverse]'}`} />
-            </div>
-            <ul className="mt-3 space-y-1 rounded-md bg-ink/[0.04] p-2.5" aria-label="ciphertext samples">
-              {m.sample.map((h, i) => {
-                const hex = String(h);
-                return (
-                  <li key={i} className="mono break-all text-[11px] leading-snug text-ink/80" title={hex}>
-                    {hex.length > 96 ? `${hex.slice(0, 96)}…` : hex}
-                    {hex.length > 96 && <span className="text-muted"> ({num(hex.length / 2)} B, {t('r.truncated')})</span>}
-                  </li>
-                );
-              })}
-              <li className="mono text-[11px] text-muted">… +{num(Math.max(0, m.n - m.sample.length))}</li>
-            </ul>
-          </div>
-          <BankBox id={b} active={!fromA} />
-        </div>
-      )}
-      {coordWire.map((w, i) => (
-        <CoordinatorRows key={i} w={w} />
-      ))}
-    </Card>
-  );
-}
-
-function BankBox({ id, active }: { id: string; active: boolean }) {
-  return (
-    <div className={`flex h-16 items-center justify-center rounded-md border-2 text-sm font-semibold mono ${active ? 'border-navy bg-navy text-white dark:text-paper' : 'border-line text-muted'}`}>{id}</div>
-  );
-}
-
-function fmtBytes(n: number, num: (n: number, d?: number) => string) {
-  if (n >= 1_000_000) return `${num(n / 1_000_000, 1)} MB`;
-  if (n >= 1000) return `${num(n / 1000, 1)} kB`;
-  return `${num(n)} B`;
-}
-
-function ExposureTable({ d }: { d: RadarResponse }) {
-  const { t, num } = useI18n();
-  const e = d.exposure;
-  const rows: { k: 'isolated' | 'staj_psi' | 'naive_raw_sharing'; raw?: number; bytes?: number; blinded?: number; match?: number }[] = [
-    { k: 'isolated', raw: e?.isolated?.raw_records_exposed, bytes: e?.isolated?.bytes_exchanged },
-    { k: 'staj_psi', raw: e?.staj_psi?.raw_records_exposed, bytes: e?.staj_psi?.bytes_exchanged, blinded: e?.staj_psi?.blinded_elements, match: e?.staj_psi?.match_rows_to_coordinator },
-    { k: 'naive_raw_sharing', raw: e?.naive_raw_sharing?.raw_records_exposed, bytes: e?.naive_raw_sharing?.bytes_exchanged },
-  ];
-  const cell = (v: number | undefined, f: (n: number) => string = (n) => num(n)) => (v === undefined ? <span className="italic text-muted">{t('common.na')}</span> : f(v));
-  return (
-    <Card title={t('r.exposure')}>
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px] border-collapse">
-          <thead className="border-b border-line">
-            <tr>
-              <th className="th" scope="col">
-                {t('r.mode')}
-              </th>
-              <th className="th text-right" scope="col">
-                {t('r.raw_records')}
-              </th>
-              <th className="th text-right" scope="col">
-                {t('r.bytes')}
-              </th>
-              <th className="th text-right" scope="col">
-                {t('r.blinded')}
-              </th>
-              <th className="th text-right" scope="col">
-                {t('r.match_rows')}
-              </th>
-            </tr>
-          </thead>
-          <tbody className="tnum">
-            {rows.map((r) => (
-              <tr key={r.k} className={`border-b border-line/70 last:border-0 ${r.k === 'staj_psi' ? 'bg-tealsoft/40' : ''}`}>
-                <th scope="row" className="td text-left font-medium">
-                  {t(`mode.${r.k}` as I18nKey)}
-                </th>
-                <td className={`td text-right ${r.k === 'naive_raw_sharing' && (r.raw ?? 0) > 0 ? 'font-semibold text-bad' : ''}`}>{cell(r.raw)}</td>
-                <td className="td text-right" title={r.bytes !== undefined ? `${num(r.bytes)} B` : undefined}>
-                  {cell(r.bytes, (n) => fmtBytes(n, num))}
-                </td>
-                <td className="td text-right">{r.k === 'staj_psi' ? cell(r.blinded) : '–'}</td>
-                <td className="td text-right">{r.k === 'staj_psi' ? cell(r.match) : '–'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
-    </Card>
+    </Section>
   );
 }
 
-function CoordinatorRows({ w }: { w: WireMsg }) {
-  const { t, num } = useI18n();
-  const rows = w.sample.filter((s): s is Record<string, unknown> => typeof s === 'object' && s !== null);
-  const cols = [...new Set(rows.flatMap((r) => Object.keys(r)))];
+interface PairRow {
+  pair: string;
+  elements: number;
+  bytes: number;
+}
+
+function Shared({ d }: { d: NetworkData }) {
+  const { num } = useI18n();
+  const ex = d.radar.exposure;
+  const psi = ex.staj_psi;
+  const perEl = psi && psi.blinded_elements ? psi.bytes_exchanged / psi.blinded_elements : 0;
+  const rows: PairRow[] = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const w of d.radar.wire) {
+      if (!/^B\w+:B\w+$/.test(w.session)) continue;
+      m.set(w.session, (m.get(w.session) ?? 0) + w.n);
+    }
+    return [...m.entries()].map(([s, n]) => ({ pair: s.replace(':', ' and '), elements: n, bytes: n * perEl }));
+  }, [d.radar.wire, perEl]);
+  const cols: Column<PairRow>[] = [
+    { key: 'pair', header: 'Banks', render: (r) => <span className="text-ink">{r.pair}</span> },
+    { key: 'el', header: 'Encrypted elements', align: 'right', render: (r) => <span className="tnum">{num(r.elements)}</span> },
+    { key: 'b', header: 'Data sent', align: 'right', render: (r) => <span className="tnum">{fmtBytes(r.bytes, num)}</span> },
+    { key: 'raw', header: 'Customer records', align: 'right', render: () => <span className="tnum">0</span> },
+  ];
+  const naive = ex.naive_raw_sharing;
   return (
-    <div className="mt-6 border-t border-line pt-4">
-      <h3 className="text-sm font-semibold">
-        {t('r.coordinator')} <span className="tnum font-normal text-muted">· {num(w.n)} · {w.from} → {w.session}</span>
-      </h3>
-      <p className="text-xs text-muted">{t('r.coordinator_sub')}</p>
-      {rows.length ? (
-        <div className="mt-2 overflow-x-auto">
-          <table className="w-full border-collapse text-xs">
-            <thead className="border-b border-line">
-              <tr>
-                {cols.map((c) => (
-                  <th key={c} className="th mono">
-                    {c}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r, i) => (
-                <tr key={i} className="border-b border-line/70 last:border-0">
-                  {cols.map((c) => (
-                    <td key={c} className="px-3 py-1.5 mono tnum">
-                      {typeof r[c] === 'object' ? JSON.stringify(r[c]) : String(r[c] ?? '–')}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <p className="mt-1 text-[11px] text-muted tnum">… +{num(Math.max(0, w.n - rows.length))}</p>
-        </div>
-      ) : (
-        <p className="mt-2 text-xs text-muted">{w.sample.map(String).join(', ')}</p>
-      )}
-    </div>
+    <Section id="shared" title="What was shared" explain="Every message between banks during the comparison, per pair of banks.">
+      <div className="max-w-3xl space-y-3">
+        <Table columns={cols} rows={rows} rowKey={(r) => r.pair} caption="Data exchanged per bank pair" maxHeight="none" />
+        <p className="text-[15px] text-ink">
+          Raw customer records shared: <span className="tnum font-semibold">{num(psi?.raw_records_exposed ?? 0)}</span>.
+          {naive && (
+            <span className="text-muted">
+              {' '}
+              Pooling raw data instead would expose <span className="tnum">{num(naive.raw_records_exposed)}</span> records (
+              {fmtBytes(naive.bytes_exchanged, num)}).
+            </span>
+          )}
+        </p>
+      </div>
+    </Section>
   );
 }

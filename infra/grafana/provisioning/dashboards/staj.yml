@@ -1,0 +1,13 @@
+apiVersion: 1
+
+providers:
+  - name: staj
+    orgId: 1
+    folder: Staj
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    updateIntervalSeconds: 10
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: false

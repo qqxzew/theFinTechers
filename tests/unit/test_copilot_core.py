@@ -94,3 +94,11 @@ def test_reference_inside_a_signal_is_valid():
                        {"text": "Bad.", "refs": ["D9:R00001.notes", "D1:R00001.nonsense"]}]}
     kinds = [(v["sentence"], v["kind"]) for v in validate_draft(d, CASE, analyst_names=[])]
     assert kinds == [(1, "unknown_reference"), (1, "unknown_reference")]
+
+
+def test_staff_name_matches_whole_words_only():
+    ok = {'sentences': [{'text': 'The maximum was 250000 CZK.', 'refs': ['D1:R00001']}]}
+    assert validate_draft(ok, CASE, analyst_names=['max']) == []
+    bad = {'sentences': [{'text': 'Checked by Max yesterday.', 'refs': ['D1:R00001']}]}
+    assert [v['kind'] for v in validate_draft(bad, CASE, analyst_names=['max'])] == ['analyst_name']
+

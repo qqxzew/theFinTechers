@@ -4,14 +4,14 @@ import type { Meta } from './types';
 
 export const ROLES = ['analyst_l1', 'analyst_l2', 'aml_officer', 'mlro'] as const;
 
-/** Demo staff directory for the approver select (local only; the server validates). */
+/** Fallback staff list for the decider/approver selects when the server sends no `meta.staff`. */
 export const STAFF: { name: string; role: string }[] = [
-  { name: 'Tomáš Svoboda', role: 'analyst_l1' },
-  { name: 'Lucie Černá', role: 'analyst_l2' },
-  { name: 'Eva Horáková', role: 'aml_officer' },
-  { name: 'Karel Beneš', role: 'aml_officer' },
-  { name: 'Petr Dvořák', role: 'mlro' },
-  { name: 'Jana Nováková', role: 'mlro' },
+  { name: 'ann', role: 'analyst_l1' },
+  { name: 'tom', role: 'analyst_l2' },
+  { name: 'eva', role: 'aml_officer' },
+  { name: 'rob', role: 'aml_officer' },
+  { name: 'zoe', role: 'mlro' },
+  { name: 'max', role: 'mlro' },
 ];
 
 interface Identity {
@@ -25,33 +25,24 @@ interface AppCtx {
   meta: Meta | null;
   metaError: string | null;
   refreshMeta: () => void;
-  dark: boolean;
-  setDark: (d: boolean) => void;
 }
 
 const Ctx = createContext<AppCtx | null>(null);
 
-function read<T>(k: string, d: T): T {
+function readIdentity(): Identity {
   try {
-    const v = localStorage.getItem(k);
-    return v ? (JSON.parse(v) as T) : d;
-  } catch {
-    return d;
-  }
-}
-function save(k: string, v: unknown) {
-  try {
-    localStorage.setItem(k, JSON.stringify(v));
+    const v = localStorage.getItem('staj.identity');
+    if (v) return JSON.parse(v) as Identity;
   } catch {
     /* ignore */
   }
+  return { name: 'eva', role: 'aml_officer' };
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [identity, setIdentityState] = useState<Identity>(() => read('staj.identity', { name: 'Eva Horáková', role: 'aml_officer' }));
+  const [identity, setIdentityState] = useState<Identity>(readIdentity);
   const [meta, setMeta] = useState<Meta | null>(null);
   const [metaError, setMetaError] = useState<string | null>(null);
-  const [dark, setDarkState] = useState<boolean>(() => read('staj.dark', false));
 
   const refreshMeta = useCallback(() => {
     getMeta()
@@ -61,29 +52,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
       })
       .catch((e: Error) => setMetaError(e.message));
   }, []);
-
   useEffect(refreshMeta, [refreshMeta]);
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', dark);
-  }, [dark]);
 
   const value = useMemo<AppCtx>(
     () => ({
       identity,
       setIdentity: (i) => {
         setIdentityState(i);
-        save('staj.identity', i);
+        try {
+          localStorage.setItem('staj.identity', JSON.stringify(i));
+        } catch {
+          /* ignore */
+        }
       },
       meta,
       metaError,
       refreshMeta,
-      dark,
-      setDark: (d) => {
-        setDarkState(d);
-        save('staj.dark', d);
-      },
     }),
-    [identity, meta, metaError, refreshMeta, dark],
+    [identity, meta, metaError, refreshMeta],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

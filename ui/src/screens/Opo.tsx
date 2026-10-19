@@ -1,294 +1,299 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { getOpo, opoExportUrl, putSectionV } from '../api';
+import { downloadOpoMarkdown, getCase, getOpo, putSectionV } from '../api';
 import { rememberCase } from '../components/Layout';
-import { Card, Chip, ErrorBox, PageHeader, ViolationList } from '../components/ui';
-import { useI18n } from '../i18n';
+import { buildSources } from '../components/report/evidence';
+import { ReportLoading } from '../components/report/ReportLoading';
+import { SectionVBody, SourcesList } from '../components/report/SectionV';
+import { Toc, type SectionStatus } from '../components/report/Toc';
+import { Button, ErrorBox, Page, PageTitle } from '../components/ui';
 import { useAsync } from '../state';
-import type { OpoDraft, Sentence } from '../types';
+import type { CaseDetail, OpoDraft, OpoSection, Sentence } from '../types';
 
-const HUMAN_SECTIONS = new Set(['VI', 'IX']);
-const isHuman = (no: string, text: string) => HUMAN_SECTIONS.has(no) || /DOPLNÍ ČLOVĚK/i.test(text);
+const HUMAN = new Set(['VI', 'IX']);
+const CONTACT = 'VIII';
+const isHuman = (s: OpoSection) => HUMAN.has(s.no) || /DOPLNÍ ČLOVĚK/i.test(s.text);
 
-/** The first GET drafts section V with an LLM (1-2 min): show elapsed time so the wait is legible. */
-function OpoLoading() {
-  const { t } = useI18n();
-  const [s, setS] = useState(0);
-  useEffect(() => {
-    const start = Date.now();
-    const h = window.setInterval(() => setS(Math.floor((Date.now() - start) / 1000)), 500);
-    return () => window.clearInterval(h);
-  }, []);
-  return (
-    <div role="status" aria-live="polite" className="card flex flex-wrap items-center gap-3 p-5 text-sm">
-      <span className="h-4 w-4 animate-spin rounded-full border-2 border-line border-t-teal" aria-hidden="true" />
-      <span>{t('o.loading')}</span>
-      <span className="ml-auto tnum text-muted">
-        {t('o.elapsed')} {Math.floor(s / 60)}:{String(s % 60).padStart(2, '0')}
-      </span>
-    </div>
-  );
-}
+const HUMAN_HINT: Record<string, string> = {
+  VI: 'Say whether the transaction was carried out, refused or postponed, and when.',
+  IX: 'Say how and on what date the report will be filed with the FIU.',
+};
 
-function CollapsibleViolations({ items, title }: { items: Record<string, unknown>[]; title: string }) {
-  const { t } = useI18n();
-  const [all, setAll] = useState(false);
-  if (!items?.length) return null;
-  const shown = all ? items : items.slice(0, 5);
-  return (
-    <div>
-      <ViolationList items={shown} title={title} total={items.length} />
-      {items.length > 5 && (
-        <button type="button" className="btn-secondary mt-1.5 py-0.5 text-xs" onClick={() => setAll((a) => !a)}>
-          {all ? t('o.show_less') : `${t('o.show_all')} (${items.length})`}
-        </button>
-      )}
-    </div>
-  );
-}
+const store = {
+  get(k: string) {
+    try {
+      return localStorage.getItem(k) ?? '';
+    } catch {
+      return '';
+    }
+  },
+  set(k: string, v: string) {
+    try {
+      localStorage.setItem(k, v);
+    } catch {
+      /* ignore */
+    }
+  },
+};
+
+const same = (a: Sentence[], b: Sentence[]) => a.length === b.length && a.every((s, i) => s.text === b[i].text && s.refs.join() === b[i].refs.join());
 
 export default function OpoScreen() {
   const { id } = useParams();
-  const { t } = useI18n();
   const nav = useNavigate();
   const [typed, setTyped] = useState('');
   useEffect(() => {
     if (id) rememberCase(id);
   }, [id]);
-  const o = useAsync(() => (id ? getOpo(id) : Promise.resolve(null)), [id]);
 
   if (!id)
     return (
-      <div>
-        <PageHeader title={t('o.title')} />
+      <Page>
+        <PageTitle title="Report draft" description="Open the FIU report draft for one case." />
         <form
-          className="card flex max-w-md flex-wrap items-end gap-2 p-4"
+          className="card flex max-w-md items-end gap-3 p-5"
           onSubmit={(e) => {
             e.preventDefault();
-            if (typed.trim()) nav(`/opo/${typed.trim()}`);
+            if (typed.trim()) nav(`/report/${typed.trim()}`);
           }}
         >
-          <div className="flex flex-1 flex-col gap-1">
-            <label className="label" htmlFor="opo-id">
-              {t('q.col_case')}
-            </label>
-            <input id="opo-id" className="input mono" placeholder="B1-R00123" value={typed} onChange={(e) => setTyped(e.target.value)} />
-          </div>
-          <button className="btn-primary">OK</button>
+          <label className="flex flex-1 flex-col gap-1">
+            <span className="label">Case id</span>
+            <input className="input mono" placeholder="B1-R03028" value={typed} onChange={(e) => setTyped(e.target.value)} />
+          </label>
+          <Button variant="primary">Open</Button>
         </form>
-      </div>
+      </Page>
     );
-
-  return (
-    <div className="space-y-4">
-      <PageHeader title={t('o.title')}>
-        <Link to={`/case/${id}`} className="btn-secondary">
-          ← {id}
-        </Link>
-        {/* Only offer export once the draft exists: export.md would otherwise start a second LLM draft. */}
-        {o.data ? (
-          <a className="btn-primary" href={opoExportUrl(id)} download={`OPO_${id}.md`}>
-            {t('o.export_md')}
-          </a>
-        ) : (
-          <button className="btn-primary" disabled>
-            {t('o.export_md')}
-          </button>
-        )}
-      </PageHeader>
-      <div role="note" className="rounded-md border border-warn/40 bg-warnsoft px-4 py-2.5 text-sm font-semibold text-warn">
-        {t('o.banner')}
-      </div>
-      {o.loading && !o.data ? (
-        <OpoLoading />
-      ) : o.error ? (
-        <ErrorBox error={o.error} message={t('o.not_found')} onRetry={o.reload} />
-      ) : o.data ? (
-        <OpoView id={id} data={o.data} setData={o.setData} />
-      ) : null}
-    </div>
-  );
+  return <Report id={id} key={id} />;
 }
 
-function OpoView({ id, data, setData }: { id: string; data: OpoDraft; setData: (d: OpoDraft) => void }) {
-  const { t } = useI18n();
-  return (
-    <div className="grid gap-5 xl:grid-cols-[1fr_320px]">
-      <div className="space-y-4">
-        <h2 className="text-base font-semibold">{data.title}</h2>
-        {data.sections.map((s) =>
-          s.no === 'V' ? (
-            <SectionV key={s.no} id={id} title={s.title} text={s.text} data={data} setData={setData} />
-          ) : (
-            <Card
-              key={s.no}
-              title={
-                <span>
-                  <span className="mono mr-2 text-muted">{s.no}.</span>
-                  {s.title}
-                </span>
-              }
-              right={isHuman(s.no, s.text) ? <Chip tone="warn">{t('o.human')}</Chip> : undefined}
-            >
-              {isHuman(s.no, s.text) ? (
-                <div className="rounded-md border border-dashed border-warn/50 bg-warnsoft/40 p-3 text-sm text-warn">
-                  {t('o.human_note')}
-                  {s.text && <p className="mt-2 text-ink">{s.text}</p>}
-                </div>
-              ) : (
-                <p className="whitespace-pre-wrap text-sm leading-relaxed">{s.text || <span className="italic text-muted">{t('common.na')}</span>}</p>
-              )}
-            </Card>
-          ),
-        )}
-      </div>
-      <aside>
-        <ContactBlock />
-      </aside>
-    </div>
-  );
-}
+function Report({ id }: { id: string }) {
+  const o = useAsync(() => getOpo(id), [id]);
+  const c = useAsync(() => getCase(id), [id]);
+  const [rows, setRows] = useState<Sentence[]>([]);
+  const [base, setBase] = useState<Sentence[]>([]);
+  const [everSaved, setEverSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState<string | null>(null);
+  const [saveErr, setSaveErr] = useState<string | null>(null);
+  const [dlErr, setDlErr] = useState<string | null>(null);
+  const [human, setHuman] = useState<Record<string, string>>(() => ({
+    VI: store.get(`staj.report.${id}.VI`),
+    IX: store.get(`staj.report.${id}.IX`),
+  }));
 
-function SectionV({ id, title, text, data, setData }: { id: string; title: string; text: string; data: OpoDraft; setData: (d: OpoDraft) => void }) {
-  const { t } = useI18n();
-  const [rows, setRows] = useState<Sentence[]>(data.section_v_sentences);
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
-  const [err, setErr] = useState<string | null>(null);
-  useEffect(() => setRows(data.section_v_sentences), [data.section_v_sentences]);
+  useEffect(() => {
+    if (o.data) {
+      setRows(o.data.section_v_sentences);
+      setBase(o.data.section_v_sentences);
+    }
+  }, [o.data]);
+
+  const dirty = !same(rows, base);
 
   const save = async () => {
-    setBusy(true);
-    setErr(null);
-    setMsg(null);
+    setSaving(true);
+    setSaveErr(null);
+    setSaveMsg(null);
     try {
-      const r = await putSectionV(id, rows.filter((s) => s.text.trim() !== ''));
-      setData(r);
-      setMsg(t('o.saved'));
+      const r = await putSectionV(
+        id,
+        rows.filter((s) => s.text.trim() !== ''),
+      );
+      o.setData(r);
+      setEverSaved(true);
+      setSaveMsg('Saved');
     } catch (e) {
-      setErr(e instanceof Error ? e.message : String(e));
+      setSaveErr(e instanceof Error ? e.message : String(e));
     } finally {
-      setBusy(false);
+      setSaving(false);
     }
   };
 
-  const upd = (i: number, patch: Partial<Sentence>) => setRows((r) => r.map((s, j) => (j === i ? { ...s, ...patch } : s)));
+  const download = async () => {
+    setDlErr(null);
+    try {
+      await downloadOpoMarkdown(id);
+    } catch (e) {
+      setDlErr(e instanceof Error ? e.message : String(e));
+    }
+  };
+
+  const actions = (
+    <div className="flex flex-col items-end gap-2">
+      <div className="flex items-center gap-2">
+        {saveMsg && !dirty && (
+          <span role="status" className="mr-2 text-[13px] text-muted">
+            {saveMsg}
+          </span>
+        )}
+        <Button onClick={save} disabled={!o.data || saving || !dirty} className="shadow-rest">
+          {saving ? 'Saving…' : 'Save edits'}
+        </Button>
+        <Button onClick={download} disabled={!o.data} className="shadow-rest">
+          Download Markdown
+        </Button>
+      </div>
+      <p className="text-[12.5px] text-faint">Draft only — nothing is sent anywhere.</p>
+    </div>
+  );
 
   return (
-    <Card
-      title={
-        <span>
-          <span className="mono mr-2 text-muted">V.</span>
-          {title}
-        </span>
-      }
-      right={<Chip tone="teal">{t('o.editable')}</Chip>}
-    >
-      <div className="space-y-3">
-        <CollapsibleViolations items={data.section_v_violations} title={t('o.violations')} />
-        {rows.length === 0 && text && (
-          <div className="rounded-md border border-dashed border-line bg-paper/60 p-3 text-sm">
-            <p className="label mb-1">{t('o.v_fallback')}</p>
-            <p className="whitespace-pre-wrap">{text}</p>
-          </div>
-        )}
-        {rows.map((s, i) => (
-          <div key={i} className="rounded-md border border-line p-2.5">
-            <label className="label" htmlFor={`sv-${i}`}>
-              {t('o.sentence')} {i + 1}
-            </label>
-            <textarea id={`sv-${i}`} rows={2} className="input mt-1 w-full" value={s.text} onChange={(e) => upd(i, { text: e.target.value })} />
-            <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-              <span className="text-[11px] text-muted">{t('o.refs')}:</span>
-              {s.refs.length ? (
-                s.refs.map((r, j) => (
-                  <Chip key={`${r}-${j}`} tone="navy" mono>
-                    {r}
-                  </Chip>
-                ))
-              ) : (
-                <Chip tone="bad">no refs</Chip>
-              )}
-              <label className="sr-only" htmlFor={`svr-${i}`}>
-                {t('o.refs')}
-              </label>
-              <input
-                id={`svr-${i}`}
-                className="input mono ml-auto w-56 py-0.5 text-[11px]"
-                value={s.refs.join(', ')}
-                onChange={(e) =>
-                  upd(i, {
-                    refs: e.target.value
-                      .split(',')
-                      .map((x) => x.trim())
-                      .filter(Boolean),
-                  })
-                }
-                aria-label={`${t('o.refs')} ${i + 1}`}
-              />
-              <button type="button" className="btn-secondary py-0.5 text-xs" onClick={() => setRows((r) => r.filter((_, j) => j !== i))}>
-                {t('o.remove')}
-              </button>
-            </div>
-          </div>
-        ))}
-        <div className="flex flex-wrap items-center gap-2">
-          <button type="button" className="btn-secondary" onClick={() => setRows((r) => [...r, { text: '', refs: [] }])}>
-            + {t('o.add_sentence')}
-          </button>
-          <button type="button" className="btn-primary" onClick={save} disabled={busy}>
-            {busy ? t('o.saving') : t('o.save')}
-          </button>
-          {msg && (
-            <span role="status" className="text-xs text-good">
-              {msg}
-            </span>
-          )}
+    <Page className="!space-y-8">
+      <header className="flex flex-wrap items-start justify-between gap-6">
+        <div className="min-w-0 space-y-2">
+          <CaseLine id={id} c={c.data} />
+          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">Report draft</h1>
         </div>
-        {err && <ErrorBox error={err} />}
-      </div>
-    </Card>
+        {actions}
+      </header>
+      {saveErr && <ErrorBox error={saveErr} message="The edits were not saved." />}
+      {dlErr && <ErrorBox error={dlErr} message="The download failed." />}
+
+      {o.loading && !o.data ? (
+        <ReportLoading />
+      ) : o.error ? (
+        <ErrorBox error={o.error} message="Could not draft the report for this case." onRetry={o.reload} />
+      ) : o.data ? (
+        <Document
+          data={o.data}
+          c={c.data}
+          rows={rows}
+          setRows={setRows}
+          vStatus={dirty || everSaved ? 'edited' : 'auto-filled'}
+          human={human}
+          setHuman={(no, v) => {
+            setHuman((h) => ({ ...h, [no]: v }));
+            store.set(`staj.report.${id}.${no}`, v);
+          }}
+        />
+      ) : null}
+    </Page>
   );
 }
 
-function ContactBlock() {
-  const { t } = useI18n();
-  const [c, setC] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('staj.opo.contact') ?? '') as { name: string; phone: string; email: string };
-    } catch {
-      return { name: 'Oddělení AML compliance', phone: '+420 000 000 000', email: 'aml@banka.example' };
-    }
-  });
-  const set = (k: 'name' | 'phone' | 'email', v: string) => {
-    const n = { ...c, [k]: v };
-    setC(n);
-    try {
-      localStorage.setItem('staj.opo.contact', JSON.stringify(n));
-    } catch {
-      /* ignore */
-    }
-  };
+function CaseLine({ id, c }: { id: string; c: CaseDetail | null }) {
   return (
-    <div className="xl:sticky xl:top-20">
-      <Card title={t('o.contact')} sub={t('o.contact_sub')}>
-        <div className="space-y-3">
-          {(
-            [
-              ['name', t('o.contact_name')],
-              ['phone', t('o.contact_phone')],
-              ['email', t('o.contact_email')],
-            ] as const
-          ).map(([k, l]) => (
-            <div key={k} className="flex flex-col gap-1">
-              <label className="label" htmlFor={`ct-${k}`}>
-                {l}
-              </label>
-              <input id={`ct-${k}`} className="input" value={c[k]} onChange={(e) => set(k, e.target.value)} />
-            </div>
-          ))}
+    <p className="flex flex-wrap items-baseline gap-x-2 text-[14px] text-muted">
+      <span>
+        Case <span className="font-mono text-[13px] text-ink">{id}</span>
+      </span>
+      {c && (
+        <>
+          <span aria-hidden="true">·</span>
+          <span>
+            client <span className="font-mono text-[13px] text-ink">{c.client_ref}</span>
+          </span>
+          <span aria-hidden="true">·</span>
+          <span>
+            bank <span className="text-ink">{c.bank_id}</span>
+          </span>
+          <span aria-hidden="true">·</span>
+          <span>
+            priority <span className="tnum font-semibold text-ink">{c.priority}</span>
+          </span>
+        </>
+      )}
+      <span aria-hidden="true">·</span>
+      <Link to={`/case/${id}`} className="text-accent hover:underline">
+        Back to the case
+      </Link>
+    </p>
+  );
+}
+
+function Document({
+  data,
+  c,
+  rows,
+  setRows,
+  vStatus,
+  human,
+  setHuman,
+}: {
+  data: OpoDraft;
+  c: CaseDetail | null;
+  rows: Sentence[];
+  setRows: (fn: (r: Sentence[]) => Sentence[]) => void;
+  vStatus: SectionStatus;
+  human: Record<string, string>;
+  setHuman: (no: string, v: string) => void;
+}) {
+  const { sources, numOf } = useMemo(() => buildSources(rows, c), [rows, c]);
+  const status = (s: OpoSection): SectionStatus => (s.no === 'V' ? vStatus : isHuman(s) ? (human[s.no]?.trim() ? 'edited' : 'needs your input') : 'auto-filled');
+
+  return (
+    <div className="grid items-start gap-10 lg:grid-cols-[240px_minmax(0,1fr)]">
+      <aside className="hidden self-stretch lg:block">
+        <Toc items={data.sections.map((s) => ({ no: s.no, title: s.title, status: status(s) }))} />
+      </aside>
+
+      <article className="card px-8 py-10 sm:px-14 sm:py-14">
+        <div className="max-w-[68ch]">
+          <h2 className="text-[20px] font-semibold leading-snug tracking-tight text-ink">{data.title}</h2>
+          <p className="mt-2 text-[13px] text-faint">Click any statement in section V to edit it. Numbers point to the sources at the end.</p>
+
+          <div className="mt-10 space-y-10">
+            {data.sections.map((s) => (
+              <DocSection key={s.no} s={s}>
+                {s.no === 'V' ? (
+                  <SectionVBody rows={rows} setRows={setRows} violations={data.section_v_violations} numOf={numOf} />
+                ) : isHuman(s) ? (
+                  <HumanBlock s={s} value={human[s.no] ?? ''} onChange={(v) => setHuman(s.no, v)} />
+                ) : s.no === CONTACT ? (
+                  <div className="rounded-lg bg-paper px-5 py-4">
+                    <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-faint">From bank settings</p>
+                    <p className="mt-1.5 text-[15px] leading-relaxed text-ink/85">{s.text}</p>
+                  </div>
+                ) : (
+                  <p className="whitespace-pre-wrap text-[16px] leading-[1.7] text-ink/90">{s.text || <span className="text-faint">Empty in this draft.</span>}</p>
+                )}
+              </DocSection>
+            ))}
+
+            {sources.length > 0 && (
+              <section id="sec-sources" className="scroll-mt-24">
+                <h3 className="mb-4 text-[17px] font-semibold tracking-tight text-ink">Sources</h3>
+                <SourcesList sources={sources} />
+              </section>
+            )}
+          </div>
         </div>
-      </Card>
+      </article>
+    </div>
+  );
+}
+
+function DocSection({ s, children }: { s: OpoSection; children: ReactNode }) {
+  return (
+    <section id={`sec-${s.no}`} aria-labelledby={`sec-${s.no}-h`} className="scroll-mt-24">
+      <h3 id={`sec-${s.no}-h`} className="mb-3 flex gap-4 text-[17px] font-semibold leading-snug tracking-tight text-ink">
+        <span className="tnum w-8 shrink-0 text-muted">{s.no}</span>
+        <span>{s.title}</span>
+      </h3>
+      <div className="pl-12">{children}</div>
+    </section>
+  );
+}
+
+function HumanBlock({ s, value, onChange }: { s: OpoSection; value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="space-y-3">
+      <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-amber">Left for the human</p>
+      <p className="text-[15px] leading-relaxed text-ink">{HUMAN_HINT[s.no] ?? 'Fill this in yourself; the system does not decide it.'}</p>
+      {s.text && <p className="text-[14px] leading-relaxed text-muted">{s.text}</p>}
+      <label className="block">
+        <span className="sr-only">{s.title}</span>
+        <textarea
+          rows={3}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Your text"
+          className="block w-full resize-y rounded-lg bg-sunken px-4 py-3 text-[15px] leading-relaxed text-ink shadow-inset outline-none placeholder:text-faint focus:bg-surface focus:shadow-focus"
+        />
+      </label>
+      <p className="text-[12.5px] text-faint">Kept in this browser only. It is not part of the Markdown download.</p>
     </div>
   );
 }
