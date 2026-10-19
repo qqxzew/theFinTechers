@@ -57,6 +57,11 @@ npm run build        # typecheck + production build to dist/
 - **Metrics modes:** for each mode the UI shows `rank.average_precision` (AP) and `rank.precision_at_k` (P@K, with K). `overall_any_priority` appears as a sub-row. The isolated mode's `per_bank`, `best_single_bank_f1` and `mean_bank_f1` get their own block.
 - **Ablations:** ΔF1 is measured against `ablations.full` when it exists. Otherwise it is measured against `modes.staj_psi.overall`.
 - **Optional metric sections:** `headline_held_out_mean`, `threshold_curve_held_out_mean` and `ring_size_sweep` are rendered generically when present (array of objects, object of objects, or key/value) and skipped when absent.
+- **`weak_evidence_experiment` (optional):** when present, Metrics shows a "Weak-evidence radar (pre-registered)" section (`src/components/WeakEvidence.tsx`):
+  - **Header:** the honest caption, the pre-registration text and the frozen config.
+  - **"Privacy cost" chart:** mean exported tokens per world on a log x-axis against mean `staj_psi` ghost recall and original-scheme recall. Dev seeds are dashed and held-out seeds solid. The variants plotted are baseline and weak_0.05 to weak_0.40.
+  - **Comparison table:** baseline vs weak_0.05 on held-out seeds, with ×-ratios for tokens, bytes and disclosed non-mule candidates computed in the UI. A second table for `dev_without_ghost_ring` appears if present.
+  - **Averaging:** every value is a mean over the seeds of its split. The mock numbers are MOCK; only their shape is meant to match.
 - **`cnb`:** shown with its own `dataset` label. If `sample_sheet_url` is not an http(s) URL or an absolute path, it is shown as a server file path rather than a link.
 - **Signal sentence:** if `Signal.template` contains `{evidence_key}` placeholders, they are filled in from `evidence`. If it is a bare id (e.g. `d5_rare_exit_concentration`), `rule_definitions[detector_id]` is shown as the plain sentence, with the template id underneath.
 - **Evidence and features:** numeric arrays of 8 or more values (e.g. `hour_hist`) are drawn as a mini histogram, and string arrays as chips. Feature descriptions come from `feature_glossary`.

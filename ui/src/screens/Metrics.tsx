@@ -5,6 +5,7 @@ import { getMetrics, resolveApiUrl } from '../api';
 import { Bar, Card, Chip, DatasetLine, ErrorBox, Loading, NA, PageHeader, fmtScalar } from '../components/ui';
 import { useI18n, type I18nKey } from '../i18n';
 import { useAsync } from '../state';
+import WeakEvidence from '../components/WeakEvidence';
 import type { Confusion, MetricsResponse, ModeResult } from '../types';
 
 const MODES = ['isolated', 'staj_psi', 'naive_raw_sharing'] as const;
@@ -206,6 +207,8 @@ function MetricsView({ d }: { d: MetricsResponse }) {
       </div>
 
       <CnbBlock d={d} />
+
+      {d.weak_evidence_experiment && <WeakEvidence x={d.weak_evidence_experiment} {...ds} />}
 
       <Extra title={t('m.extra_headline')} value={d.headline_held_out_mean} {...ds} />
       <Extra title={t('m.extra_threshold')} value={d.threshold_curve_held_out_mean} {...ds} />

@@ -295,6 +295,43 @@ export interface MetricsResponse {
   threshold_curve_held_out_mean?: unknown;
   ring_size_sweep?: unknown;
   headline_held_out_mean?: unknown;
+  weak_evidence_experiment?: WeakEvidenceExperiment;
+}
+
+/** Recall/confusion of one mode in one weak-evidence run. */
+export interface WeakM {
+  tp: number;
+  fp: number;
+  fn: number;
+  stealth_recall?: number;
+  ghost_recall?: number;
+  original_recall?: number;
+}
+
+export interface WeakRun {
+  isolated: WeakM;
+  staj_psi: WeakM;
+  exported_tokens: number;
+  exported_candidates?: number;
+  n_clients?: number;
+  match_rows?: number;
+  blinded_elements?: number;
+  bytes: number;
+  clusters_disclosed?: number;
+  disclosed_candidates?: number;
+  disclosed_candidates_non_mule?: number;
+  clusters_with_non_mule?: number;
+}
+
+/** seed -> variant (baseline | sig_only | weak_0.05 | ...) -> run */
+export type WeakSplit = Record<string, Record<string, WeakRun>>;
+
+export interface WeakEvidenceExperiment {
+  dev?: WeakSplit;
+  held_out?: WeakSplit;
+  dev_without_ghost_ring?: WeakSplit;
+  preregistration?: string;
+  frozen_config?: { weak_top_frac?: number; use_significance?: boolean; min_significance?: number };
 }
 
 export interface AuditEntry {

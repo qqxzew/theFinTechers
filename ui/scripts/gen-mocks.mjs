@@ -579,6 +579,41 @@ const conf = (tp, fp, fn) => {
   return { tp, fp, fn, precision: +p.toFixed(3), recall: +r.toFixed(3), f1: +((2 * p * r) / (p + r)).toFixed(3) };
 };
 const ov = (tp, fp, fn) => ({ ...conf(tp, fp, fn), n_mules: 36, n_accounts: 3000 });
+function weakExperiment() {
+  const VAR = {
+    baseline: { tok: 120, bytesMul: 1, ghost: 0.0, orig: 0.96, fp: 7, nonMule: 0.2 },
+    sig_only: { tok: 110, bytesMul: 0.95, ghost: 0.0, orig: 0.95, fp: 6, nonMule: 0.1 },
+    'weak_0.05': { tok: 790, bytesMul: 8, ghost: 0.8, orig: 0.96, fp: 8, nonMule: 1.4 },
+    'weak_0.10': { tok: 1500, bytesMul: 15, ghost: 0.25, orig: 0.95, fp: 10, nonMule: 3.1 },
+    'weak_0.20': { tok: 3000, bytesMul: 30, ghost: 0.1, orig: 0.94, fp: 13, nonMule: 6.5 },
+    'weak_0.40': { tok: 6100, bytesMul: 61, ghost: 0.0, orig: 0.93, fp: 18, nonMule: 12.0 },
+  };
+  const clamp = (x) => Math.max(0, Math.min(1, +x.toFixed(3)));
+  const run = (v, ghostOn) => {
+    const g = ghostOn ? clamp(v.ghost + (rnd() - 0.5) * 0.1) : 0;
+    const o = clamp(v.orig + (rnd() - 0.5) * 0.04);
+    const tok = Math.round(v.tok * (0.9 + rnd() * 0.2));
+    const nMule = ghostOn ? 41 : 36;
+    const tp = Math.round(o * 36 + g * (nMule - 36));
+    const M = (gg, oo, fp) => ({ tp, fp, fn: nMule - tp, stealth_recall: clamp(oo - 0.05), ghost_recall: gg, original_recall: oo });
+    return {
+      isolated: M(0, clamp(o - 0.3), v.fp - 1),
+      staj_psi: M(g, o, v.fp + int(-1, 1)),
+      exported_tokens: tok, exported_candidates: Math.round(tok / 6), n_clients: 3000, match_rows: Math.round(tok / 9),
+      blinded_elements: tok * 2, bytes: Math.round(40000 * v.bytesMul * (0.9 + rnd() * 0.2)),
+      clusters_disclosed: g > 0.5 ? 4 : 3, disclosed_candidates: 30 + Math.round(v.nonMule), disclosed_candidates_non_mule: +(v.nonMule * (0.8 + rnd() * 0.4)).toFixed(1),
+      clusters_with_non_mule: v.nonMule > 2 ? 2 : v.nonMule > 0.5 ? 1 : 0,
+    };
+  };
+  const split = (seeds, ghostOn) => Object.fromEntries(seeds.map((sd) => [String(sd), Object.fromEntries(Object.entries(VAR).map(([k, v]) => [k, run(v, ghostOn)]))]));
+  return {
+    dev: split([7, 101, 202, 303, 404], true),
+    held_out: split([505, 606], true),
+    dev_without_ghost_ring: split([7, 101, 202], false),
+    preregistration: 'MOCK: variant weak_0.05 and its config were frozen on dev seeds before the held-out seeds 505/606 were run; the ghost_ring was added after the first sweep showed no headroom.',
+    frozen_config: { weak_top_frac: 0.05, use_significance: true, min_significance: 2.0 },
+  };
+}
 write('metrics.json', {
   dataset: 'staj-synth-v0.3 (MOCK)',
   seed: 20261019,
@@ -660,6 +695,8 @@ write('metrics.json', {
     sample_sheet_url: '/mock/review_sheet_30.csv',
   },
   operating_point: { definition: 'case triage REVIEW, route mule_review and priority >= 40', min_priority: 40 },
+  // Weak-evidence radar experiment (MOCK numbers; shape only: 0.05 finds the ghost ring, 0.10+ dilutes it).
+  weak_evidence_experiment: weakExperiment(),
   // Optional sections (backend may add later); the UI renders them generically.
   headline_held_out_mean: { staj_psi: { precision: 0.79, recall: 0.82, f1: 0.805 }, isolated: { precision: 0.66, recall: 0.47, f1: 0.55 } },
   ring_size_sweep: [3, 4, 5, 6, 8].map((ring) => ({ ring_size: ring, recall_isolated: +(0.2 + ring * 0.03).toFixed(2), recall_staj_psi: +(0.55 + ring * 0.05).toFixed(2) })),
