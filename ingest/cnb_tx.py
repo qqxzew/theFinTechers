@@ -51,7 +51,7 @@ def load_transactions(path: str | Path, fx: dict[str, Any], bank_id: str = "B0")
     raw = pl.read_csv(StringIO(text), separator=";", encoding="utf8", infer_schema_length=0)
     raw.columns = _SOURCE_COLUMNS
 
-    rates = fx["rates"]
+    rates = fx["rates"] if not fx.get("volume_is_czk", False) else {c: 1.0 for c in fx["rates"]}
     direction = pl.col("channel_type").replace_strict(_DIRECTION_MAP, return_dtype=pl.String)
     df = raw.with_columns(
         pl.lit(bank_id).alias("bank_id"),

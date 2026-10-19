@@ -3,27 +3,27 @@
   "n_clients": 5493,
   "fx_placeholder": true,
   "rule_a": {
-    "expected=monthly,q2=monthly": 5493,
-    "expected=monthly,q2=quarterly": 5493,
-    "expected=monthly,q2=yearly": 5493,
-    "expected=quarterly,q2=monthly": 5493,
-    "expected=quarterly,q2=quarterly": 5493,
-    "expected=quarterly,q2=yearly": 5493,
-    "expected=yearly,q2=monthly": 5493,
-    "expected=yearly,q2=quarterly": 5493,
-    "expected=yearly,q2=yearly": 5493
+    "expected=monthly,q2=monthly": 3313,
+    "expected=monthly,q2=quarterly": 4669,
+    "expected=monthly,q2=yearly": 5473,
+    "expected=quarterly,q2=monthly": 5003,
+    "expected=quarterly,q2=quarterly": 5012,
+    "expected=quarterly,q2=yearly": 5473,
+    "expected=yearly,q2=monthly": 5489,
+    "expected=yearly,q2=quarterly": 5489,
+    "expected=yearly,q2=yearly": 5489
   },
   "rule_b": {
-    "alerts": 112,
+    "alerts": 4,
     "by_reason": {
-      "pep_large_outgoing": 112
+      "pep_large_outgoing": 4
     }
   },
   "rule_c": {
-    "alerts": 1088
+    "alerts": 16
   },
   "rule_c_first_inflow": {
-    "alerts": 916
+    "alerts": 18
   },
-  "seconds": 37.3
+  "seconds": 36.5
 }

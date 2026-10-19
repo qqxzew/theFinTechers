@@ -1,3 +1,5 @@
+# volume_is_czk: evidence in docs/DECISIONS.md D-006. true = the CNB `volume` column is already CZK-denominated regardless of the `currency` label.
+volume_is_czk: true
 placeholder: true
 source: "PLACEHOLDER rates for July 2026, NOT official CNB rates - replace"
 date: "2026-07"
