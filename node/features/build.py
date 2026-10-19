@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 
 import polars as pl
 
+from ingest.units import projected_monthly
 from node.features.cycles import inflow_cycles
 from node.features.degree import counterparty_degree
 from node.features.hours import active_hour_profile
@@ -50,6 +51,7 @@ def _client_row(cid: str, rows: list[dict], deg: dict[str, int], cfg: dict, cyc:
         "n_senders": len(senders), "n_senders_rare": sum(1 for s in senders if deg.get(s, 1) <= rare_max),
         "n_exits": len(out_tokens),
         "exit_tokens_rare": sorted(t for t in out_tokens if deg.get(t, 1) <= rare_max),
+        "exit_tokens_low": sorted(t for t in out_tokens if deg.get(t, 1) <= cfg.get("low_max", 12)),
         "popular_inflow_share": pop_in / in_total if in_total else 0.0,
         "recurring_income_share": rec_in / in_total if in_total else 0.0,
         "reciprocity_share": (sum(r["amount_czk"] for r in rows if r["counterparty_token"] in senders & out_tokens) / (in_total + out_total))
@@ -88,7 +90,7 @@ def _client_row(cid: str, rows: list[dict], deg: dict[str, int], cfg: dict, cyc:
     return row
 
 
-def build_features(tx: pl.DataFrame, clients: pl.DataFrame, cfg: dict, asof: datetime) -> pl.DataFrame:
+def build_features(tx: pl.DataFrame, clients: pl.DataFrame, cfg: dict, asof: datetime, expected_unit: str = "monthly") -> pl.DataFrame:
     """tx: canonical transactions of ONE bank; clients: canonical clients of that bank. Returns one row per client with activity."""
     deg_df = counterparty_degree(tx)
     deg = dict(zip(deg_df["counterparty_token"].to_list(), deg_df["degree"].to_list(), strict=True))
@@ -112,5 +114,6 @@ def build_features(tx: pl.DataFrame, clients: pl.DataFrame, cfg: dict, asof: dat
         ((pl.lit(asof) - pl.col("contract_date").dt.replace_time_zone("UTC")).dt.total_days()).alias("days_since_contract"),
         (pl.col("in_total") + pl.col("out_total")).alias("july_total"),
         (pl.col("in_total") / (pl.col("in_total") + pl.col("out_total"))).alias("inflow_share_of_volume"),
+        pl.col("expected_volume").map_elements(lambda v: projected_monthly(v, expected_unit), return_dtype=pl.Float64).alias("expected_monthly"),
     )
     return feat

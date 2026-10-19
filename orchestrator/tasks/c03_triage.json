@@ -1,0 +1,15 @@
+{
+ "id": "c03_triage",
+ "goal": "Create node/cases/triage.py with `triage(suspicious: list[Signal], exculpatory: list[Signal], priority: int, route: str, cfg: dict) -> tuple[Triage, list[str]]` (Triage from common.schemas). cfg['explains'] maps an exculpatory detector id -> list of suspicious detector ids it can explain; cfg['fp_max_priority'] is the FP priority ceiling. For each suspicious signal s: explainers = [e for e in exculpatory if s.detector_id in cfg['explains'].get(e.detector_id, [])]. If explainers: reason f'{s.signal_id} explained by {explainers[0].signal_id}'; else reason f'{s.signal_id} unexplained'. Result: FP only if route != 'victim_protection' AND priority < cfg['fp_max_priority'] AND there is at least one suspicious signal AND every suspicious signal has an explainer. Otherwise REVIEW. Add a first reason: f'priority {priority} < {fp_max}' when priority below, else f'priority {priority} >= {fp_max}'; for route 'victim_protection' add 'route victim_protection: never auto-closed'. Return (Triage, reasons). Read tests/unit/test_cases.py (test_triage_fp_only_when_every_suspicion_is_explained).",
+ "read": [
+  "tests/unit/test_cases.py",
+  "common/schemas.py"
+ ],
+ "write": [
+  "node/cases/triage.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_cases.py -q -k triage"
+ ],
+ "max_steps": 14
+}

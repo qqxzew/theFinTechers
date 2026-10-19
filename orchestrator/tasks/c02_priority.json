@@ -1,0 +1,14 @@
+{
+ "id": "c02_priority",
+ "goal": "Create node/cases/priority.py with `priority(prob: float, meta: dict, cfg: dict) -> int`. f = cfg['priority_factors']. total = cfg['prob_scale']*prob + factors: f['aml_risk'][meta['aml_risk']]; + f['pep'] if meta['pep']; + f['high_risk_country'] if meta['high_risk_country']; new-client: days = meta['days_since_contract']; if days < f['new_client_days'][0] add f['new_client_points'][0] elif days < f['new_client_days'][1] add f['new_client_points'][1]; + f['distant_form'] if meta['contract_form']=='distant form'; multi-flag: n = meta['n_distinct_detectors']; add f['multi_flag']['3'] if n >= 3, elif n == 2 add f['multi_flag']['2']; + f['cluster'] if meta['in_cluster']; amount: pts = f['amount_log_points'] * log10(meta['big_amount']/f['amount_ref']) / 2 clipped to [0, f['amount_log_points']] (0 if big_amount <= 0). Result = int(round(clip(total, 0, 100))). Read tests/unit/test_cases.py (test_priority_factors) for exact numbers; note Python round() is banker's rounding - use int(math.floor(total + 0.5)).",
+ "read": [
+  "tests/unit/test_cases.py"
+ ],
+ "write": [
+  "node/cases/priority.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_cases.py -q -k priority"
+ ],
+ "max_steps": 14
+}

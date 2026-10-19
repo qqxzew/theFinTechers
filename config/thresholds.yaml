@@ -12,3 +12,54 @@ rule_c:
   outflow_window_h: 6
   outflow_share: 0.8
   anchor: threshold_crossing   # threshold_crossing | first_inflow
+
+# ---- bank node (blue team) ----
+features:
+  rare_max: 3          # exit/sender token is "rare" if <= this many distinct clients of THIS bank touch it
+  popular_min: 100     # "popular" (utility/merchant/employer-like) if >= this many
+  low_max: 12          # low-degree exits used by D6 same-hand grouping
+  cycle_gap_h: 6
+  cycle_out_window_h: 24
+detectors:
+  D1: {inflow_min: 100000.0, drained_min: 0.8, tight_lag_iqr_h: 1.5, min_cycles_repeat: 2, min_score: 0.5}
+  D2: {max_days: 60, max_life_events: 3, min_big: 100000.0, drained_min: 0.9}
+  D3: {gap_mult: 3.0}
+  D4: {min_rare_senders: 8, min_avg_in: 5000.0, min_in_total: 50000.0}
+  D5: {min_share_rare: 0.5, max_recurring: 0.3, max_popular_in: 0.3, min_out: 50000.0}
+  D6: {min_cycles: 2, min_group: 3, lag_tol_h: 0.75, ret_tol: 0.02, hour_cos: 0.8, min_lift: 3.0, seed: 0, baseline_runs: 20, min_ret: 0.01, min_hour_conc: 0.7}
+  D7: {min_cycles: 3, tol: 0.015, min_k: 0.01}
+  D8: {band: 0.1, min_count: 3, min_share: 0.3}
+  E1: {min_count: 3, max_amount_cv: 0.1, min_recurring: 0.5}
+  E2: {min_share: 0.3}
+  E3: {min_recurring: 0.7}
+  E4: {min_popular_in: 0.7, popular_sender_degree: 100}
+  E5: {min_reciprocity: 0.4}
+  VICTIM: {max_single_in: 50000.0, min_out: 100000.0, min_out_in_ratio: 3.0}
+cases:
+  prob_scale: 60.0
+  fp_max_priority: 30
+  weights:
+    bias: -4.0
+    points: {D1: 3.0, D2: 3.5, D3: 1.0, D4: 2.0, D5: 2.0, D6: 3.0, D7: 3.0, D8: 1.5, R-A: 0.5, R-B: 1.0, R-C: 2.0,
+             E1: -3.0, E2: -1.5, E3: -2.0, E4: -1.5, E5: -1.5}
+  explains:
+    E1: [D1, D4, D5, D8, R-C]
+    E2: [D1, D3, D5, R-A]
+    E3: [D1, D2, D3, D4, D5, R-A, R-C]
+    E4: [D1, D3, D4, R-A, R-C]
+    E5: [D1, D5]
+  priority_factors:
+    aml_risk: {low: 0, medium: 5, high: 12}
+    pep: 10
+    high_risk_country: 10
+    new_client_days: [90, 365]
+    new_client_points: [8, 4]
+    distant_form: 4
+    multi_flag: {"2": 4, "3": 8}
+    cluster: 15
+    amount_log_points: 15
+    amount_ref: 10000.0
+token_export:
+  min_prob: 0.10        # candidate band lower bound (includes weakly suspicious)
+  min_set_size: 5
+radar_guards: {min_set_size: 5, max_tokens: 5000, max_sessions_per_hour: 20, max_unscored_share: 0.2}

@@ -28,7 +28,7 @@ class World:
     def new_ext_account(self, country: str = "CZ") -> str:
         """A fresh external account token (e.g. an IBAN-like string of an account outside the bank)."""
         self._n_ext += 1
-        return f"A{country}{self._n_ext:05d}"
+        return f"X{country}{self._n_ext:06d}"
 
     def new_client(self, bank_id: str, *, contract_date: datetime, contract_form: str = "in person",
                    client_type: str = "natural person", country: str = "CZ", pep: bool = False, aml_risk: str = "low",

@@ -1,0 +1,15 @@
+{
+ "id": "c01_scoring",
+ "goal": "Create node/cases/scoring.py with `score_case(signals: list[Signal], exculpatory: list[Signal], weights: dict) -> dict`. weights = {'bias': float, 'points': {detector_id: float}}. For every signal s (suspicious and exculpatory alike): pts = weights['points'][s.detector_id] * s.score (unknown detector id -> KeyError). points dict maps s.signal_id -> pts. logit = weights['bias'] + sum(all pts). prob = 1/(1+exp(-logit)). Return {'logit','prob','points'}. Transparent additive log-odds, no ML. Read tests/unit/test_cases.py (test_score_additive_logodds).",
+ "read": [
+  "tests/unit/test_cases.py",
+  "common/schemas.py"
+ ],
+ "write": [
+  "node/cases/scoring.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_cases.py -q -k additive"
+ ],
+ "max_steps": 12
+}

@@ -1,0 +1,18 @@
+{
+ "id": "c04_builder",
+ "goal": "Create node/cases/builder.py with `build_case(bank_id, client_id, signals, exculpatory, meta, cfg) -> Case` (Case, Triage, Signal from common.schemas). Modules node/cases/scoring.py (score_case(signals, exculpatory, cfg['weights']) -> dict with 'prob'), node/cases/priority.py (priority(prob, meta, cfg) -> int) and node/cases/triage.py (triage(suspicious, exculpatory, priority, route, cfg) -> (Triage, reasons)) already exist: import and use them, read them first. Steps: suspicious = signals without detector_id 'VICTIM' (the VICTIM signal only routes); route = 'victim_protection' if any signal has detector_id 'VICTIM' else 'mule_review'. meta2 = {**meta, 'n_distinct_detectors': number of distinct detector_ids in suspicious}. prob from score_case(signals, exculpatory, cfg['weights']). prio = priority(prob, meta2, cfg). Return Case(case_id=f'{bank_id}-{client_id}', bank_id, client_id, signals=signals, exculpatory=exculpatory, priority=prio, triage=..., triage_reasons=reasons, route=route, cluster_id=meta.get('cluster_id')). Read tests/unit/test_cases.py (test_build_case).",
+ "read": [
+  "tests/unit/test_cases.py",
+  "common/schemas.py",
+  "node/cases/scoring.py",
+  "node/cases/priority.py",
+  "node/cases/triage.py"
+ ],
+ "write": [
+  "node/cases/builder.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_cases.py -q"
+ ],
+ "max_steps": 14
+}
