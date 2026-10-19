@@ -15,13 +15,23 @@ from node.cases.builder import build_case
 from node.cases.scoring import score_case
 from node.detectors import ALL_DETECTORS, d6_same_hand, d8_structuring
 from node.features.build import build_features
-from node.innocence import e1_mom, e2_life, e3_source, e4_institutional, e5_reciprocity, victim
+from node.innocence import (
+    e1_mom,
+    e2_life,
+    e3_source,
+    e4_institutional,
+    e5_reciprocity,
+    e6_pooling,
+    e7_cohost,
+    e8_earner,
+    victim,
+)
 from node.rules.rule_a import rule_a
 from node.rules.rule_b import rule_b
 from node.rules.rule_c import rule_c
 from node.tokens.export import export_candidates
 
-INNOCENCE = [e1_mom, e2_life, e3_source, e4_institutional, e5_reciprocity]
+INNOCENCE = [e1_mom, e2_life, e3_source, e4_institutional, e5_reciprocity, e6_pooling, e7_cohost, e8_earner]
 ASOF = datetime(2026, 7, 31, 23, 59, 59, tzinfo=UTC)
 
 
@@ -43,6 +53,11 @@ class NodeResult:
     alerts: pl.DataFrame
     candidates: list[dict]
     signals: list[Signal] = field(default_factory=list)
+    metas: dict[str, dict] = field(default_factory=dict)
+    exculpatory: dict[str, list[Signal]] = field(default_factory=dict)
+    degree: dict[str, int] = field(default_factory=dict)
+    ref_to_client: dict[str, str] = field(default_factory=dict)
+    cfg: dict = field(default_factory=dict)
 
 
 def _rule_signals(a: pl.DataFrame, b: pl.DataFrame, c: pl.DataFrame) -> list[Signal]:
@@ -99,15 +114,49 @@ def run_node(bank_id: str, tx: pl.DataFrame, clients: pl.DataFrame, cfg: dict, b
                 exc.setdefault(cid, []).extend(m.detect(by_id[cid], ctx))
     hr = cfg["hr_countries"]
     cl_by = {r["client_id"]: r for r in clients.to_dicts()}
-    cases, probs = [], {}
+    cases, probs, metas = [], {}, {}
     for cid, sigs in sus.items():
         f = by_id[cid]
         meta = {"aml_risk": f["aml_risk"] or "low", "pep": bool(f["pep"]), "high_risk_country": (cl_by[cid]["client_country"] or "") in hr,
                 "days_since_contract": f["days_since_contract"] if f["days_since_contract"] is not None else 9999,
                 "contract_form": f["contract_form"], "in_cluster": False, "big_amount": f["big_in_amount"] or f["max_single_in"] or 0.0,
                 "cluster_id": None}
+        metas[cid] = meta
         case = build_case(bank_id, cid, sigs, exc.get(cid, []), meta, cfg["cases"])
         cases.append(case)
         probs[cid] = score_case([s for s in sigs if s.detector_id != "VICTIM"], exc.get(cid, []), cfg["cases"]["weights"])["prob"]
     cand = export_candidates(cases, by_id, probs, bank_secret, cfg["token_export"])
-    return NodeResult(bank_id, feat, cases, probs, alerts, cand, [s for v in sus.values() for s in v])
+    from node.features.degree import counterparty_degree
+    dd = counterparty_degree(tx)
+    degree = dict(zip(dd["counterparty_token"].to_list(), dd["degree"].to_list(), strict=True))
+    from node.tokens.export import cand_ref
+    ref_to_client = {cand_ref(bank_secret, c.client_id): c.client_id for c in cases}
+    return NodeResult(bank_id, feat, cases, probs, alerts, cand, [s for v in sus.values() for s in v], metas, exc, degree, ref_to_client, cfg)
+
+
+def apply_clusters(res: NodeResult, clusters: list[dict]) -> list[Case]:
+    """Rebuild the cases of candidates that sit in a DISCLOSED cluster: cluster membership raises priority and blocks auto-closing."""
+    member: dict[str, str] = {}
+    member_score: dict[str, float] = {}
+    for c in clusters:
+        if not c["disclosed"]:
+            continue
+        for bank, ref in c["candidates"]:
+            if bank == res.bank_id and ref in res.ref_to_client:
+                member[res.ref_to_client[ref]] = c["cluster_id"]
+                member_score[res.ref_to_client[ref]] = c["score"]
+    out = []
+    sigs_by: dict[str, list[Signal]] = {}
+    for s in res.signals:
+        sigs_by.setdefault(s.client_id, []).append(s)
+    for case in res.cases:
+        cid = case.client_id
+        if cid in member:
+            meta = {**res.metas[cid], "in_cluster": True, "cluster_id": member[cid]}
+            xs = Signal(signal_id=f"X:{cid}", detector_id="X", version="1", client_id=cid, score=member_score[cid],
+                        evidence=[f"cluster_id={member[cid]}"], explanation_template_key="radar_cluster",
+                        source="Stáj radar: blinded cross-bank exit-token match (PSI)")
+            out.append(build_case(res.bank_id, cid, [*sigs_by[cid], xs], res.exculpatory.get(cid, []), meta, res.cfg["cases"]))
+        else:
+            out.append(case)
+    return out

@@ -1,0 +1,82 @@
+{
+  "title": "Oznámení podezřelého obchodu – NÁVRH – B2-R00210",
+  "sections": [
+    {
+      "no": "I",
+      "title": "Oznamující povinná osoba",
+      "text": "Banka B2 (syntetická), IČO 00000000 – údaje z nastavení povinné osoby."
+    },
+    {
+      "no": "II",
+      "title": "Subjekt podezřelého obchodu",
+      "text": "Klient c-d03f9a71 (pseudonym). Identifikační údaje doplní systém banky při odeslání; v návrhu se nezobrazují."
+    },
+    {
+      "no": "III",
+      "title": "Popis obchodu",
+      "text": "Příchozí a odchozí platby v období 1. 7. – 31. 7. 2026, celkem 940000 Kč příchozích a 902000 Kč odchozích."
+    },
+    {
+      "no": "IV",
+      "title": "Časový rámec a objem",
+      "text": "Počet transakcí: 44. Podrobný výpis viz příloha (export z jádrového systému)."
+    },
+    {
+      "no": "V",
+      "title": "Důvody podezření",
+      "text": ""
+    },
+    {
+      "no": "VI",
+      "title": "Přijatá opatření",
+      "text": ""
+    },
+    {
+      "no": "VII",
+      "title": "Související účty a protistrany",
+      "text": "Pseudonymní protistrany: c-f46674f2, c-3260e953, c-0723d13b, c-0b8cdaa0, c-62176ebd."
+    },
+    {
+      "no": "VIII",
+      "title": "Podklady a přílohy",
+      "text": "Případová karta, auditní záznam (hash hlavy řetězce), výpis transakcí."
+    },
+    {
+      "no": "IX",
+      "title": "Další skutečnosti",
+      "text": ""
+    },
+    {
+      "no": "X",
+      "title": "Kontaktní údaje",
+      "text": "Kontaktní osoba povinné osoby dle nastavení (bank_settings). Jméno analytika se do oznámení neuvádí."
+    }
+  ],
+  "section_v_sentences": [
+    {
+      "text": "Odchozí platby se opakovaně drží těsně pod 15 000 Kč.",
+      "refs": [
+        "D8:R00210"
+      ]
+    },
+    {
+      "text": "Objem v červenci je 7,8násobek očekávaného měsíčního profilu.",
+      "refs": [
+        "D3:R00210"
+      ]
+    },
+    {
+      "text": "Klient je politicky exponovaná osoba, proto případ eskaluje na MLRO.",
+      "refs": [
+        "feature:is_pep"
+      ]
+    }
+  ],
+  "section_v_violations": [
+    {
+      "check": "mentions_internal_role",
+      "sentence_index": 2,
+      "detail": "Sentence refers to internal escalation (MLRO); FAÚ report should state facts only."
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "sources": [
+    {"name": "ČNB hackathon dataset (transactions.csv, clients.csv)", "kind": "real-synthetic",
+     "description": "397,853 synthetic transactions of 5,493 synthetic clients, 1-31 July 2026, provided by the organisers. Contains NO mule networks (re-checked with CZK amounts: relay matches equal a shuffled baseline). Used for the FINREG rules A/B/C and as the 'normal life' background."},
+    {"name": "Red-team world (redteam/)", "kind": "planted",
+     "description": "Generated locally by an isolated package from ČNB distributions: 3 banks, ~3,000 background clients resampled from ČNB, plus PLANTED schemes (day-zero handover, same hand, stealth same hand, fixed skim, invoice mule, victim draining own savings) and PLANTED honest look-alikes (migrant remittances, students splitting rent, second-hand seller, group collection, co-host middleman, freelancer, fundraiser). Labels are hidden from the detectors and used only by eval/."},
+    {"name": "IBM AMLworld HI-Small (Altman et al., NeurIPS 2023)", "kind": "generic",
+     "description": "Generic synthetic laundering patterns (fan-out, cycle, ...), NOT Czech mule schemes. Downloaded; evaluation not yet computed."}
+  ],
+  "planted": [
+    "All mule accounts, victim accounts and honest look-alike personas in the red-team world are planted by us; detection rates on them measure how well the detectors recognise OUR OWN scheme definitions, not real-world recall.",
+    "The persona separators E6-E8 were designed against our own personas; their false-positive rates on real customers are unknown.",
+    "Thresholds of D6 and the radar candidate band were set while looking at dev seed 7; the headline numbers are reported on held-out seed 101."
+  ],
+  "limitations": [
+    "The ČNB data contain no mule networks; the cross-bank value of the radar is demonstrated only on planted red-team data.",
+    "FINREG rule A fires on 60-99.9 % of clients under every interpretation of the profile units; it is a high-volume, low-precision rule and the triage layer carries the value.",
+    "The ČNB 'volume' column behaves as already denominated in CZK (median ~3,000 for every currency); FX conversion is a placeholder flag.",
+    "Escalation matrix, FX rates and bank settings are placeholders.",
+    "EU high-risk list compiled from web search and not verified against the consolidated EUR-Lex text; FATF lists read from the FATF page on 19 June 2026 plenary state. None of the 33 country codes in the ČNB data is on either list, so the country condition of rule B cannot fire there.",
+    "Card, ATM, merchant, device and IP detectors are out of scope for the data we have (interfaces only).",
+    "PSI is semi-honest DH-PSI; a malicious bank can probe with crafted tokens (mitigated by guards, not eliminated). Production would use AWS Clean Rooms or Nitro Enclaves - NOT used here.",
+    "Mule accounts that imitate an ordinary spending life would defeat the 'life' separators."
+  ],
+  "legal_note": "PSI minimises what is shared. It is not a legal basis: sharing between banks needs the banking-secrecy change (§ 38 of Act 21/1992 Coll.; planned Safe-D scheme) and, under EU AMLR Art. 75, an information-sharing partnership (applies from 10 July 2027) with supervisor notification and a DPIA.",
+  "not_found_in_public_sources": [
+    "As of 19 Oct 2026 we did not find in public sources: a catalogue of Czech/CEE mule schemes encoded as detectors; explicit honest look-alike personas with a separator per persona; 'same hand' (one operator) detection from transactions alone; PSI-based cross-bank matching of mule exit tokens; a draft FAÚ report structured by FAÚ Methodological Guideline No. 4."
+  ]
+}

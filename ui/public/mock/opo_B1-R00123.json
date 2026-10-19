@@ -1,0 +1,83 @@
+{
+  "title": "Oznámení podezřelého obchodu – NÁVRH – B1-R00123",
+  "sections": [
+    {
+      "no": "I",
+      "title": "Oznamující povinná osoba",
+      "text": "Banka B1 (syntetická), IČO 00000000 – údaje z nastavení povinné osoby."
+    },
+    {
+      "no": "II",
+      "title": "Subjekt podezřelého obchodu",
+      "text": "Klient c-9f2a1b3c (pseudonym). Identifikační údaje doplní systém banky při odeslání; v návrhu se nezobrazují."
+    },
+    {
+      "no": "III",
+      "title": "Popis obchodu",
+      "text": "Příchozí a odchozí platby v období 1. 7. – 31. 7. 2026, celkem 655300 Kč příchozích a 612000 Kč odchozích."
+    },
+    {
+      "no": "IV",
+      "title": "Časový rámec a objem",
+      "text": "Počet transakcí: 54. Podrobný výpis viz příloha (export z jádrového systému)."
+    },
+    {
+      "no": "V",
+      "title": "Důvody podezření",
+      "text": ""
+    },
+    {
+      "no": "VI",
+      "title": "Přijatá opatření",
+      "text": ""
+    },
+    {
+      "no": "VII",
+      "title": "Související účty a protistrany",
+      "text": "Pseudonymní protistrany: c-02618d88, c-dc493f76, c-8f2ad1f2, c-cf98f94f, c-604ee2ee."
+    },
+    {
+      "no": "VIII",
+      "title": "Podklady a přílohy",
+      "text": "Případová karta, auditní záznam (hash hlavy řetězce), výpis transakcí."
+    },
+    {
+      "no": "IX",
+      "title": "Další skutečnosti",
+      "text": ""
+    },
+    {
+      "no": "X",
+      "title": "Kontaktní údaje",
+      "text": "Kontaktní osoba povinné osoby dle nastavení (bank_settings). Jméno analytika se do oznámení neuvádí."
+    }
+  ],
+  "section_v_sentences": [
+    {
+      "text": "Účet přijal od 6 různých odesílatelů celkem 655 300 Kč a během mediánu 5,5 hodiny z nich odeslal dál 96 %.",
+      "refs": [
+        "D1:R00123"
+      ]
+    },
+    {
+      "text": "Odchozí platby míří z 93 % na protistrany, které banka téměř nezná.",
+      "refs": [
+        "D5:R00123"
+      ]
+    },
+    {
+      "text": "První příchozí platba přišla 6 dní po založení účtu.",
+      "refs": [
+        "D2:R00123"
+      ]
+    },
+    {
+      "text": "Stejný časový a retenční otisk sdílí 4 další kandidáti ve 2 dalších bankách (shluk K1).",
+      "refs": [
+        "D6:c-9f2a1b3c",
+        "cluster:K1"
+      ]
+    }
+  ],
+  "section_v_violations": []
+}

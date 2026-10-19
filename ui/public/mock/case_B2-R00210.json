@@ -1,0 +1,541 @@
+{
+  "case_id": "B2-R00210",
+  "client_ref": "c-d03f9a71",
+  "bank_id": "B2",
+  "priority": 88,
+  "triage": "REVIEW",
+  "route": "mule_review",
+  "signals": [
+    {
+      "signal_id": "D3:R00210",
+      "detector_id": "D3",
+      "score": 0.72,
+      "evidence": {
+        "july_total": 940000,
+        "expected_monthly": 120000,
+        "inflow_share_of_volume": 0.49
+      },
+      "notes": [],
+      "template": "July volume {july_total} CZK vs expected {expected_monthly} CZK.",
+      "source": "node/detectors/d3_profile_gap.py@1.1 · config/thresholds.yaml#d3"
+    },
+    {
+      "signal_id": "D8:R00210",
+      "detector_id": "D8",
+      "score": 0.81,
+      "evidence": {
+        "out_amounts": [
+          14800,
+          14650,
+          14900,
+          14700,
+          14850,
+          14600
+        ]
+      },
+      "notes": [],
+      "template": "Outgoing amounts cluster just below 15 000 CZK: {out_amounts}.",
+      "source": "node/detectors/d8_structuring.py@1.0 · config/thresholds.yaml#d8"
+    }
+  ],
+  "exculpatory": [
+    {
+      "signal_id": "E5:R00210",
+      "detector_id": "E5",
+      "score": 0.31,
+      "evidence": {
+        "reciprocity_share": 0.22
+      },
+      "notes": [],
+      "template": "{reciprocity_share} of flows are reciprocal with the same counterparties.",
+      "source": "node/innocence/e5_reciprocity.py@1.0"
+    }
+  ],
+  "features": {
+    "in_total_czk": 940000,
+    "out_total_czk": 902000,
+    "n_tx": 44,
+    "days_since_contract": 2900,
+    "declared_income_czk": 120000,
+    "is_pep": true,
+    "pep_category": "domestic, municipal",
+    "segment": "premium"
+  },
+  "triage_reasons": [
+    "Client is a PEP (escalation matrix row 0)",
+    "D8 structuring below 15 000 CZK",
+    "Profile gap 7.8x"
+  ],
+  "cluster": null,
+  "rule_definitions": {
+    "R-A": "Rule A (CNB pilot): inflow followed by >= 80 % outflow within 48 h, aggregated per unit.",
+    "R-B": "Rule B (CNB pilot): first incoming payment above 50 000 CZK within 30 days of account opening.",
+    "R-C": "Rule C (CNB pilot): monthly turnover exceeds 3x declared income.",
+    "D1": "D1 flow-through: money passes through with low retention and short lag.",
+    "D2": "D2 day-zero: activity starts within days of contract opening.",
+    "D3": "D3 profile gap: volume far above declared profile.",
+    "D4": "D4 fan-in: many rare senders to one account.",
+    "D5": "D5 rare exit: outflows go to counterparties rarely seen in the bank.",
+    "D6": "D6 same hand: timing/retention fingerprint shared with other candidates.",
+    "D7": "D7 fixed skim: constant retained share per cycle.",
+    "D8": "D8 structuring: outgoing amounts cluster just below a threshold.",
+    "X": "X cross-bank cluster: blinded-token overlap with candidates in other banks (disclosed only if >= 2 banks and >= 3 candidates)."
+  },
+  "timeline": [
+    {
+      "ts": "2026-07-02T12:00:00Z",
+      "direction": "out",
+      "amount_czk": 21000,
+      "counterparty": "c-f46674f2"
+    },
+    {
+      "ts": "2026-07-03T16:00:00Z",
+      "direction": "out",
+      "amount_czk": 18000,
+      "counterparty": "c-f46674f2"
+    },
+    {
+      "ts": "2026-07-03T23:00:00Z",
+      "direction": "out",
+      "amount_czk": 14701,
+      "counterparty": "c-3260e953"
+    },
+    {
+      "ts": "2026-07-04T16:00:00Z",
+      "direction": "in",
+      "amount_czk": 9000,
+      "counterparty": "c-0723d13b"
+    },
+    {
+      "ts": "2026-07-05T03:00:00Z",
+      "direction": "in",
+      "amount_czk": 24000,
+      "counterparty": "c-0b8cdaa0"
+    },
+    {
+      "ts": "2026-07-06T05:00:00Z",
+      "direction": "out",
+      "amount_czk": 14531,
+      "counterparty": "c-3260e953"
+    },
+    {
+      "ts": "2026-07-06T23:00:00Z",
+      "direction": "in",
+      "amount_czk": 16000,
+      "counterparty": "c-62176ebd"
+    },
+    {
+      "ts": "2026-07-07T21:00:00Z",
+      "direction": "out",
+      "amount_czk": 14522,
+      "counterparty": "c-f46674f2"
+    },
+    {
+      "ts": "2026-07-09T02:00:00Z",
+      "direction": "in",
+      "amount_czk": 23000,
+      "counterparty": "c-3ebb3bd5"
+    },
+    {
+      "ts": "2026-07-09T04:00:00Z",
+      "direction": "in",
+      "amount_czk": 27000,
+      "counterparty": "c-62176ebd"
+    },
+    {
+      "ts": "2026-07-09T08:00:00Z",
+      "direction": "out",
+      "amount_czk": 14712,
+      "counterparty": "c-92866a60"
+    },
+    {
+      "ts": "2026-07-09T19:00:00Z",
+      "direction": "out",
+      "amount_czk": 21000,
+      "counterparty": "c-92866a60"
+    },
+    {
+      "ts": "2026-07-10T01:00:00Z",
+      "direction": "in",
+      "amount_czk": 18000,
+      "counterparty": "c-62176ebd"
+    },
+    {
+      "ts": "2026-07-10T20:00:00Z",
+      "direction": "in",
+      "amount_czk": 16000,
+      "counterparty": "c-d53f1586"
+    },
+    {
+      "ts": "2026-07-11T06:00:00Z",
+      "direction": "out",
+      "amount_czk": 3000,
+      "counterparty": "c-f46674f2"
+    },
+    {
+      "ts": "2026-07-12T03:00:00Z",
+      "direction": "out",
+      "amount_czk": 14674,
+      "counterparty": "c-3260e953"
+    },
+    {
+      "ts": "2026-07-13T03:00:00Z",
+      "direction": "out",
+      "amount_czk": 23000,
+      "counterparty": "c-3260e953"
+    },
+    {
+      "ts": "2026-07-14T04:00:00Z",
+      "direction": "in",
+      "amount_czk": 15000,
+      "counterparty": "c-d53f1586"
+    },
+    {
+      "ts": "2026-07-14T07:00:00Z",
+      "direction": "in",
+      "amount_czk": 7000,
+      "counterparty": "c-0b8cdaa0"
+    },
+    {
+      "ts": "2026-07-15T05:00:00Z",
+      "direction": "out",
+      "amount_czk": 14805,
+      "counterparty": "c-f46674f2"
+    },
+    {
+      "ts": "2026-07-15T19:00:00Z",
+      "direction": "out",
+      "amount_czk": 12000,
+      "counterparty": "c-f46674f2"
+    },
+    {
+      "ts": "2026-07-16T17:00:00Z",
+      "direction": "in",
+      "amount_czk": 21000,
+      "counterparty": "c-0b8cdaa0"
+    },
+    {
+      "ts": "2026-07-17T09:00:00Z",
+      "direction": "out",
+      "amount_czk": 14000,
+      "counterparty": "c-92866a60"
+    },
+    {
+      "ts": "2026-07-18T02:00:00Z",
+      "direction": "in",
+      "amount_czk": 7000,
+      "counterparty": "c-0b8cdaa0"
+    },
+    {
+      "ts": "2026-07-18T18:00:00Z",
+      "direction": "in",
+      "amount_czk": 28000,
+      "counterparty": "c-d53f1586"
+    },
+    {
+      "ts": "2026-07-19T02:00:00Z",
+      "direction": "in",
+      "amount_czk": 18000,
+      "counterparty": "c-62176ebd"
+    },
+    {
+      "ts": "2026-07-20T01:00:00Z",
+      "direction": "in",
+      "amount_czk": 14000,
+      "counterparty": "c-62176ebd"
+    },
+    {
+      "ts": "2026-07-20T20:00:00Z",
+      "direction": "out",
+      "amount_czk": 14756,
+      "counterparty": "c-3260e953"
+    },
+    {
+      "ts": "2026-07-21T05:00:00Z",
+      "direction": "out",
+      "amount_czk": 14654,
+      "counterparty": "c-92866a60"
+    },
+    {
+      "ts": "2026-07-21T09:00:00Z",
+      "direction": "out",
+      "amount_czk": 14741,
+      "counterparty": "c-3260e953"
+    },
+    {
+      "ts": "2026-07-21T17:00:00Z",
+      "direction": "in",
+      "amount_czk": 25000,
+      "counterparty": "c-5d0d0e68"
+    },
+    {
+      "ts": "2026-07-22T22:00:00Z",
+      "direction": "in",
+      "amount_czk": 10000,
+      "counterparty": "c-0723d13b"
+    },
+    {
+      "ts": "2026-07-23T05:00:00Z",
+      "direction": "in",
+      "amount_czk": 12000,
+      "counterparty": "c-d53f1586"
+    },
+    {
+      "ts": "2026-07-24T05:00:00Z",
+      "direction": "out",
+      "amount_czk": 12000,
+      "counterparty": "c-92866a60"
+    },
+    {
+      "ts": "2026-07-25T09:00:00Z",
+      "direction": "in",
+      "amount_czk": 13000,
+      "counterparty": "c-0b8cdaa0"
+    },
+    {
+      "ts": "2026-07-25T22:00:00Z",
+      "direction": "out",
+      "amount_czk": 14719,
+      "counterparty": "c-92866a60"
+    },
+    {
+      "ts": "2026-07-26T12:00:00Z",
+      "direction": "in",
+      "amount_czk": 24000,
+      "counterparty": "c-0723d13b"
+    },
+    {
+      "ts": "2026-07-27T17:00:00Z",
+      "direction": "out",
+      "amount_czk": 27000,
+      "counterparty": "c-3260e953"
+    },
+    {
+      "ts": "2026-07-28T10:00:00Z",
+      "direction": "in",
+      "amount_czk": 5000,
+      "counterparty": "c-5d0d0e68"
+    },
+    {
+      "ts": "2026-07-29T13:00:00Z",
+      "direction": "in",
+      "amount_czk": 5000,
+      "counterparty": "c-d53f1586"
+    },
+    {
+      "ts": "2026-07-30T19:00:00Z",
+      "direction": "in",
+      "amount_czk": 20000,
+      "counterparty": "c-3ebb3bd5"
+    },
+    {
+      "ts": "2026-08-01T01:00:00Z",
+      "direction": "out",
+      "amount_czk": 14636,
+      "counterparty": "c-f46674f2"
+    },
+    {
+      "ts": "2026-08-01T17:00:00Z",
+      "direction": "out",
+      "amount_czk": 14899,
+      "counterparty": "c-3260e953"
+    },
+    {
+      "ts": "2026-08-01T23:00:00Z",
+      "direction": "in",
+      "amount_czk": 12000,
+      "counterparty": "c-d53f1586"
+    }
+  ],
+  "local_graph": {
+    "nodes": [
+      {
+        "id": "c-d03f9a71",
+        "label": "c-d03f9a71",
+        "kind": "client"
+      },
+      {
+        "id": "c-f46674f2",
+        "label": "c-f46674f2",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-3260e953",
+        "label": "c-3260e953",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-0723d13b",
+        "label": "c-0723d13b",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-0b8cdaa0",
+        "label": "c-0b8cdaa0",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-62176ebd",
+        "label": "c-62176ebd",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-3ebb3bd5",
+        "label": "c-3ebb3bd5",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-92866a60",
+        "label": "c-92866a60",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-d53f1586",
+        "label": "c-d53f1586",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-5d0d0e68",
+        "label": "c-5d0d0e68",
+        "kind": "counterparty_rare"
+      }
+    ],
+    "edges": [
+      {
+        "source": "c-d03f9a71",
+        "target": "c-f46674f2",
+        "amount_czk": 97963,
+        "direction": "out"
+      },
+      {
+        "source": "c-d03f9a71",
+        "target": "c-3260e953",
+        "amount_czk": 138302,
+        "direction": "out"
+      },
+      {
+        "source": "c-0723d13b",
+        "target": "c-d03f9a71",
+        "amount_czk": 43000,
+        "direction": "in"
+      },
+      {
+        "source": "c-0b8cdaa0",
+        "target": "c-d03f9a71",
+        "amount_czk": 72000,
+        "direction": "in"
+      },
+      {
+        "source": "c-62176ebd",
+        "target": "c-d03f9a71",
+        "amount_czk": 93000,
+        "direction": "in"
+      },
+      {
+        "source": "c-3ebb3bd5",
+        "target": "c-d03f9a71",
+        "amount_czk": 43000,
+        "direction": "in"
+      },
+      {
+        "source": "c-d03f9a71",
+        "target": "c-92866a60",
+        "amount_czk": 91085,
+        "direction": "out"
+      },
+      {
+        "source": "c-d53f1586",
+        "target": "c-d03f9a71",
+        "amount_czk": 88000,
+        "direction": "in"
+      },
+      {
+        "source": "c-5d0d0e68",
+        "target": "c-d03f9a71",
+        "amount_czk": 30000,
+        "direction": "in"
+      }
+    ]
+  },
+  "explanation": {
+    "cs": [
+      {
+        "text": "Odchozí platby se opakovaně drží těsně pod 15 000 Kč.",
+        "refs": [
+          "D8:R00210"
+        ]
+      },
+      {
+        "text": "Objem v červenci je 7,8násobek očekávaného měsíčního profilu.",
+        "refs": [
+          "D3:R00210"
+        ]
+      },
+      {
+        "text": "Klient je politicky exponovaná osoba, proto případ eskaluje na MLRO.",
+        "refs": [
+          "feature:is_pep"
+        ]
+      }
+    ],
+    "en": [
+      {
+        "text": "Outgoing payments repeatedly stay just below 15,000 CZK.",
+        "refs": [
+          "D8:R00210"
+        ]
+      },
+      {
+        "text": "July volume is 7.8 times the expected monthly profile.",
+        "refs": [
+          "D3:R00210"
+        ]
+      },
+      {
+        "text": "The client is a politically exposed person, so the case escalates to the MLRO.",
+        "refs": [
+          "feature:is_pep"
+        ]
+      }
+    ],
+    "not_a_mom": null,
+    "triage_justification": {
+      "cs": {
+        "text": "Návrh REVIEW: strukturování a PEP status.",
+        "refs": [
+          "D8:R00210",
+          "feature:is_pep"
+        ]
+      },
+      "en": {
+        "text": "Proposed REVIEW: structuring and PEP status.",
+        "refs": [
+          "D8:R00210",
+          "feature:is_pep"
+        ]
+      }
+    }
+  },
+  "explanation_violations": [],
+  "escalation": {
+    "role": "mlro",
+    "rule_index": 0,
+    "matrix_is_placeholder": true
+  },
+  "proposals": [
+    {
+      "triage": "REVIEW",
+      "reason": "PEP + D8",
+      "agent": "triage-agent@0.4",
+      "ts": "2026-10-19T07:45:12Z"
+    }
+  ],
+  "decision": null,
+  "_mock": {
+    "relationship_owner": "Petr Dvořák",
+    "rule_authors": [
+      "Ondřej Malý"
+    ],
+    "first_triager": "triage-agent"
+  }
+}

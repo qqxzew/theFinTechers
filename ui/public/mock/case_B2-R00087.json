@@ -1,0 +1,462 @@
+{
+  "case_id": "B2-R00087",
+  "client_ref": "c-41d7e0a2",
+  "bank_id": "B2",
+  "priority": 81,
+  "triage": "REVIEW",
+  "route": "mule_review",
+  "signals": [
+    {
+      "signal_id": "D4:R00087",
+      "detector_id": "D4",
+      "score": 0.84,
+      "evidence": {
+        "n_senders_rare": 14,
+        "in_total": 388000,
+        "n_in": 22
+      },
+      "notes": [],
+      "template": "{n_in} inflows totalling {in_total} CZK from {n_senders_rare} rare senders.",
+      "source": "node/detectors/d4_fan_in.py@1.0 · config/thresholds.yaml#d4"
+    },
+    {
+      "signal_id": "D7:R00087",
+      "detector_id": "D7",
+      "score": 0.77,
+      "evidence": {
+        "cycle_retentions": [
+          0.05,
+          0.05,
+          0.049,
+          0.051,
+          0.05
+        ]
+      },
+      "notes": [],
+      "template": "Constant retained share per cycle: {cycle_retentions}.",
+      "source": "node/detectors/d7_fixed_skim.py@1.0 · config/thresholds.yaml#d7"
+    },
+    {
+      "signal_id": "D6:c-41d7e0a2",
+      "detector_id": "D6",
+      "score": 0.79,
+      "evidence": {
+        "exit_tokens_low": 2,
+        "lag_median_h": 6.1,
+        "retention_median": 0.05,
+        "n_peers": 4
+      },
+      "notes": [],
+      "template": "Fingerprint matches {n_peers} other candidates.",
+      "source": "node/detectors/d6_same_hand.py@0.9 · radar/clustering.py"
+    }
+  ],
+  "exculpatory": [],
+  "features": {
+    "in_total_czk": 388000,
+    "out_total_czk": 368600,
+    "n_tx": 40,
+    "days_since_contract": 21,
+    "declared_income_czk": 31000,
+    "is_pep": false,
+    "segment": "retail"
+  },
+  "triage_reasons": [
+    "D4 fan-in above threshold",
+    "D7 fixed skim 5 %",
+    "Cluster K1 disclosed"
+  ],
+  "cluster": {
+    "cluster_id": "K1",
+    "n_other_banks": 2,
+    "n_other_candidates": 4,
+    "lag_ret_concentration": 0.87
+  },
+  "rule_definitions": {
+    "R-A": "Rule A (CNB pilot): inflow followed by >= 80 % outflow within 48 h, aggregated per unit.",
+    "R-B": "Rule B (CNB pilot): first incoming payment above 50 000 CZK within 30 days of account opening.",
+    "R-C": "Rule C (CNB pilot): monthly turnover exceeds 3x declared income.",
+    "D1": "D1 flow-through: money passes through with low retention and short lag.",
+    "D2": "D2 day-zero: activity starts within days of contract opening.",
+    "D3": "D3 profile gap: volume far above declared profile.",
+    "D4": "D4 fan-in: many rare senders to one account.",
+    "D5": "D5 rare exit: outflows go to counterparties rarely seen in the bank.",
+    "D6": "D6 same hand: timing/retention fingerprint shared with other candidates.",
+    "D7": "D7 fixed skim: constant retained share per cycle.",
+    "D8": "D8 structuring: outgoing amounts cluster just below a threshold.",
+    "X": "X cross-bank cluster: blinded-token overlap with candidates in other banks (disclosed only if >= 2 banks and >= 3 candidates)."
+  },
+  "timeline": [
+    {
+      "ts": "2026-07-02T05:00:00Z",
+      "direction": "in",
+      "amount_czk": 38671,
+      "counterparty": "c-2b54e07d"
+    },
+    {
+      "ts": "2026-07-02T21:00:00Z",
+      "direction": "in",
+      "amount_czk": 33012,
+      "counterparty": "c-d7f21ce6"
+    },
+    {
+      "ts": "2026-07-03T10:00:00Z",
+      "direction": "out",
+      "amount_czk": 73000,
+      "counterparty": "c-cda7bfcf"
+    },
+    {
+      "ts": "2026-07-04T03:00:00Z",
+      "direction": "in",
+      "amount_czk": 24918,
+      "counterparty": "c-d7f21ce6"
+    },
+    {
+      "ts": "2026-07-04T06:00:00Z",
+      "direction": "in",
+      "amount_czk": 37822,
+      "counterparty": "c-6e43589b"
+    },
+    {
+      "ts": "2026-07-04T19:00:00Z",
+      "direction": "out",
+      "amount_czk": 90000,
+      "counterparty": "c-cda7bfcf"
+    },
+    {
+      "ts": "2026-07-05T19:00:00Z",
+      "direction": "in",
+      "amount_czk": 43410,
+      "counterparty": "c-d7f21ce6"
+    },
+    {
+      "ts": "2026-07-06T06:00:00Z",
+      "direction": "in",
+      "amount_czk": 18482,
+      "counterparty": "c-2b54e07d"
+    },
+    {
+      "ts": "2026-07-07T02:00:00Z",
+      "direction": "out",
+      "amount_czk": 75000,
+      "counterparty": "c-cda7bfcf"
+    },
+    {
+      "ts": "2026-07-08T08:00:00Z",
+      "direction": "in",
+      "amount_czk": 43437,
+      "counterparty": "c-18f612d5"
+    },
+    {
+      "ts": "2026-07-08T13:00:00Z",
+      "direction": "in",
+      "amount_czk": 28490,
+      "counterparty": "c-2b54e07d"
+    },
+    {
+      "ts": "2026-07-09T03:00:00Z",
+      "direction": "out",
+      "amount_czk": 72000,
+      "counterparty": "c-5111b97c"
+    },
+    {
+      "ts": "2026-07-10T08:00:00Z",
+      "direction": "in",
+      "amount_czk": 21428,
+      "counterparty": "c-3a20b1fe"
+    },
+    {
+      "ts": "2026-07-10T10:00:00Z",
+      "direction": "in",
+      "amount_czk": 34588,
+      "counterparty": "c-d7f21ce6"
+    },
+    {
+      "ts": "2026-07-10T13:00:00Z",
+      "direction": "out",
+      "amount_czk": 58000,
+      "counterparty": "c-e53b7eca"
+    },
+    {
+      "ts": "2026-07-10T23:00:00Z",
+      "direction": "in",
+      "amount_czk": 25180,
+      "counterparty": "c-18f612d5"
+    },
+    {
+      "ts": "2026-07-12T03:00:00Z",
+      "direction": "in",
+      "amount_czk": 21779,
+      "counterparty": "c-6e43589b"
+    },
+    {
+      "ts": "2026-07-13T06:00:00Z",
+      "direction": "out",
+      "amount_czk": 95000,
+      "counterparty": "c-cda7bfcf"
+    },
+    {
+      "ts": "2026-07-13T16:00:00Z",
+      "direction": "in",
+      "amount_czk": 22591,
+      "counterparty": "c-6e43589b"
+    },
+    {
+      "ts": "2026-07-14T11:00:00Z",
+      "direction": "in",
+      "amount_czk": 41257,
+      "counterparty": "c-6e43589b"
+    },
+    {
+      "ts": "2026-07-14T23:00:00Z",
+      "direction": "out",
+      "amount_czk": 83000,
+      "counterparty": "c-cda7bfcf"
+    },
+    {
+      "ts": "2026-07-15T05:00:00Z",
+      "direction": "in",
+      "amount_czk": 21379,
+      "counterparty": "c-3402f11a"
+    },
+    {
+      "ts": "2026-07-15T20:00:00Z",
+      "direction": "in",
+      "amount_czk": 49870,
+      "counterparty": "c-6e43589b"
+    },
+    {
+      "ts": "2026-07-16T16:00:00Z",
+      "direction": "out",
+      "amount_czk": 60000,
+      "counterparty": "c-5111b97c"
+    },
+    {
+      "ts": "2026-07-17T22:00:00Z",
+      "direction": "in",
+      "amount_czk": 27028,
+      "counterparty": "c-2b54e07d"
+    },
+    {
+      "ts": "2026-07-18T00:00:00Z",
+      "direction": "in",
+      "amount_czk": 20313,
+      "counterparty": "c-2b54e07d"
+    },
+    {
+      "ts": "2026-07-18T20:00:00Z",
+      "direction": "out",
+      "amount_czk": 52000,
+      "counterparty": "c-cda7bfcf"
+    },
+    {
+      "ts": "2026-07-19T00:00:00Z",
+      "direction": "in",
+      "amount_czk": 49634,
+      "counterparty": "c-d7f21ce6"
+    },
+    {
+      "ts": "2026-07-20T06:00:00Z",
+      "direction": "in",
+      "amount_czk": 24616,
+      "counterparty": "c-2b54e07d"
+    },
+    {
+      "ts": "2026-07-21T05:00:00Z",
+      "direction": "out",
+      "amount_czk": 53000,
+      "counterparty": "c-cda7bfcf"
+    },
+    {
+      "ts": "2026-07-21T10:00:00Z",
+      "direction": "in",
+      "amount_czk": 25768,
+      "counterparty": "c-2b54e07d"
+    },
+    {
+      "ts": "2026-07-22T01:00:00Z",
+      "direction": "in",
+      "amount_czk": 32868,
+      "counterparty": "c-d7f21ce6"
+    },
+    {
+      "ts": "2026-07-23T03:00:00Z",
+      "direction": "out",
+      "amount_czk": 60000,
+      "counterparty": "c-cda7bfcf"
+    },
+    {
+      "ts": "2026-07-23T09:00:00Z",
+      "direction": "in",
+      "amount_czk": 29909,
+      "counterparty": "c-d7f21ce6"
+    },
+    {
+      "ts": "2026-07-23T23:00:00Z",
+      "direction": "in",
+      "amount_czk": 48582,
+      "counterparty": "c-2b54e07d"
+    },
+    {
+      "ts": "2026-07-24T08:00:00Z",
+      "direction": "out",
+      "amount_czk": 58000,
+      "counterparty": "c-e53b7eca"
+    },
+    {
+      "ts": "2026-07-25T06:00:00Z",
+      "direction": "in",
+      "amount_czk": 34483,
+      "counterparty": "c-18f612d5"
+    },
+    {
+      "ts": "2026-07-25T09:00:00Z",
+      "direction": "in",
+      "amount_czk": 28606,
+      "counterparty": "c-d7f21ce6"
+    },
+    {
+      "ts": "2026-07-25T16:00:00Z",
+      "direction": "out",
+      "amount_czk": 85000,
+      "counterparty": "c-cda7bfcf"
+    },
+    {
+      "ts": "2026-07-25T18:00:00Z",
+      "direction": "in",
+      "amount_czk": 46820,
+      "counterparty": "c-3402f11a"
+    }
+  ],
+  "local_graph": {
+    "nodes": [
+      {
+        "id": "c-41d7e0a2",
+        "label": "c-41d7e0a2",
+        "kind": "client"
+      },
+      {
+        "id": "c-2b54e07d",
+        "label": "c-2b54e07d",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-d7f21ce6",
+        "label": "c-d7f21ce6",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-cda7bfcf",
+        "label": "c-cda7bfcf",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-6e43589b",
+        "label": "c-6e43589b",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-18f612d5",
+        "label": "c-18f612d5",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-5111b97c",
+        "label": "c-5111b97c",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-3a20b1fe",
+        "label": "c-3a20b1fe",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-e53b7eca",
+        "label": "c-e53b7eca",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-3402f11a",
+        "label": "c-3402f11a",
+        "kind": "counterparty_rare"
+      }
+    ],
+    "edges": [
+      {
+        "source": "c-2b54e07d",
+        "target": "c-41d7e0a2",
+        "amount_czk": 231950,
+        "direction": "in"
+      },
+      {
+        "source": "c-d7f21ce6",
+        "target": "c-41d7e0a2",
+        "amount_czk": 276945,
+        "direction": "in"
+      },
+      {
+        "source": "c-41d7e0a2",
+        "target": "c-cda7bfcf",
+        "amount_czk": 666000,
+        "direction": "out"
+      },
+      {
+        "source": "c-6e43589b",
+        "target": "c-41d7e0a2",
+        "amount_czk": 173319,
+        "direction": "in"
+      },
+      {
+        "source": "c-18f612d5",
+        "target": "c-41d7e0a2",
+        "amount_czk": 103100,
+        "direction": "in"
+      },
+      {
+        "source": "c-41d7e0a2",
+        "target": "c-5111b97c",
+        "amount_czk": 132000,
+        "direction": "out"
+      },
+      {
+        "source": "c-3a20b1fe",
+        "target": "c-41d7e0a2",
+        "amount_czk": 21428,
+        "direction": "in"
+      },
+      {
+        "source": "c-41d7e0a2",
+        "target": "c-e53b7eca",
+        "amount_czk": 116000,
+        "direction": "out"
+      },
+      {
+        "source": "c-3402f11a",
+        "target": "c-41d7e0a2",
+        "amount_czk": 68199,
+        "direction": "in"
+      }
+    ]
+  },
+  "explanation": null,
+  "explanation_violations": [],
+  "escalation": {
+    "role": "aml_officer",
+    "rule_index": 3,
+    "matrix_is_placeholder": true
+  },
+  "proposals": [
+    {
+      "triage": "REVIEW",
+      "reason": "D4 + D7 + cluster K1",
+      "agent": "triage-agent@0.4",
+      "ts": "2026-10-19T07:43:51Z"
+    }
+  ],
+  "decision": null,
+  "_mock": {
+    "relationship_owner": "Eva Horáková",
+    "rule_authors": [],
+    "first_triager": "Tomáš Svoboda"
+  }
+}

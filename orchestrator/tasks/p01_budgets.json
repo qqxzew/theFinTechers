@@ -1,0 +1,14 @@
+{
+ "id": "p01_budgets",
+ "goal": "Create copilot/budgets.py with `class BudgetExceeded(Exception)` and `class Budget(max_steps:int, max_tokens:int, max_cost_usd:float, timeout_s:float)` (a plain class or dataclass with these constructor args). Attributes steps=0, tokens=0, cost_usd=0.0. Methods: charge_step(): steps += 1; if steps > max_steps raise BudgetExceeded('max_steps ...'). charge_usage(usage: dict, price_in: float, price_out: float): usage has inputTokens and outputTokens (ints, default 0); tokens += in+out; cost_usd += in*price_in + out*price_out; AFTER adding, if tokens > max_tokens raise BudgetExceeded('max_tokens ...'); if cost_usd > max_cost_usd raise BudgetExceeded('max_cost ...'). check_time(): raises BudgetExceeded('timeout ...') if time.monotonic() - start > timeout_s (start recorded in __init__). Message of each exception must start with the limit name. Read tests/unit/test_copilot_core.py (test_budget_limits).",
+ "read": [
+  "tests/unit/test_copilot_core.py"
+ ],
+ "write": [
+  "copilot/budgets.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_copilot_core.py -q -k budget"
+ ],
+ "max_steps": 12
+}

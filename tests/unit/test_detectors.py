@@ -21,7 +21,7 @@ NORMAL = dict(
     drained_24h_share=0.1, life_events_before_big=20, in_max_24h=15000.0, out_max_24h=15000.0, n_cycles=3,
     cycle_retentions=[0.3, 0.1, 0.5], cycle_lags_h=[8.0, 12.0, 3.0], retention_median=0.3, retention_iqr=0.2,
     lag_median_h=8.0, lag_iqr_h=4.5, expected_monthly=100000.0, july_total=158000.0, inflow_share_of_volume=0.5,
-    out_amounts=[1500.0] * 40,
+    out_amounts=[1500.0] * 40, life_payment_share=0.8, top_exit_share=0.05,
 )
 
 

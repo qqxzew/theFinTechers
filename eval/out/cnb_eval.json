@@ -1,0 +1,96 @@
+{
+ "dataset": "CNB hackathon dataset (synthetic, no labels)",
+ "synthetic": true,
+ "n_clients": 5493,
+ "n_tx": 397853,
+ "rule_a_alerts_per_unit": {
+  "expected=monthly,q2=monthly": 3313,
+  "expected=monthly,q2=quarterly": 4669,
+  "expected=monthly,q2=yearly": 5473,
+  "expected=quarterly,q2=monthly": 5003,
+  "expected=quarterly,q2=quarterly": 5012,
+  "expected=quarterly,q2=yearly": 5473,
+  "expected=yearly,q2=monthly": 5489,
+  "expected=yearly,q2=quarterly": 5489,
+  "expected=yearly,q2=yearly": 5489
+ },
+ "alerts_by_type": {
+  "A": 4669,
+  "C": 16,
+  "B": 4
+ },
+ "rule_b_alerts": 4,
+ "rule_c_alerts": 16,
+ "rule_c_triage": {
+  "FP": 14,
+  "REVIEW": 2
+ },
+ "cases": 4670,
+ "triage": {
+  "FP": 4659,
+  "REVIEW": 11
+ },
+ "routes": {
+  "mule_review": 4670
+ },
+ "signals_by_detector": {
+  "R-A": 4669,
+  "D3": 1989,
+  "D1": 36,
+  "R-C": 16,
+  "R-B": 3
+ },
+ "priority_hist": [
+  {
+   "bin": "0-9",
+   "count": 2801
+  },
+  {
+   "bin": "10-19",
+   "count": 1600
+  },
+  {
+   "bin": "20-29",
+   "count": 261
+  },
+  {
+   "bin": "30-39",
+   "count": 8
+  },
+  {
+   "bin": "40-49",
+   "count": 0
+  },
+  {
+   "bin": "50-59",
+   "count": 0
+  },
+  {
+   "bin": "60-69",
+   "count": 0
+  },
+  {
+   "bin": "70-79",
+   "count": 0
+  },
+  {
+   "bin": "80-89",
+   "count": 0
+  },
+  {
+   "bin": "90-100",
+   "count": 0
+  }
+ ],
+ "operating_point_min_priority": 30,
+ "actionable_review": 8,
+ "mom_persona": {
+  "definition": "client with >= 2 remittances to the same recipient (remit_top_recipient_count >= 2); 232 clients by our analysis of the CNB data",
+  "n": 232,
+  "review_any_priority": 2,
+  "review_actionable": 2,
+  "fp_rate_any_priority": 0.0086,
+  "fp_rate": 0.0086
+ },
+ "sample_sheet_url": "eval/out/cnb_sample_30.csv"
+}

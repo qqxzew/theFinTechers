@@ -12,7 +12,7 @@ def plant_group_collection(w: World, n: int = 4, instance: int = 0) -> None:
     """Plant honest organisers of a group collection: many distinct payers send small
     contributions, then exactly one near-total payment goes to a single venue/supplier,
     alongside small everyday transfers with popular accounts."""
-    popular_pool = [w.new_ext_account() for _ in range(20)]
+    popular_pool = w.popular_pool(20)
     for _ in range(n):
         bank = w.banks[int(w.rng.integers(0, len(w.banks)))]
         contract_date = JUL1 - timedelta(days=int(w.rng.integers(365, 2191)))

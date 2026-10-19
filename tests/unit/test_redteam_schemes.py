@@ -109,3 +109,17 @@ def test_victim_draining():
         big_in = t.filter((pl.col("direction") == "in") & (pl.col("amount_czk") >= 50000))
         assert big_in.height == 0  # no third-party big inflow; the victim empties own savings
         assert t.filter(pl.col("direction") != "in")["amount_czk"].sum() >= 100000
+
+
+def test_same_hand_stealth_is_small_per_account_but_shares_exits():
+    from redteam.schemes.same_hand_stealth import plant_same_hand_stealth
+
+    w = _world()
+    plant_same_hand_stealth(w, n=15)
+    tx, cl, lab = _df(w)
+    ids = lab["client_id"].to_list()
+    assert len(ids) == 15 and len(set(cl["bank_id"])) == 3
+    per_acc = tx.group_by("client_id").agg(pl.col("amount_czk").filter(pl.col("direction") == "in").sum().alias("tin"))
+    assert per_acc["tin"].max() <= 3 * 45000
+    exits = tx.filter(pl.col("direction") == "out")["counterparty_token"].n_unique()
+    assert exits <= 3

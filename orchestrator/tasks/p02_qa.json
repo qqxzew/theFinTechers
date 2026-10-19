@@ -1,0 +1,14 @@
+{
+ "id": "p02_qa",
+ "goal": "Create copilot/qa.py with `validate_draft(draft: dict, case: dict, analyst_names: list[str], customer_facing: bool = False) -> list[dict]` returning a list of violations {'kind': str, 'sentence': int|None, 'detail': str}; empty list = valid. draft = {'sentences': [{'text': str, 'refs': [str]}], 'free_text': str(optional)}. case is the structured case JSON (read CASE at the top of tests/unit/test_copilot_core.py: keys signals[].signal_id, exculpatory[].signal_id, features{}, triage_reasons[], cluster{}). Checks, per sentence i: (1) 'missing_reference': no refs AND the lowercase text contains none of 'not available', 'nedostupn', 'neni k dispozici', 'není k dispozici'. (2) 'unknown_reference' for every ref that is not valid: valid refs are every signal_id in case['signals'] and case['exculpatory']; 'features.<k>' with k in case['features']; 'cluster.<k>' with k in case['cluster']; 'case.<k>' with k a top-level key of case; 'triage_reasons[<i>]' with i a valid index. (3) 'number_not_in_case': find numbers in the text with regex (integers/decimals, allow spaces or non-breaking spaces as thousands separators like '250 000'); a number with an absolute value >= 1000 must match (within 0.5 percent relative tolerance) some numeric value found anywhere in the case JSON (walk dicts/lists recursively, ints and floats, ignore bools); a number immediately followed by optional space and '%' (a percentage p) must match some numeric case value v in [0,1] with abs(p - 100*v) <= 1.0, or equal some case value exactly. Numbers < 1000 that are not percentages are ignored. (4) 'analyst_name': any non-empty name in analyst_names occurs (case-insensitive) in any sentence text or in draft.get('free_text',''). (5) if customer_facing: 'tipping_off' (at most ONE violation per sentence) when the text matches any of these case-insensitive regexes: r'report(ed)?\\s+(you|this|it|to)', r'\\bFIU\\b', r'FA[UÚ]', r'oznám', r'podez[řr]el', r'suspicious (transaction|activity) report', r'do not tell', r'nesd[ěe]l', r'\\bSTR\\b', r'\\bOPO\\b'. Use only the standard library. Read tests/unit/test_copilot_core.py (test_valid_draft_passes, test_unsupported_claims_and_bad_refs_are_reported, test_analyst_name_and_tipping_off_are_blocked, test_not_available_is_allowed_without_refs) carefully for exact expectations.",
+ "read": [
+  "tests/unit/test_copilot_core.py"
+ ],
+ "write": [
+  "copilot/qa.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_copilot_core.py -q -k \"draft or unsupported or analyst or not_available\""
+ ],
+ "max_steps": 20
+}

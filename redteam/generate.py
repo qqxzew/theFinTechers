@@ -23,6 +23,7 @@ from redteam.schemes.day_zero import plant_day_zero
 from redteam.schemes.fixed_skim import plant_fixed_skim
 from redteam.schemes.invoice_mule import plant_invoice_mule
 from redteam.schemes.same_hand import plant_same_hand
+from redteam.schemes.same_hand_stealth import plant_same_hand_stealth
 from redteam.schemes.victim import plant_victim
 from redteam.world import World
 
@@ -38,6 +39,7 @@ def generate(seed: int, out: str, n_banks: int = 3, n_per_bank: int = 1000, cnb_
     plant_day_zero(w, n=SCHEMES["day_zero"])
     for inst in range(SCHEMES["same_hand"]):
         plant_same_hand(w, n=int(w.rng.integers(9, 16)), instance=inst + 1)
+    plant_same_hand_stealth(w, n=int(w.rng.integers(12, 19)), instance=10)
     plant_fixed_skim(w, n=SCHEMES["fixed_skim"], k=float(w.rng.uniform(0.06, 0.12)))
     plant_invoice_mule(w, n=SCHEMES["invoice_mule"])
     plant_victim(w, n=SCHEMES["victim"])
@@ -45,6 +47,9 @@ def generate(seed: int, out: str, n_banks: int = 3, n_per_bank: int = 1000, cnb_
                      (plant_group_collection, "group_collection"), (plant_middleman_cohost, "middleman_cohost"),
                      (plant_freelancer, "freelancer"), (plant_fundraiser, "fundraiser")):
         fn(w, n=LOOKALIKES[name])
+    for lab_row in list(w.labels):
+        if lab_row["persona"] in ("fundraiser", "group_collection", "middleman_cohost", "students_rent", "freelancer"):
+            w.add_everyday(lab_row["client_id"])
     p = Path(out)
     p.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(w.tx, infer_schema_length=None).sort("ts").write_parquet(p / "tx.parquet")

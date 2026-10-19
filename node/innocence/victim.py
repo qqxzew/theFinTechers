@@ -17,6 +17,7 @@ def detect(f: dict, ctx: dict) -> list[Signal]:
         f["max_single_in"] < cfg["max_single_in"]
         and out_total >= cfg["min_out"]
         and out_total >= cfg["min_out_in_ratio"] * in_total
+        and f.get("share_rare", 0.0) >= cfg.get("min_share_rare", 0.0)
     ):
         return []
     ratio = cfg["min_out_in_ratio"]
@@ -29,7 +30,7 @@ def detect(f: dict, ctx: dict) -> list[Signal]:
             version=VERSION,
             client_id=f["client_id"],
             score=score,
-            evidence=["max_single_in", "out_total", "in_total"],
+            evidence=["max_single_in", "out_total", "in_total", "share_rare"],
             explanation_template_key="victim",
             source=SOURCE,
             exculpatory=False,

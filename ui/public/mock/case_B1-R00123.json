@@ -1,0 +1,672 @@
+{
+  "case_id": "B1-R00123",
+  "client_ref": "c-9f2a1b3c",
+  "bank_id": "B1",
+  "priority": 92,
+  "triage": "REVIEW",
+  "route": "mule_review",
+  "signals": [
+    {
+      "signal_id": "D1:R00123",
+      "detector_id": "D1",
+      "score": 0.91,
+      "evidence": {
+        "retention_median": 0.04,
+        "lag_median_h": 5.5,
+        "n_cycles": 11
+      },
+      "notes": [],
+      "template": "Median retention {retention_median} and median lag {lag_median_h} h over {n_cycles} in/out cycles.",
+      "source": "node/detectors/d1_flow_through.py@1.2 · config/thresholds.yaml#d1"
+    },
+    {
+      "signal_id": "D2:R00123",
+      "detector_id": "D2",
+      "score": 0.74,
+      "evidence": {
+        "days_since_contract": 6,
+        "first_in_czk": 31200
+      },
+      "notes": [],
+      "template": "First inflow of {first_in_czk} CZK arrived {days_since_contract} days after the contract was opened.",
+      "source": "node/detectors/d2_day_zero.py@1.0 · config/thresholds.yaml#d2"
+    },
+    {
+      "signal_id": "D5:R00123",
+      "detector_id": "D5",
+      "score": 0.88,
+      "evidence": {
+        "share_rare": 0.93,
+        "recurring_income_share": 0,
+        "popular_inflow_share": 0.02,
+        "out_total": 612000
+      },
+      "notes": [],
+      "template": "{share_rare} of outflows ({out_total} CZK) go to counterparties rarely seen in the bank; recurring income share {recurring_income_share}.",
+      "source": "node/detectors/d5_rare_exit.py@1.3 · config/thresholds.yaml#d5"
+    },
+    {
+      "signal_id": "D6:c-9f2a1b3c",
+      "detector_id": "D6",
+      "score": 0.81,
+      "evidence": {
+        "exit_tokens_low": 3,
+        "lag_median_h": 5.5,
+        "retention_median": 0.04,
+        "hour_hist": "21-23 h",
+        "n_peers": 4
+      },
+      "notes": [
+        "Fingerprint compared on blinded tokens only."
+      ],
+      "template": "Timing and retention fingerprint matches {n_peers} other candidates (peak {hour_hist}).",
+      "source": "node/detectors/d6_same_hand.py@0.9 · radar/clustering.py"
+    }
+  ],
+  "exculpatory": [
+    {
+      "signal_id": "E2:R00123",
+      "detector_id": "E2",
+      "score": 0.12,
+      "evidence": {
+        "share_popular": 0.05
+      },
+      "notes": [
+        "Below threshold, shown for completeness."
+      ],
+      "template": "Only {share_popular} of spending goes to popular merchants (weak life-activity signal).",
+      "source": "node/innocence/e2_life.py@1.0"
+    }
+  ],
+  "features": {
+    "in_total_czk": 655300,
+    "out_total_czk": 612000,
+    "n_tx": 54,
+    "days_since_contract": 6,
+    "declared_income_czk": 24000,
+    "is_pep": false,
+    "age_band": "18-24",
+    "segment": "retail"
+  },
+  "triage_reasons": [
+    "D1 and D5 both above threshold",
+    "No exculpatory signal above 0.5",
+    "Cross-bank cluster K1 disclosed (3 banks, 5 candidates)"
+  ],
+  "cluster": {
+    "cluster_id": "K1",
+    "n_other_banks": 2,
+    "n_other_candidates": 4,
+    "lag_ret_concentration": 0.87
+  },
+  "rule_definitions": {
+    "R-A": "Rule A (CNB pilot): inflow followed by >= 80 % outflow within 48 h, aggregated per unit.",
+    "R-B": "Rule B (CNB pilot): first incoming payment above 50 000 CZK within 30 days of account opening.",
+    "R-C": "Rule C (CNB pilot): monthly turnover exceeds 3x declared income.",
+    "D1": "D1 flow-through: money passes through with low retention and short lag.",
+    "D2": "D2 day-zero: activity starts within days of contract opening.",
+    "D3": "D3 profile gap: volume far above declared profile.",
+    "D4": "D4 fan-in: many rare senders to one account.",
+    "D5": "D5 rare exit: outflows go to counterparties rarely seen in the bank.",
+    "D6": "D6 same hand: timing/retention fingerprint shared with other candidates.",
+    "D7": "D7 fixed skim: constant retained share per cycle.",
+    "D8": "D8 structuring: outgoing amounts cluster just below a threshold.",
+    "X": "X cross-bank cluster: blinded-token overlap with candidates in other banks (disclosed only if >= 2 banks and >= 3 candidates)."
+  },
+  "timeline": [
+    {
+      "ts": "2026-07-01T12:00:00Z",
+      "direction": "in",
+      "amount_czk": 26396,
+      "counterparty": "c-02618d88"
+    },
+    {
+      "ts": "2026-07-02T12:00:00Z",
+      "direction": "in",
+      "amount_czk": 45320,
+      "counterparty": "c-dc493f76"
+    },
+    {
+      "ts": "2026-07-03T07:00:00Z",
+      "direction": "out",
+      "amount_czk": 61000,
+      "counterparty": "c-8f2ad1f2"
+    },
+    {
+      "ts": "2026-07-03T11:00:00Z",
+      "direction": "in",
+      "amount_czk": 39297,
+      "counterparty": "c-02618d88"
+    },
+    {
+      "ts": "2026-07-04T10:00:00Z",
+      "direction": "in",
+      "amount_czk": 42029,
+      "counterparty": "c-cf98f94f"
+    },
+    {
+      "ts": "2026-07-04T23:00:00Z",
+      "direction": "out",
+      "amount_czk": 83000,
+      "counterparty": "c-604ee2ee"
+    },
+    {
+      "ts": "2026-07-05T18:00:00Z",
+      "direction": "in",
+      "amount_czk": 49238,
+      "counterparty": "c-cc33bdb0"
+    },
+    {
+      "ts": "2026-07-05T22:00:00Z",
+      "direction": "in",
+      "amount_czk": 36936,
+      "counterparty": "c-02618d88"
+    },
+    {
+      "ts": "2026-07-06T05:00:00Z",
+      "direction": "out",
+      "amount_czk": 63000,
+      "counterparty": "c-8d5dffd2"
+    },
+    {
+      "ts": "2026-07-07T02:00:00Z",
+      "direction": "in",
+      "amount_czk": 43809,
+      "counterparty": "c-a857b2e0"
+    },
+    {
+      "ts": "2026-07-08T07:00:00Z",
+      "direction": "in",
+      "amount_czk": 36321,
+      "counterparty": "c-cc33bdb0"
+    },
+    {
+      "ts": "2026-07-08T17:00:00Z",
+      "direction": "out",
+      "amount_czk": 74000,
+      "counterparty": "c-604ee2ee"
+    },
+    {
+      "ts": "2026-07-09T21:00:00Z",
+      "direction": "in",
+      "amount_czk": 33524,
+      "counterparty": "c-a857b2e0"
+    },
+    {
+      "ts": "2026-07-11T03:00:00Z",
+      "direction": "in",
+      "amount_czk": 18947,
+      "counterparty": "c-4f1e5a66"
+    },
+    {
+      "ts": "2026-07-12T06:00:00Z",
+      "direction": "out",
+      "amount_czk": 67000,
+      "counterparty": "c-8f2ad1f2"
+    },
+    {
+      "ts": "2026-07-12T19:00:00Z",
+      "direction": "in",
+      "amount_czk": 32834,
+      "counterparty": "c-dc493f76"
+    },
+    {
+      "ts": "2026-07-13T23:00:00Z",
+      "direction": "in",
+      "amount_czk": 42809,
+      "counterparty": "c-a857b2e0"
+    },
+    {
+      "ts": "2026-07-14T10:00:00Z",
+      "direction": "out",
+      "amount_czk": 78000,
+      "counterparty": "c-604ee2ee"
+    },
+    {
+      "ts": "2026-07-14T20:00:00Z",
+      "direction": "in",
+      "amount_czk": 44636,
+      "counterparty": "c-cc33bdb0"
+    },
+    {
+      "ts": "2026-07-14T23:00:00Z",
+      "direction": "in",
+      "amount_czk": 32445,
+      "counterparty": "c-a857b2e0"
+    },
+    {
+      "ts": "2026-07-15T11:00:00Z",
+      "direction": "out",
+      "amount_czk": 94000,
+      "counterparty": "c-8f2ad1f2"
+    },
+    {
+      "ts": "2026-07-16T02:00:00Z",
+      "direction": "in",
+      "amount_czk": 38943,
+      "counterparty": "c-cc33bdb0"
+    },
+    {
+      "ts": "2026-07-16T18:00:00Z",
+      "direction": "in",
+      "amount_czk": 26234,
+      "counterparty": "c-dc493f76"
+    },
+    {
+      "ts": "2026-07-17T23:00:00Z",
+      "direction": "out",
+      "amount_czk": 84000,
+      "counterparty": "c-8f2ad1f2"
+    },
+    {
+      "ts": "2026-07-18T19:00:00Z",
+      "direction": "in",
+      "amount_czk": 47264,
+      "counterparty": "c-cf98f94f"
+    },
+    {
+      "ts": "2026-07-19T02:00:00Z",
+      "direction": "in",
+      "amount_czk": 40421,
+      "counterparty": "c-cc33bdb0"
+    },
+    {
+      "ts": "2026-07-19T04:00:00Z",
+      "direction": "out",
+      "amount_czk": 58000,
+      "counterparty": "c-8f2ad1f2"
+    },
+    {
+      "ts": "2026-07-20T07:00:00Z",
+      "direction": "in",
+      "amount_czk": 19539,
+      "counterparty": "c-a857b2e0"
+    },
+    {
+      "ts": "2026-07-21T00:00:00Z",
+      "direction": "in",
+      "amount_czk": 23646,
+      "counterparty": "c-cf98f94f"
+    },
+    {
+      "ts": "2026-07-21T11:00:00Z",
+      "direction": "out",
+      "amount_czk": 41000,
+      "counterparty": "c-8d5dffd2"
+    },
+    {
+      "ts": "2026-07-22T07:00:00Z",
+      "direction": "in",
+      "amount_czk": 46322,
+      "counterparty": "c-02618d88"
+    },
+    {
+      "ts": "2026-07-23T09:00:00Z",
+      "direction": "in",
+      "amount_czk": 38896,
+      "counterparty": "c-4f1e5a66"
+    },
+    {
+      "ts": "2026-07-23T19:00:00Z",
+      "direction": "out",
+      "amount_czk": 42000,
+      "counterparty": "c-8f2ad1f2"
+    },
+    {
+      "ts": "2026-07-24T03:00:00Z",
+      "direction": "in",
+      "amount_czk": 19258,
+      "counterparty": "c-cf98f94f"
+    },
+    {
+      "ts": "2026-07-24T09:00:00Z",
+      "direction": "in",
+      "amount_czk": 37127,
+      "counterparty": "c-a857b2e0"
+    },
+    {
+      "ts": "2026-07-24T13:00:00Z",
+      "direction": "out",
+      "amount_czk": 85000,
+      "counterparty": "c-604ee2ee"
+    },
+    {
+      "ts": "2026-07-24T23:00:00Z",
+      "direction": "in",
+      "amount_czk": 19009,
+      "counterparty": "c-4f1e5a66"
+    },
+    {
+      "ts": "2026-07-26T02:00:00Z",
+      "direction": "in",
+      "amount_czk": 24459,
+      "counterparty": "c-4f1e5a66"
+    },
+    {
+      "ts": "2026-07-27T08:00:00Z",
+      "direction": "out",
+      "amount_czk": 66000,
+      "counterparty": "c-604ee2ee"
+    },
+    {
+      "ts": "2026-07-28T09:00:00Z",
+      "direction": "in",
+      "amount_czk": 40660,
+      "counterparty": "c-cf98f94f"
+    },
+    {
+      "ts": "2026-07-28T17:00:00Z",
+      "direction": "in",
+      "amount_czk": 20438,
+      "counterparty": "c-a857b2e0"
+    },
+    {
+      "ts": "2026-07-28T20:00:00Z",
+      "direction": "out",
+      "amount_czk": 68000,
+      "counterparty": "c-604ee2ee"
+    },
+    {
+      "ts": "2026-07-29T14:00:00Z",
+      "direction": "in",
+      "amount_czk": 25172,
+      "counterparty": "c-cf98f94f"
+    },
+    {
+      "ts": "2026-07-30T07:00:00Z",
+      "direction": "in",
+      "amount_czk": 21892,
+      "counterparty": "c-a857b2e0"
+    },
+    {
+      "ts": "2026-07-31T06:00:00Z",
+      "direction": "out",
+      "amount_czk": 75000,
+      "counterparty": "c-604ee2ee"
+    },
+    {
+      "ts": "2026-07-31T18:00:00Z",
+      "direction": "in",
+      "amount_czk": 36614,
+      "counterparty": "c-02618d88"
+    },
+    {
+      "ts": "2026-08-01T10:00:00Z",
+      "direction": "in",
+      "amount_czk": 47136,
+      "counterparty": "c-4f1e5a66"
+    },
+    {
+      "ts": "2026-08-02T11:00:00Z",
+      "direction": "out",
+      "amount_czk": 83000,
+      "counterparty": "c-8d5dffd2"
+    },
+    {
+      "ts": "2026-08-02T22:00:00Z",
+      "direction": "in",
+      "amount_czk": 31807,
+      "counterparty": "c-4f1e5a66"
+    },
+    {
+      "ts": "2026-08-03T23:00:00Z",
+      "direction": "in",
+      "amount_czk": 29955,
+      "counterparty": "c-dc493f76"
+    },
+    {
+      "ts": "2026-08-05T03:00:00Z",
+      "direction": "out",
+      "amount_czk": 52000,
+      "counterparty": "c-604ee2ee"
+    },
+    {
+      "ts": "2026-08-05T14:00:00Z",
+      "direction": "in",
+      "amount_czk": 31881,
+      "counterparty": "c-cc33bdb0"
+    },
+    {
+      "ts": "2026-08-06T01:00:00Z",
+      "direction": "in",
+      "amount_czk": 23582,
+      "counterparty": "c-4f1e5a66"
+    },
+    {
+      "ts": "2026-08-06T14:00:00Z",
+      "direction": "out",
+      "amount_czk": 74000,
+      "counterparty": "c-8d5dffd2"
+    }
+  ],
+  "local_graph": {
+    "nodes": [
+      {
+        "id": "c-9f2a1b3c",
+        "label": "c-9f2a1b3c",
+        "kind": "client"
+      },
+      {
+        "id": "c-02618d88",
+        "label": "c-02618d88",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-dc493f76",
+        "label": "c-dc493f76",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-8f2ad1f2",
+        "label": "c-8f2ad1f2",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-cf98f94f",
+        "label": "c-cf98f94f",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-604ee2ee",
+        "label": "c-604ee2ee",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-cc33bdb0",
+        "label": "c-cc33bdb0",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-8d5dffd2",
+        "label": "c-8d5dffd2",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-a857b2e0",
+        "label": "c-a857b2e0",
+        "kind": "counterparty_rare"
+      },
+      {
+        "id": "c-4f1e5a66",
+        "label": "c-4f1e5a66",
+        "kind": "counterparty_rare"
+      }
+    ],
+    "edges": [
+      {
+        "source": "c-02618d88",
+        "target": "c-9f2a1b3c",
+        "amount_czk": 185565,
+        "direction": "in"
+      },
+      {
+        "source": "c-dc493f76",
+        "target": "c-9f2a1b3c",
+        "amount_czk": 134343,
+        "direction": "in"
+      },
+      {
+        "source": "c-9f2a1b3c",
+        "target": "c-8f2ad1f2",
+        "amount_czk": 406000,
+        "direction": "out"
+      },
+      {
+        "source": "c-cf98f94f",
+        "target": "c-9f2a1b3c",
+        "amount_czk": 198029,
+        "direction": "in"
+      },
+      {
+        "source": "c-9f2a1b3c",
+        "target": "c-604ee2ee",
+        "amount_czk": 581000,
+        "direction": "out"
+      },
+      {
+        "source": "c-cc33bdb0",
+        "target": "c-9f2a1b3c",
+        "amount_czk": 241440,
+        "direction": "in"
+      },
+      {
+        "source": "c-9f2a1b3c",
+        "target": "c-8d5dffd2",
+        "amount_czk": 261000,
+        "direction": "out"
+      },
+      {
+        "source": "c-a857b2e0",
+        "target": "c-9f2a1b3c",
+        "amount_czk": 251583,
+        "direction": "in"
+      },
+      {
+        "source": "c-4f1e5a66",
+        "target": "c-9f2a1b3c",
+        "amount_czk": 203836,
+        "direction": "in"
+      }
+    ]
+  },
+  "explanation": {
+    "cs": [
+      {
+        "text": "Účet přijal od 6 různých odesílatelů celkem 655 300 Kč a během mediánu 5,5 hodiny z nich odeslal dál 96 %.",
+        "refs": [
+          "D1:R00123"
+        ]
+      },
+      {
+        "text": "Odchozí platby míří z 93 % na protistrany, které banka téměř nezná.",
+        "refs": [
+          "D5:R00123"
+        ]
+      },
+      {
+        "text": "První příchozí platba přišla 6 dní po založení účtu.",
+        "refs": [
+          "D2:R00123"
+        ]
+      },
+      {
+        "text": "Stejný časový a retenční otisk sdílí 4 další kandidáti ve 2 dalších bankách (shluk K1).",
+        "refs": [
+          "D6:c-9f2a1b3c",
+          "cluster:K1"
+        ]
+      }
+    ],
+    "en": [
+      {
+        "text": "The account received 655,300 CZK from 6 different senders and forwarded 96 % of it within a median of 5.5 hours.",
+        "refs": [
+          "D1:R00123"
+        ]
+      },
+      {
+        "text": "93 % of outgoing payments go to counterparties the bank barely knows.",
+        "refs": [
+          "D5:R00123"
+        ]
+      },
+      {
+        "text": "The first incoming payment arrived 6 days after the account was opened.",
+        "refs": [
+          "D2:R00123"
+        ]
+      },
+      {
+        "text": "The same timing and retention fingerprint is shared by 4 other candidates in 2 other banks (cluster K1).",
+        "refs": [
+          "D6:c-9f2a1b3c",
+          "cluster:K1"
+        ]
+      }
+    ],
+    "not_a_mom": {
+      "cs": [
+        {
+          "text": "Nejde o pravidelné rodinné remitence: chybí opakovaný příjem i stálý příjemce.",
+          "refs": [
+            "E2:R00123"
+          ]
+        }
+      ],
+      "en": [
+        {
+          "text": "This is not a recurring family remittance pattern: there is no recurring income and no stable recipient.",
+          "refs": [
+            "E2:R00123"
+          ]
+        }
+      ]
+    },
+    "triage_justification": {
+      "cs": {
+        "text": "Návrh REVIEW: dva silné detektory a zveřejněný přeshraniční shluk, bez vyvracejícího signálu.",
+        "refs": [
+          "D1:R00123",
+          "D5:R00123",
+          "cluster:K1"
+        ]
+      },
+      "en": {
+        "text": "Proposed REVIEW: two strong detectors and a disclosed cross-bank cluster, no exculpatory signal.",
+        "refs": [
+          "D1:R00123",
+          "D5:R00123",
+          "cluster:K1"
+        ]
+      }
+    }
+  },
+  "explanation_violations": [],
+  "escalation": {
+    "role": "mlro",
+    "rule_index": 1,
+    "matrix_is_placeholder": true
+  },
+  "proposals": [
+    {
+      "triage": "REVIEW",
+      "reason": "D1+D5 above threshold; no exculpatory signal > 0.5",
+      "agent": "triage-agent@0.4",
+      "ts": "2026-10-19T07:41:10Z"
+    },
+    {
+      "triage": "REVIEW",
+      "reason": "Cluster K1 disclosed, priority raised 78 -> 92",
+      "agent": "radar-coordinator@0.3",
+      "ts": "2026-10-19T08:02:44Z"
+    }
+  ],
+  "decision": null,
+  "_mock": {
+    "relationship_owner": "Karel Beneš",
+    "rule_authors": [
+      "Ondřej Malý"
+    ],
+    "first_triager": "Tomáš Svoboda"
+  }
+}

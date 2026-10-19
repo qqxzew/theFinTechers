@@ -24,11 +24,25 @@ class World:
     _n_tx: int = 0
     _n_ext: int = 0
     _bank_of: dict = field(default_factory=dict)
+    popular_tokens: list = field(default_factory=list)
 
     def new_ext_account(self, country: str = "CZ") -> str:
         """A fresh external account token (e.g. an IBAN-like string of an account outside the bank)."""
         self._n_ext += 1
         return f"X{country}{self._n_ext:06d}"
+
+    def popular_pool(self, n: int = 20) -> list[str]:
+        """Genuinely popular external accounts (utilities, employers, merchants) taken from the ČNB-derived background."""
+        if len(self.popular_tokens) >= n:
+            idx = self.rng.choice(len(self.popular_tokens), size=n, replace=False)
+            return [self.popular_tokens[int(i)] for i in idx]
+        return [self.new_ext_account() for _ in range(n)]
+
+    def add_everyday(self, client_id: str, n_lo: int = 6, n_hi: int = 12) -> None:
+        """Ordinary life: small payments to genuinely popular accounts (utilities, shops) at random times."""
+        pool = self.popular_pool(20)
+        for _ in range(int(self.rng.integers(n_lo, n_hi + 1))):
+            self.add_tx(client_id, self.random_time(1, 28), float(self.rng.uniform(200, 2500)), "out", pool[int(self.rng.integers(0, len(pool)))])
 
     def new_client(self, bank_id: str, *, contract_date: datetime, contract_form: str = "in person",
                    client_type: str = "natural person", country: str = "CZ", pep: bool = False, aml_risk: str = "low",

@@ -1,0 +1,490 @@
+{
+ "world": "data/redteam/seed7",
+ "synthetic": true,
+ "n_tx": 218864,
+ "n_clients": 3107,
+ "modes": {
+  "isolated": {
+   "overall": {
+    "tp": 45,
+    "fp": 41,
+    "fn": 0,
+    "precision": 0.5233,
+    "recall": 1.0,
+    "f1": 0.687,
+    "n_mules": 45,
+    "n_accounts": 3107
+   },
+   "per_bank": {
+    "B1": {
+     "tp": 18,
+     "fp": 15,
+     "fn": 0,
+     "precision": 0.5455,
+     "recall": 1.0,
+     "f1": 0.7059,
+     "n_mules": 18,
+     "n_accounts": 1037
+    },
+    "B2": {
+     "tp": 13,
+     "fp": 15,
+     "fn": 0,
+     "precision": 0.4643,
+     "recall": 1.0,
+     "f1": 0.6341,
+     "n_mules": 13,
+     "n_accounts": 1036
+    },
+    "B3": {
+     "tp": 14,
+     "fp": 11,
+     "fn": 0,
+     "precision": 0.56,
+     "recall": 1.0,
+     "f1": 0.7179,
+     "n_mules": 14,
+     "n_accounts": 1034
+    }
+   },
+   "best_single_bank_f1": 0.7179,
+   "mean_bank_f1": 0.686,
+   "exposure": {
+    "raw_records_exposed": 0,
+    "bytes_exchanged": 0
+   }
+  },
+  "staj_psi": {
+   "overall": {
+    "tp": 45,
+    "fp": 41,
+    "fn": 0,
+    "precision": 0.5233,
+    "recall": 1.0,
+    "f1": 0.687,
+    "n_mules": 45,
+    "n_accounts": 3107
+   },
+   "exposure": {
+    "mode": "staj_psi",
+    "raw_records_exposed": 0,
+    "blinded_elements": 428,
+    "bytes_exchanged": 109568,
+    "match_rows_to_coordinator": 68
+   },
+   "clusters_disclosed": 2,
+   "refused": {}
+  },
+  "naive_raw_sharing": {
+   "overall": {
+    "tp": 45,
+    "fp": 35,
+    "fn": 0,
+    "precision": 0.5625,
+    "recall": 1.0,
+    "f1": 0.72,
+    "n_mules": 45,
+    "n_accounts": 3107
+   },
+   "exposure": {
+    "raw_records_exposed": 218864,
+    "bytes_exchanged": 19386423
+   }
+  }
+ },
+ "breakdown_isolated": {
+  "mule/same_hand": {
+   "n": 25,
+   "flagged_as_mule_case": 25,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "victim/victim": {
+   "n": 8,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 7,
+   "rate": 0.875
+  },
+  "honest/fundraiser": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "mule/fixed_skim": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/migrant_remit": {
+   "n": 10,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "honest/freelancer": {
+   "n": 10,
+   "flagged_as_mule_case": 5,
+   "routed_to_victim_protection": 0,
+   "rate": 0.5
+  },
+  "mule/invoice_mule": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/second_hand_seller": {
+   "n": 10,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "honest/group_collection": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "mule/day_zero": {
+   "n": 8,
+   "flagged_as_mule_case": 8,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/students_rent": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "background/cnb_background": {
+   "n": 3000,
+   "flagged_as_mule_case": 12,
+   "routed_to_victim_protection": 44,
+   "rate": 0.004
+  },
+  "honest/middleman_cohost": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  }
+ },
+ "breakdown_staj_psi": {
+  "honest/students_rent": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/second_hand_seller": {
+   "n": 10,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "mule/invoice_mule": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "mule/same_hand": {
+   "n": 25,
+   "flagged_as_mule_case": 25,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/middleman_cohost": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/freelancer": {
+   "n": 10,
+   "flagged_as_mule_case": 5,
+   "routed_to_victim_protection": 0,
+   "rate": 0.5
+  },
+  "honest/group_collection": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "victim/victim": {
+   "n": 8,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 7,
+   "rate": 0.875
+  },
+  "mule/fixed_skim": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "mule/day_zero": {
+   "n": 8,
+   "flagged_as_mule_case": 8,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/fundraiser": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "background/cnb_background": {
+   "n": 3000,
+   "flagged_as_mule_case": 12,
+   "routed_to_victim_protection": 44,
+   "rate": 0.004
+  },
+  "honest/migrant_remit": {
+   "n": 10,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  }
+ },
+ "failures_staj_psi": {
+  "worst_false_positives": [
+   {
+    "client_id": "R03089",
+    "label": "honest",
+    "scheme": "lookalike",
+    "persona": "middleman_cohost",
+    "priority": 68,
+    "triage": "REVIEW",
+    "signals": [
+     "R-A:R03089",
+     "D4:R03089",
+     "D5:R03089",
+     "D7:R03089"
+    ],
+    "exculpatory": [],
+    "reasons": [
+     "B1-R03089: priority 68 >= 30",
+     "B1-R03089: R-A:R03089 unexplained",
+     "B1-R03089: D4:R03089 unexplained",
+     "B1-R03089: D5:R03089 unexplained"
+    ]
+   },
+   {
+    "client_id": "R03088",
+    "label": "honest",
+    "scheme": "lookalike",
+    "persona": "middleman_cohost",
+    "priority": 42,
+    "triage": "REVIEW",
+    "signals": [
+     "R-A:R03088",
+     "D4:R03088",
+     "D5:R03088"
+    ],
+    "exculpatory": [],
+    "reasons": [
+     "B1-R03088: priority 42 >= 30",
+     "B1-R03088: R-A:R03088 unexplained",
+     "B1-R03088: D4:R03088 unexplained",
+     "B1-R03088: D5:R03088 unexplained"
+    ]
+   },
+   {
+    "client_id": "R03091",
+    "label": "honest",
+    "scheme": "lookalike",
+    "persona": "middleman_cohost",
+    "priority": 41,
+    "triage": "REVIEW",
+    "signals": [
+     "R-A:R03091",
+     "D4:R03091",
+     "D5:R03091"
+    ],
+    "exculpatory": [],
+    "reasons": [
+     "B3-R03091: priority 41 >= 30",
+     "B3-R03091: R-A:R03091 unexplained",
+     "B3-R03091: D4:R03091 unexplained",
+     "B3-R03091: D5:R03091 unexplained"
+    ]
+   },
+   {
+    "client_id": "R03087",
+    "label": "honest",
+    "scheme": "lookalike",
+    "persona": "middleman_cohost",
+    "priority": 39,
+    "triage": "REVIEW",
+    "signals": [
+     "R-A:R03087",
+     "D4:R03087",
+     "D5:R03087"
+    ],
+    "exculpatory": [],
+    "reasons": [
+     "B2-R03087: priority 39 >= 30",
+     "B2-R03087: R-A:R03087 unexplained",
+     "B2-R03087: D4:R03087 unexplained",
+     "B2-R03087: D5:R03087 unexplained"
+    ]
+   },
+   {
+    "client_id": "R03086",
+    "label": "honest",
+    "scheme": "lookalike",
+    "persona": "middleman_cohost",
+    "priority": 38,
+    "triage": "REVIEW",
+    "signals": [
+     "R-A:R03086",
+     "D4:R03086",
+     "D5:R03086"
+    ],
+    "exculpatory": [],
+    "reasons": [
+     "B1-R03086: priority 38 >= 30",
+     "B1-R03086: R-A:R03086 unexplained",
+     "B1-R03086: D4:R03086 unexplained",
+     "B1-R03086: D5:R03086 unexplained"
+    ]
+   },
+   {
+    "client_id": "R02468",
+    "label": "background",
+    "scheme": "cnb_background",
+    "persona": null,
+    "priority": 37,
+    "triage": "REVIEW",
+    "signals": [
+     "R-A:R02468",
+     "R-B:R02468",
+     "D3:R02468"
+    ],
+    "exculpatory": [
+     "E2:R02468"
+    ],
+    "reasons": [
+     "B2-R02468: priority 37 >= 30",
+     "B2-R02468: R-A:R02468 explained by E2:R02468",
+     "B2-R02468: R-B:R02468 unexplained",
+     "B2-R02468: D3:R02468 explained by E2:R02468"
+    ]
+   },
+   {
+    "client_id": "R02670",
+    "label": "background",
+    "scheme": "cnb_background",
+    "persona": null,
+    "priority": 36,
+    "triage": "REVIEW",
+    "signals": [
+     "R-A:R02670",
+     "D3:R02670"
+    ],
+    "exculpatory": [
+     "E2:R02670",
+     "E3:R02670",
+     "E4:R02670"
+    ],
+    "reasons": [
+     "B3-R02670: priority 36 >= 30",
+     "B3-R02670: R-A:R02670 explained by E2:R02670",
+     "B3-R02670: D3:R02670 explained by E2:R02670"
+    ]
+   },
+   {
+    "client_id": "R00391",
+    "label": "background",
+    "scheme": "cnb_background",
+    "persona": null,
+    "priority": 32,
+    "triage": "REVIEW",
+    "signals": [
+     "R-A:R00391",
+     "R-C:R00391",
+     "D3:R00391"
+    ],
+    "exculpatory": [
+     "E2:R00391"
+    ],
+    "reasons": [
+     "B1-R00391: priority 32 >= 30",
+     "B1-R00391: R-A:R00391 explained by E2:R00391",
+     "B1-R00391: R-C:R00391 unexplained",
+     "B1-R00391: D3:R00391 explained by E2:R00391"
+    ]
+   }
+  ],
+  "false_negatives": []
+ },
+ "clusters": [
+  {
+   "cluster_id": "5c64f48f0d60",
+   "banks": [
+    "B1",
+    "B2",
+    "B3"
+   ],
+   "score": 0.8833,
+   "disclosed": true,
+   "same_hand_global": true,
+   "lag_ret_concentration": 1.0,
+   "n_candidates": 11
+  },
+  {
+   "cluster_id": "e6102f7bd4f7",
+   "banks": [
+    "B1",
+    "B2",
+    "B3"
+   ],
+   "score": 0.8722,
+   "disclosed": true,
+   "same_hand_global": true,
+   "lag_ret_concentration": 1.0,
+   "n_candidates": 14
+  }
+ ],
+ "ablations": {
+  "without_innocence_layer": {
+   "tp": 45,
+   "fp": 2553,
+   "fn": 0,
+   "precision": 0.0173,
+   "recall": 1.0,
+   "f1": 0.0341,
+   "n_mules": 45,
+   "n_accounts": 3107
+  },
+  "without_radar": {
+   "tp": 45,
+   "fp": 41,
+   "fn": 0,
+   "precision": 0.5233,
+   "recall": 1.0,
+   "f1": 0.687,
+   "n_mules": 45,
+   "n_accounts": 3107
+  },
+  "without_D6_D7": {
+   "tp": 45,
+   "fp": 41,
+   "fn": 0,
+   "precision": 0.5233,
+   "recall": 1.0,
+   "f1": 0.687,
+   "n_mules": 45,
+   "n_accounts": 3107
+  }
+ },
+ "disclosed_cluster_candidate_labels": {
+  "mule": 25
+ }
+}

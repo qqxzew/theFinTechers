@@ -1,0 +1,10 @@
+# PLACEHOLDER escalation matrix (synthetic, NOT the bank's official matrix) - replace with the official one when available.
+placeholder: true
+roles: [analyst_l1, analyst_l2, aml_officer, mlro]
+four_eyes_min_priority: 70
+rules:
+  - {when: {pep: true}, role: aml_officer}
+  - {when: {cluster: true, priority_min: 70}, role: mlro}
+  - {when: {priority_min: 70}, role: aml_officer}
+  - {when: {priority_min: 40}, role: analyst_l2}
+  - {when: {}, role: analyst_l1}

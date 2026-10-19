@@ -8,7 +8,7 @@ from redteam.world import World
 
 def plant_students_rent(w: World, n: int = 4, instance: int = 0) -> None:
     """Plant n honest rent collectors: flatmates send their shares in, one rent payment goes out to the landlord."""
-    popular_pool = [w.new_ext_account() for _ in range(20)]
+    popular_pool = w.popular_pool(20)
     for _ in range(n):
         bank_id = str(w.rng.choice(w.banks))
         months = int(w.rng.integers(6, 41))

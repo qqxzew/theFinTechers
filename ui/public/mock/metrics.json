@@ -1,0 +1,280 @@
+{
+  "dataset": "staj-synth-v0.3 (MOCK)",
+  "seed": 20261019,
+  "synthetic": true,
+  "modes": {
+    "isolated": {
+      "overall": {
+        "tp": 17,
+        "fp": 9,
+        "fn": 19,
+        "precision": 0.654,
+        "recall": 0.472,
+        "f1": 0.548,
+        "n_mules": 36,
+        "n_accounts": 3000
+      },
+      "exposure": {
+        "raw_records_exposed": 0
+      }
+    },
+    "staj_psi": {
+      "overall": {
+        "tp": 29,
+        "fp": 7,
+        "fn": 7,
+        "precision": 0.806,
+        "recall": 0.806,
+        "f1": 0.806,
+        "n_mules": 36,
+        "n_accounts": 3000
+      },
+      "exposure": {
+        "raw_records_exposed": 0,
+        "blinded_elements": 6372
+      }
+    },
+    "naive_raw_sharing": {
+      "overall": {
+        "tp": 31,
+        "fp": 7,
+        "fn": 5,
+        "precision": 0.816,
+        "recall": 0.861,
+        "f1": 0.838,
+        "n_mules": 36,
+        "n_accounts": 3000
+      },
+      "exposure": {
+        "raw_records_exposed": 48210
+      }
+    }
+  },
+  "breakdown": {
+    "scheme:fan_in_star": {
+      "n": 12,
+      "flagged_as_mule_case": 11,
+      "routed_to_victim_protection": 0,
+      "rate": 0.917
+    },
+    "scheme:chain_relay": {
+      "n": 10,
+      "flagged_as_mule_case": 8,
+      "routed_to_victim_protection": 0,
+      "rate": 0.8
+    },
+    "scheme:same_hand_ring": {
+      "n": 8,
+      "flagged_as_mule_case": 7,
+      "routed_to_victim_protection": 0,
+      "rate": 0.875
+    },
+    "scheme:slow_mule": {
+      "n": 6,
+      "flagged_as_mule_case": 3,
+      "routed_to_victim_protection": 0,
+      "rate": 0.5
+    },
+    "persona:mom_remitter": {
+      "n": 120,
+      "flagged_as_mule_case": 3,
+      "routed_to_victim_protection": 0,
+      "rate": 0.025
+    },
+    "persona:shared_flat": {
+      "n": 80,
+      "flagged_as_mule_case": 4,
+      "routed_to_victim_protection": 0,
+      "rate": 0.05
+    },
+    "persona:airbnb_cohost": {
+      "n": 40,
+      "flagged_as_mule_case": 3,
+      "routed_to_victim_protection": 0,
+      "rate": 0.075
+    },
+    "persona:gig_earner": {
+      "n": 60,
+      "flagged_as_mule_case": 2,
+      "routed_to_victim_protection": 0,
+      "rate": 0.033
+    },
+    "persona:new_job": {
+      "n": 50,
+      "flagged_as_mule_case": 1,
+      "routed_to_victim_protection": 0,
+      "rate": 0.02
+    },
+    "victim:safe_account_scam": {
+      "n": 9,
+      "flagged_as_mule_case": 1,
+      "routed_to_victim_protection": 7,
+      "rate": 0.778
+    },
+    "victim:investment_scam": {
+      "n": 6,
+      "flagged_as_mule_case": 0,
+      "routed_to_victim_protection": 4,
+      "rate": 0.667
+    }
+  },
+  "ablations": {
+    "full": {
+      "tp": 29,
+      "fp": 7,
+      "fn": 7,
+      "precision": 0.806,
+      "recall": 0.806,
+      "f1": 0.806
+    },
+    "without_innocence_layer": {
+      "tp": 30,
+      "fp": 41,
+      "fn": 6,
+      "precision": 0.423,
+      "recall": 0.833,
+      "f1": 0.561
+    },
+    "without_radar": {
+      "tp": 17,
+      "fp": 9,
+      "fn": 19,
+      "precision": 0.654,
+      "recall": 0.472,
+      "f1": 0.548
+    },
+    "without_d6_d7": {
+      "tp": 23,
+      "fp": 8,
+      "fn": 13,
+      "precision": 0.742,
+      "recall": 0.639,
+      "f1": 0.687
+    }
+  },
+  "failures": {
+    "worst_false_positives": [
+      {
+        "case_id": "B2-R00544",
+        "client_ref": "c-88a1f0d2",
+        "persona": "airbnb_cohost",
+        "priority": 77,
+        "signals": [
+          "D4",
+          "D5"
+        ],
+        "why": "Many one-off guest payments look like fan-in; E7 co-host signal below threshold."
+      },
+      {
+        "case_id": "B1-R00602",
+        "client_ref": "c-13c9be47",
+        "persona": "shared_flat",
+        "priority": 71,
+        "signals": [
+          "D1",
+          "D8"
+        ],
+        "why": "Rent split just below 15 000 CZK looks like structuring."
+      },
+      {
+        "case_id": "B3-R00718",
+        "client_ref": "c-f04e7a3b",
+        "persona": "mom_remitter",
+        "priority": 64,
+        "signals": [
+          "D5"
+        ],
+        "why": "Remittance recipient changed bank mid-period; E1 lost the recurring recipient."
+      }
+    ],
+    "false_negatives": [
+      {
+        "client_ref": "c-6b0d92e5",
+        "bank_id": "B3",
+        "scheme": "slow_mule",
+        "max_priority": 31,
+        "missed_because": "Lag 9 days and 30 % retention; D1 lag threshold is 72 h."
+      },
+      {
+        "client_ref": "c-c27a4f18",
+        "bank_id": "B2",
+        "scheme": "slow_mule",
+        "max_priority": 28,
+        "missed_because": "Exits to popular exchange (not rare), D5 silent."
+      },
+      {
+        "client_ref": "c-90ef1d6c",
+        "bank_id": "B1",
+        "scheme": "chain_relay",
+        "max_priority": 44,
+        "missed_because": "Single-bank chain; no radar overlap, below operating point."
+      }
+    ]
+  },
+  "cnb": {
+    "n_clients": 3000,
+    "n_tx": 214503,
+    "rule_a_alerts_per_unit": {
+      "per_calendar_month": 41,
+      "per_rolling_30d": 57,
+      "per_calendar_week": 12
+    },
+    "rule_b_alerts": 23,
+    "rule_c_alerts": 64,
+    "rule_c_triage": {
+      "FP": 38,
+      "REVIEW": 26
+    },
+    "priority_hist": [
+      {
+        "bin": "0-10",
+        "count": 14
+      },
+      {
+        "bin": "10-20",
+        "count": 22
+      },
+      {
+        "bin": "20-30",
+        "count": 19
+      },
+      {
+        "bin": "30-40",
+        "count": 11
+      },
+      {
+        "bin": "40-50",
+        "count": 9
+      },
+      {
+        "bin": "50-60",
+        "count": 8
+      },
+      {
+        "bin": "60-70",
+        "count": 7
+      },
+      {
+        "bin": "70-80",
+        "count": 6
+      },
+      {
+        "bin": "80-90",
+        "count": 4
+      },
+      {
+        "bin": "90-100",
+        "count": 3
+      }
+    ],
+    "mom_persona": {
+      "n": 120,
+      "fp_rate": 0.025
+    },
+    "sample_sheet_url": "/mock/review_sheet_30.csv"
+  },
+  "operating_point": {
+    "definition": "Case counts as flagged when priority >= min_priority and triage = REVIEW.",
+    "min_priority": 40
+  }
+}

@@ -1,0 +1,529 @@
+{
+  "banks": [
+    {
+      "bank_id": "B1",
+      "n_cases": 19,
+      "n_review": 12,
+      "n_candidates_exported": 7,
+      "local_graph": {
+        "nodes": [
+          {
+            "id": "B1:c-c933576a",
+            "label": "c-c933",
+            "kind": "client"
+          },
+          {
+            "id": "B1:c-d82767fd",
+            "label": "c-d827",
+            "kind": "client"
+          },
+          {
+            "id": "B1:c-5c459c81",
+            "label": "c-5c45",
+            "kind": "counterparty_rare"
+          },
+          {
+            "id": "B1:c-542be8e7",
+            "label": "c-542b",
+            "kind": "counterparty_rare"
+          },
+          {
+            "id": "B1:c-70914148",
+            "label": "c-7091",
+            "kind": "counterparty_rare"
+          },
+          {
+            "id": "B1:c-b69b5df4",
+            "label": "c-b69b",
+            "kind": "counterparty_rare"
+          },
+          {
+            "id": "B1:c-21169a71",
+            "label": "c-2116",
+            "kind": "counterparty_rare"
+          }
+        ],
+        "edges": [
+          {
+            "source": "B1:c-c933576a",
+            "target": "B1:c-d82767fd"
+          },
+          {
+            "source": "B1:c-d82767fd",
+            "target": "B1:c-5c459c81"
+          },
+          {
+            "source": "B1:c-5c459c81",
+            "target": "B1:c-542be8e7"
+          },
+          {
+            "source": "B1:c-5c459c81",
+            "target": "B1:c-70914148"
+          },
+          {
+            "source": "B1:c-c933576a",
+            "target": "B1:c-b69b5df4"
+          },
+          {
+            "source": "B1:c-b69b5df4",
+            "target": "B1:c-21169a71"
+          }
+        ]
+      }
+    },
+    {
+      "bank_id": "B2",
+      "n_cases": 17,
+      "n_review": 10,
+      "n_candidates_exported": 5,
+      "local_graph": {
+        "nodes": [
+          {
+            "id": "B2:c-caa6cea2",
+            "label": "c-caa6",
+            "kind": "client"
+          },
+          {
+            "id": "B2:c-ead67cf0",
+            "label": "c-ead6",
+            "kind": "client"
+          },
+          {
+            "id": "B2:c-d7bec787",
+            "label": "c-d7be",
+            "kind": "counterparty_rare"
+          },
+          {
+            "id": "B2:c-f585cf62",
+            "label": "c-f585",
+            "kind": "counterparty_rare"
+          },
+          {
+            "id": "B2:c-0c931b1b",
+            "label": "c-0c93",
+            "kind": "counterparty_rare"
+          }
+        ],
+        "edges": [
+          {
+            "source": "B2:c-caa6cea2",
+            "target": "B2:c-ead67cf0"
+          },
+          {
+            "source": "B2:c-caa6cea2",
+            "target": "B2:c-d7bec787"
+          },
+          {
+            "source": "B2:c-caa6cea2",
+            "target": "B2:c-f585cf62"
+          },
+          {
+            "source": "B2:c-f585cf62",
+            "target": "B2:c-0c931b1b"
+          }
+        ]
+      }
+    },
+    {
+      "bank_id": "B3",
+      "n_cases": 12,
+      "n_review": 7,
+      "n_candidates_exported": 4,
+      "local_graph": {
+        "nodes": [
+          {
+            "id": "B3:c-66a62373",
+            "label": "c-66a6",
+            "kind": "client"
+          },
+          {
+            "id": "B3:c-e3b32351",
+            "label": "c-e3b3",
+            "kind": "client"
+          },
+          {
+            "id": "B3:c-8b486d3c",
+            "label": "c-8b48",
+            "kind": "counterparty_rare"
+          },
+          {
+            "id": "B3:c-53dd7c24",
+            "label": "c-53dd",
+            "kind": "counterparty_rare"
+          }
+        ],
+        "edges": [
+          {
+            "source": "B3:c-66a62373",
+            "target": "B3:c-e3b32351"
+          },
+          {
+            "source": "B3:c-e3b32351",
+            "target": "B3:c-8b486d3c"
+          },
+          {
+            "source": "B3:c-e3b32351",
+            "target": "B3:c-53dd7c24"
+          }
+        ]
+      }
+    }
+  ],
+  "clusters": [
+    {
+      "cluster_id": "K1",
+      "banks": [
+        "B1",
+        "B2",
+        "B3"
+      ],
+      "n_candidates": 5,
+      "tokens": 6,
+      "score": 0.87,
+      "disclosed": true,
+      "same_hand_global": true,
+      "lag_ret_concentration": 0.87
+    },
+    {
+      "cluster_id": "K2",
+      "banks": [
+        "B1",
+        "B3"
+      ],
+      "n_candidates": 2,
+      "tokens": 2,
+      "score": 0.61,
+      "disclosed": false,
+      "same_hand_global": false,
+      "lag_ret_concentration": null
+    },
+    {
+      "cluster_id": "K3",
+      "banks": [
+        "B2"
+      ],
+      "n_candidates": 3,
+      "tokens": 3,
+      "score": 0.55,
+      "disclosed": false,
+      "same_hand_global": false,
+      "lag_ret_concentration": 0.41
+    }
+  ],
+  "cluster_graph": {
+    "nodes": [
+      {
+        "id": "B1",
+        "label": "B1",
+        "kind": "bank"
+      },
+      {
+        "id": "B2",
+        "label": "B2",
+        "kind": "bank"
+      },
+      {
+        "id": "B3",
+        "label": "B3",
+        "kind": "bank"
+      },
+      {
+        "id": "c-9f2a1b3c",
+        "label": "c-9f2a1b3c",
+        "kind": "candidate",
+        "bank": "B1"
+      },
+      {
+        "id": "c-0a7d2e11",
+        "label": "c-0a7d2e11",
+        "kind": "candidate",
+        "bank": "B1"
+      },
+      {
+        "id": "c-41d7e0a2",
+        "label": "c-41d7e0a2",
+        "kind": "candidate",
+        "bank": "B2"
+      },
+      {
+        "id": "c-b6f3c810",
+        "label": "c-b6f3c810",
+        "kind": "candidate",
+        "bank": "B2"
+      },
+      {
+        "id": "c-e1924d5a",
+        "label": "c-e1924d5a",
+        "kind": "candidate",
+        "bank": "B3"
+      },
+      {
+        "id": "t-d992a7",
+        "label": "t-d992a7",
+        "kind": "token"
+      },
+      {
+        "id": "t-807be5",
+        "label": "t-807be5",
+        "kind": "token"
+      },
+      {
+        "id": "t-a042ee",
+        "label": "t-a042ee",
+        "kind": "token"
+      },
+      {
+        "id": "t-9ce6b8",
+        "label": "t-9ce6b8",
+        "kind": "token"
+      },
+      {
+        "id": "t-df251f",
+        "label": "t-df251f",
+        "kind": "token"
+      },
+      {
+        "id": "t-cf16f1",
+        "label": "t-cf16f1",
+        "kind": "token"
+      }
+    ],
+    "edges": [
+      {
+        "source": "B1",
+        "target": "c-9f2a1b3c"
+      },
+      {
+        "source": "B1",
+        "target": "c-0a7d2e11"
+      },
+      {
+        "source": "B2",
+        "target": "c-41d7e0a2"
+      },
+      {
+        "source": "B2",
+        "target": "c-b6f3c810"
+      },
+      {
+        "source": "B3",
+        "target": "c-e1924d5a"
+      },
+      {
+        "source": "c-9f2a1b3c",
+        "target": "t-d992a7"
+      },
+      {
+        "source": "c-9f2a1b3c",
+        "target": "t-807be5"
+      },
+      {
+        "source": "c-0a7d2e11",
+        "target": "t-d992a7"
+      },
+      {
+        "source": "c-0a7d2e11",
+        "target": "t-a042ee"
+      },
+      {
+        "source": "c-41d7e0a2",
+        "target": "t-807be5"
+      },
+      {
+        "source": "c-41d7e0a2",
+        "target": "t-9ce6b8"
+      },
+      {
+        "source": "c-b6f3c810",
+        "target": "t-a042ee"
+      },
+      {
+        "source": "c-b6f3c810",
+        "target": "t-9ce6b8"
+      },
+      {
+        "source": "c-e1924d5a",
+        "target": "t-9ce6b8"
+      },
+      {
+        "source": "c-e1924d5a",
+        "target": "t-df251f"
+      },
+      {
+        "source": "c-9f2a1b3c",
+        "target": "t-cf16f1"
+      },
+      {
+        "source": "c-e1924d5a",
+        "target": "t-cf16f1"
+      }
+    ]
+  },
+  "wire": [
+    {
+      "session": "B1xB2",
+      "msg": "A->B blind",
+      "from": "B1",
+      "n": 636,
+      "sample": [
+        "ba56fabec34ba496103112892d6311c5d135d44b0cf0f99f5acbc0e3a4a56be4",
+        "0b12a8c9f8a5149f3975e439de4cbf527fba14ce1741aa32ceb2ff26f7d26c5d",
+        "3de6f7517dc246d8e0e0d327a36613e828a6e5756ed4af5143f4823e606aa48d",
+        "c1b31a2e197e60918cc7f3366b839adcbe7375afe79b24d578fb7a3571a46bb4"
+      ]
+    },
+    {
+      "session": "B1xB2",
+      "msg": "B->A double_blind",
+      "from": "B2",
+      "n": 636,
+      "sample": [
+        "c5cd415a40257eecb862fe34e13ce3077623695c43be36edd0b5edc7c381dee2",
+        "0958fbb0cdf0cb2232309510af1ef81ab9c0f35401598c1ffe3e0bb03ff9cd05",
+        "9481aa930dbd9f7b1836d52220ebe477845713c3c994302217d7f8ee08c10b86",
+        "8e158fac855a132dd8f2a94af7b02b882d5340e45290aa7d1cb900b84e96a3cd"
+      ]
+    },
+    {
+      "session": "B1xB2",
+      "msg": "B->A blind",
+      "from": "B2",
+      "n": 395,
+      "sample": [
+        "526008273e3e6b5985b24ed46dee8bc54f94775121a79fc3b3b966179126495d",
+        "35352f3fd1a2f0c34273adadc0d1066e7d4aa4b76aef01045e1c57a11a574acb",
+        "4cbae7962ac7ae65fcd18a16bce9b4550157973a9620268371ae92e6a1a9c407",
+        "05a80dfa7c3576d28056b5cb99abaa167acbb078fd26f2e1eb0278ef6727b0a7"
+      ]
+    },
+    {
+      "session": "B1xB2",
+      "msg": "A->B back",
+      "from": "B1",
+      "n": 395,
+      "sample": [
+        "12451e91cc9d53667ccbf198af38dc350a98546293faceb44d88fc385404c252",
+        "d503f941737f816c34961dca9d1ec24d9849566978c6c9fffc36a8e96e2d637a",
+        "e9f0c99be0b7516b87f0ef83d41e0e56e6ac65e8126759adfef3746e19a13711",
+        "873beba8c9b8c0fb24b2d21f9893c4d40f3527fe5cf2da18a93f13481ae2d75c"
+      ]
+    },
+    {
+      "session": "B1xB3",
+      "msg": "A->B blind",
+      "from": "B1",
+      "n": 502,
+      "sample": [
+        "f4a2704bd4402311db9001e3ba3e62e5edee134b716d70112e4609e548c33a22",
+        "dde459951ba5e02ae8349d7e007051ea600505bf76340388aa09f4ff462be3c9",
+        "6bb5819229884bf97a5ae7721071b2fe0441701f29d0c54d6944e9f113632bce",
+        "5e84434be0f24d2e96a781eef3824d6db5eaf80f94f48905b715bd519b929733"
+      ]
+    },
+    {
+      "session": "B1xB3",
+      "msg": "B->A double_blind",
+      "from": "B3",
+      "n": 502,
+      "sample": [
+        "3ad925d3080bed1ba62d72c12f179a5ccc4e478a9840a395b5133e6d6a615aa7",
+        "f257650b066fc7d140cae53ba2a89f0781153687ede8746b52f8a1719630464a",
+        "4edd3581d7b49ef90e42ec73c9591ed1586f137a9a9d8e76a32a0a8503f7988f",
+        "1c6c8d763e8be93b729f879b87d26f9290653f1dac1ead2f7804f50a040949ef"
+      ]
+    },
+    {
+      "session": "B1xB3",
+      "msg": "B->A blind",
+      "from": "B3",
+      "n": 459,
+      "sample": [
+        "6a6d8cc47b99c1b88d5b0b8f937776f75450d7eea47fc2e3e599cbbf14cfd6a5",
+        "d74cea8c487326c563727e0d554d1bbaa64a4cb631f01097b8db8caf481ef946",
+        "c1e6879c4146bf0baa34af726af37b91b7213b593df9d4094ad71c031c8c7cf5",
+        "d330f99cf3716a349e14dffee997aab893f788ede797c85a166aff61b5eef976"
+      ]
+    },
+    {
+      "session": "B1xB3",
+      "msg": "A->B back",
+      "from": "B1",
+      "n": 459,
+      "sample": [
+        "da9be90e32a6d7e05a5838d852e1fb3702a02aa9b1af17173018a7f47bff3152",
+        "bd04d93b6d96fed6996585d3b0dad1266f88f43dd4de1693f0fe37993df1c104",
+        "bc78adfafd706d964507f950da521bdaa1a616ef77a4aa0d9348a00c258da57d",
+        "d06180c08ddf201f2945344dc2fda66adf8605c70b753f8fa7a8d9ea278e56ac"
+      ]
+    },
+    {
+      "session": "B2xB3",
+      "msg": "A->B blind",
+      "from": "B2",
+      "n": 702,
+      "sample": [
+        "ff70fed95b87f11b595850def58328592cdb16ec47e4ff1ddf40772e5b685c6f",
+        "ceade66602cbaeba4c22c867efc52428f2f82d8a1a46d598fdd678297d7aa9bc",
+        "c5af92f9bc61bd941af2030a2ef23623e7d7b8a6316a01196b82571fdb33d287",
+        "c5174e47209b3d4c4b941a3a1d96e100a12d172c09a50f0f465a09e5406da76c"
+      ]
+    },
+    {
+      "session": "B2xB3",
+      "msg": "B->A double_blind",
+      "from": "B3",
+      "n": 702,
+      "sample": [
+        "c46aa78ab251b6377e1a82f22959f13628be993dd12dc6e198dc339e11133cfc",
+        "b3957bd78e737068f69b0e47d528c0032805aee0a708246375745ae3c1c34e7e",
+        "cd11c61b13688d1b899bd50b94a785cf58722bd61096dadb6d4b71c845c75d46",
+        "e5c235e58967600f9561812a1075441686b01285ee63311e47eaab8191eb68fa"
+      ]
+    },
+    {
+      "session": "B2xB3",
+      "msg": "B->A blind",
+      "from": "B3",
+      "n": 492,
+      "sample": [
+        "2ec1296ff5f676e6a7c98647eb0e2606da0b2e6508af50c6470c892ed8ab2f18",
+        "44efbe241fa869ed75b3ce148f3b3014505b093cb165abaa5501a02e9df636e8",
+        "cffda86404a05dd15ef0a312097c70f56afcd57861ea5b418e88f2ac4d201d21",
+        "2b7a073fa533df201a68d561b1f905961596aef17fdb0a52e020bc9f797e1915"
+      ]
+    },
+    {
+      "session": "B2xB3",
+      "msg": "A->B back",
+      "from": "B2",
+      "n": 492,
+      "sample": [
+        "e681b533937ebf111dfd55f2649e86aa0dbe775513625ccb16c8acd2c0863e8b",
+        "6f1c2954f99501eaa35e3c058a85e0846caf362934b927355dad7dfb8f7b1ce9",
+        "39675ac78b220c1f62faeab85cfdc4ddb550f0c4e6b6ef2c9b123020b69e81c5",
+        "ebec2a6cc8ed998f3eae64569d13e3dde2200c920bdd415d85005a59fdf5b872"
+      ]
+    }
+  ],
+  "exposure": {
+    "isolated": {
+      "raw_records_exposed": 0,
+      "bytes_exchanged": 0
+    },
+    "staj_psi": {
+      "raw_records_exposed": 0,
+      "blinded_elements": 6372,
+      "bytes_exchanged": 203904,
+      "match_rows_to_coordinator": 14
+    },
+    "naive_raw_sharing": {
+      "raw_records_exposed": 48210,
+      "bytes_exchanged": 9843120
+    }
+  },
+  "disclosure_rule": "A cluster is disclosed only if it spans >= 2 banks and >= 3 candidates.",
+  "refused": {
+    "K2": "only 2 candidates (< 3)",
+    "K3": "only 1 bank (< 2)"
+  }
+}

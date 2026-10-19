@@ -1,0 +1,732 @@
+{
+  "counts": {
+    "alerts_before_triage": 137,
+    "cases": 48,
+    "review": 35,
+    "fp_auto_closed": 13,
+    "victim_protection": 3
+  },
+  "items": [
+    {
+      "case_id": "B1-R00123",
+      "bank_id": "B1",
+      "client_ref": "c-9f2a1b3c",
+      "priority": 92,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "R-A",
+        "D1",
+        "D2",
+        "D5",
+        "D6",
+        "X"
+      ],
+      "cluster_id": "K1",
+      "escalation_role": "mlro",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B2-R00087",
+      "bank_id": "B2",
+      "client_ref": "c-41d7e0a2",
+      "priority": 81,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D4",
+        "D7",
+        "D6",
+        "X"
+      ],
+      "cluster_id": "K1",
+      "escalation_role": "aml_officer",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B1-R00311",
+      "bank_id": "B1",
+      "client_ref": "c-7be05d19",
+      "priority": 18,
+      "triage": "FP",
+      "route": "mule_review",
+      "rules": [
+        "R-C",
+        "D5"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l1",
+      "decision_status": "confirmed"
+    },
+    {
+      "case_id": "B3-R00045",
+      "bank_id": "B3",
+      "client_ref": "c-2c8e66f0",
+      "priority": 74,
+      "triage": "REVIEW",
+      "route": "victim_protection",
+      "rules": [
+        "R-B",
+        "D3"
+      ],
+      "cluster_id": null,
+      "escalation_role": "aml_officer",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B2-R00210",
+      "bank_id": "B2",
+      "client_ref": "c-d03f9a71",
+      "priority": 88,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D3",
+        "D8"
+      ],
+      "cluster_id": null,
+      "escalation_role": "mlro",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B3-R00167",
+      "bank_id": "B3",
+      "client_ref": "c-5a19c4e8",
+      "priority": 55,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D8",
+        "D1"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l2",
+      "decision_status": "overridden"
+    },
+    {
+      "case_id": "B1-R00915",
+      "bank_id": "B1",
+      "client_ref": "c-26e231b1",
+      "priority": 78,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "R-A",
+        "X"
+      ],
+      "cluster_id": "K1",
+      "escalation_role": "aml_officer",
+      "decision_status": "confirmed"
+    },
+    {
+      "case_id": "B3-R00333",
+      "bank_id": "B3",
+      "client_ref": "c-5e8cbfd9",
+      "priority": 39,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D8"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l1",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B2-R00219",
+      "bank_id": "B2",
+      "client_ref": "c-b57c43c9",
+      "priority": 68,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D2",
+        "D8",
+        "R-A",
+        "X"
+      ],
+      "cluster_id": "K1",
+      "escalation_role": "analyst_l2",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B2-R00464",
+      "bank_id": "B2",
+      "client_ref": "c-6783ce2c",
+      "priority": 21,
+      "triage": "FP",
+      "route": "mule_review",
+      "rules": [
+        "R-A"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l1",
+      "decision_status": "confirmed"
+    },
+    {
+      "case_id": "B1-R00318",
+      "bank_id": "B1",
+      "client_ref": "c-34989be0",
+      "priority": 11,
+      "triage": "FP",
+      "route": "mule_review",
+      "rules": [
+        "D4",
+        "D7",
+        "D8"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l1",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B2-R00810",
+      "bank_id": "B2",
+      "client_ref": "c-3c2aa947",
+      "priority": 53,
+      "triage": "REVIEW",
+      "route": "victim_protection",
+      "rules": [
+        "D3"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l2",
+      "decision_status": "confirmed"
+    },
+    {
+      "case_id": "B1-R00746",
+      "bank_id": "B1",
+      "client_ref": "c-80becce7",
+      "priority": 55,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D2",
+        "D3",
+        "D5",
+        "X"
+      ],
+      "cluster_id": "K2",
+      "escalation_role": "analyst_l2",
+      "decision_status": "confirmed"
+    },
+    {
+      "case_id": "B2-R00140",
+      "bank_id": "B2",
+      "client_ref": "c-dcfd6bac",
+      "priority": 97,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D3",
+        "R-C"
+      ],
+      "cluster_id": null,
+      "escalation_role": "mlro",
+      "decision_status": "overridden"
+    },
+    {
+      "case_id": "B2-R00776",
+      "bank_id": "B2",
+      "client_ref": "c-2829e4d1",
+      "priority": 91,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D6",
+        "R-A"
+      ],
+      "cluster_id": null,
+      "escalation_role": "mlro",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B1-R00492",
+      "bank_id": "B1",
+      "client_ref": "c-69736bb7",
+      "priority": 50,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D3",
+        "X"
+      ],
+      "cluster_id": "K2",
+      "escalation_role": "analyst_l2",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B1-R00448",
+      "bank_id": "B1",
+      "client_ref": "c-bd8ff55c",
+      "priority": 51,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D1",
+        "D4",
+        "R-C"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l2",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B1-R00261",
+      "bank_id": "B1",
+      "client_ref": "c-d023c2f9",
+      "priority": 41,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D3"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l2",
+      "decision_status": "overridden"
+    },
+    {
+      "case_id": "B1-R00497",
+      "bank_id": "B1",
+      "client_ref": "c-323db2c8",
+      "priority": 76,
+      "triage": "FP",
+      "route": "mule_review",
+      "rules": [
+        "D5",
+        "D8",
+        "R-B"
+      ],
+      "cluster_id": null,
+      "escalation_role": "aml_officer",
+      "decision_status": "confirmed"
+    },
+    {
+      "case_id": "B3-R00778",
+      "bank_id": "B3",
+      "client_ref": "c-cedff75e",
+      "priority": 89,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D1",
+        "D3"
+      ],
+      "cluster_id": null,
+      "escalation_role": "mlro",
+      "decision_status": "confirmed"
+    },
+    {
+      "case_id": "B2-R00764",
+      "bank_id": "B2",
+      "client_ref": "c-2bd48657",
+      "priority": 49,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "R-A"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l2",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B1-R00322",
+      "bank_id": "B1",
+      "client_ref": "c-2789f81d",
+      "priority": 96,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "R-B",
+        "R-C"
+      ],
+      "cluster_id": null,
+      "escalation_role": "mlro",
+      "decision_status": "confirmed"
+    },
+    {
+      "case_id": "B2-R00373",
+      "bank_id": "B2",
+      "client_ref": "c-57dee502",
+      "priority": 84,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "R-C"
+      ],
+      "cluster_id": null,
+      "escalation_role": "aml_officer",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B2-R00164",
+      "bank_id": "B2",
+      "client_ref": "c-393b11eb",
+      "priority": 49,
+      "triage": "FP",
+      "route": "mule_review",
+      "rules": [
+        "D2"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l2",
+      "decision_status": "confirmed"
+    },
+    {
+      "case_id": "B2-R00881",
+      "bank_id": "B2",
+      "client_ref": "c-71c9d1ef",
+      "priority": 80,
+      "triage": "REVIEW",
+      "route": "victim_protection",
+      "rules": [
+        "D1"
+      ],
+      "cluster_id": null,
+      "escalation_role": "aml_officer",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B2-R00871",
+      "bank_id": "B2",
+      "client_ref": "c-88b3d454",
+      "priority": 55,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D3",
+        "D7",
+        "R-A"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l2",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B2-R00209",
+      "bank_id": "B2",
+      "client_ref": "c-a39f8b7f",
+      "priority": 30,
+      "triage": "FP",
+      "route": "mule_review",
+      "rules": [
+        "D1",
+        "D7",
+        "R-B"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l1",
+      "decision_status": "confirmed"
+    },
+    {
+      "case_id": "B2-R00190",
+      "bank_id": "B2",
+      "client_ref": "c-1b06e973",
+      "priority": 42,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D5"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l2",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B2-R00537",
+      "bank_id": "B2",
+      "client_ref": "c-e5d3e407",
+      "priority": 49,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D1",
+        "D2",
+        "D8"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l2",
+      "decision_status": "overridden"
+    },
+    {
+      "case_id": "B1-R00723",
+      "bank_id": "B1",
+      "client_ref": "c-97e4995e",
+      "priority": 52,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D2"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l2",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B1-R00540",
+      "bank_id": "B1",
+      "client_ref": "c-78006a1e",
+      "priority": 5,
+      "triage": "FP",
+      "route": "mule_review",
+      "rules": [
+        "R-C"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l1",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B2-R00777",
+      "bank_id": "B2",
+      "client_ref": "c-9c0f780c",
+      "priority": 46,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D6",
+        "R-A",
+        "R-C"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l2",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B2-R00927",
+      "bank_id": "B2",
+      "client_ref": "c-b1999271",
+      "priority": 18,
+      "triage": "FP",
+      "route": "mule_review",
+      "rules": [
+        "D1",
+        "D6",
+        "R-C"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l1",
+      "decision_status": "confirmed"
+    },
+    {
+      "case_id": "B3-R00923",
+      "bank_id": "B3",
+      "client_ref": "c-796e3755",
+      "priority": 98,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "R-C"
+      ],
+      "cluster_id": null,
+      "escalation_role": "mlro",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B2-R00977",
+      "bank_id": "B2",
+      "client_ref": "c-cd6e6412",
+      "priority": 9,
+      "triage": "FP",
+      "route": "mule_review",
+      "rules": [
+        "D2"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l1",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B1-R00374",
+      "bank_id": "B1",
+      "client_ref": "c-26bdbfc0",
+      "priority": 7,
+      "triage": "FP",
+      "route": "mule_review",
+      "rules": [
+        "D7"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l1",
+      "decision_status": "confirmed"
+    },
+    {
+      "case_id": "B2-R00681",
+      "bank_id": "B2",
+      "client_ref": "c-1e147111",
+      "priority": 56,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D7"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l2",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B2-R00849",
+      "bank_id": "B2",
+      "client_ref": "c-b581aa0a",
+      "priority": 68,
+      "triage": "FP",
+      "route": "mule_review",
+      "rules": [
+        "D2"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l2",
+      "decision_status": "confirmed"
+    },
+    {
+      "case_id": "B2-R00416",
+      "bank_id": "B2",
+      "client_ref": "c-caa9b851",
+      "priority": 70,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D2",
+        "D5",
+        "R-C"
+      ],
+      "cluster_id": null,
+      "escalation_role": "aml_officer",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B3-R00885",
+      "bank_id": "B3",
+      "client_ref": "c-800788d3",
+      "priority": 87,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D4"
+      ],
+      "cluster_id": null,
+      "escalation_role": "mlro",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B2-R00820",
+      "bank_id": "B2",
+      "client_ref": "c-46387baf",
+      "priority": 39,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D4",
+        "D7",
+        "D8"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l1",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B2-R00492",
+      "bank_id": "B2",
+      "client_ref": "c-36f0eeea",
+      "priority": 81,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "R-C"
+      ],
+      "cluster_id": null,
+      "escalation_role": "aml_officer",
+      "decision_status": "confirmed"
+    },
+    {
+      "case_id": "B1-R00485",
+      "bank_id": "B1",
+      "client_ref": "c-08ab62ec",
+      "priority": 53,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D3"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l2",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B1-R00618",
+      "bank_id": "B1",
+      "client_ref": "c-2521d714",
+      "priority": 53,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D7",
+        "D8"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l2",
+      "decision_status": "open"
+    },
+    {
+      "case_id": "B2-R00643",
+      "bank_id": "B2",
+      "client_ref": "c-149df047",
+      "priority": 18,
+      "triage": "FP",
+      "route": "mule_review",
+      "rules": [
+        "D1",
+        "D3",
+        "R-C"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l1",
+      "decision_status": "confirmed"
+    },
+    {
+      "case_id": "B2-R00296",
+      "bank_id": "B2",
+      "client_ref": "c-2d2eb848",
+      "priority": 90,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D5",
+        "R-A"
+      ],
+      "cluster_id": null,
+      "escalation_role": "mlro",
+      "decision_status": "overridden"
+    },
+    {
+      "case_id": "B1-R00395",
+      "bank_id": "B1",
+      "client_ref": "c-52c72eb8",
+      "priority": 23,
+      "triage": "FP",
+      "route": "mule_review",
+      "rules": [
+        "D2",
+        "D5"
+      ],
+      "cluster_id": null,
+      "escalation_role": "analyst_l1",
+      "decision_status": "confirmed"
+    },
+    {
+      "case_id": "B1-R00157",
+      "bank_id": "B1",
+      "client_ref": "c-d2ec7078",
+      "priority": 95,
+      "triage": "REVIEW",
+      "route": "mule_review",
+      "rules": [
+        "D4"
+      ],
+      "cluster_id": null,
+      "escalation_role": "mlro",
+      "decision_status": "confirmed"
+    }
+  ]
+}

@@ -9,7 +9,7 @@ from redteam.world import World
 def plant_fundraiser(w: World, n: int = 3, instance: int = 0) -> None:
     """Plant honest fundraisers collecting for a relative: many distinct donors send small
     gifts over a few days, then the collected total is remitted to a clinic abroad (DE or AT)."""
-    popular_pool = [w.new_ext_account() for _ in range(20)]
+    popular_pool = w.popular_pool(20)
     _ = popular_pool
     for _ in range(n):
         bank = w.banks[int(w.rng.integers(0, len(w.banks)))]

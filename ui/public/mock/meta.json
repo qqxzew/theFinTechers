@@ -1,0 +1,25 @@
+{
+  "data_label": "SYNTHETIC",
+  "fx_placeholder": true,
+  "matrix_placeholder": true,
+  "models": {
+    "agent_primary": "eu.anthropic.claude-sonnet-4-5",
+    "fallback": "eu.anthropic.claude-haiku-4-5",
+    "bulk": "eu.anthropic.claude-haiku-4-5",
+    "active": {
+      "agent_primary": "eu.anthropic.claude-sonnet-4-5"
+    }
+  },
+  "chain": {
+    "ok": true,
+    "length": 137,
+    "head": "1013075e16e95b2d3ca8876835cca70301559aed70a896b9ea8e41f211a83793"
+  },
+  "roles": [
+    "analyst_l1",
+    "analyst_l2",
+    "aml_officer",
+    "mlro"
+  ],
+  "four_eyes_min_priority": 70
+}

@@ -8,7 +8,7 @@ from redteam.world import START, World
 
 def plant_migrant_remit(w: World, n: int = 5, instance: int = 0) -> None:
     """Plant n honest migrant clients: monthly salary in, regular remittances home, small daily spends."""
-    pool = [w.new_ext_account() for _ in range(20)]
+    pool = w.popular_pool(20)
     employer = pool[int(w.rng.integers(0, len(pool)))]
 
     for _ in range(n):

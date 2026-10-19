@@ -16,7 +16,7 @@ def plant_freelancer(w: World, n: int = 4, instance: int = 0) -> None:
     6..14 outgoing payments of 800..15000 CZK into a shared pool of 20 popular
     external accounts, never exceeding 60% of total income in any 24h window.
     """
-    popular = [w.new_ext_account() for _ in range(20)]
+    popular = w.popular_pool(20)
     for _ in range(n):
         bank = w.banks[int(w.rng.integers(len(w.banks)))]
         contract_date = datetime(2026 - int(w.rng.integers(1, 6)), 7, int(w.rng.integers(1, 29)), tzinfo=UTC)

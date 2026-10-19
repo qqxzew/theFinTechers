@@ -8,7 +8,7 @@ from redteam.world import World
 
 def plant_middleman_cohost(w: World, n: int = 3, instance: int = 0) -> None:
     """Plant honest look-alike co-hosts: receive guest payments, forward amount minus a fixed cut to one host."""
-    popular = [w.new_ext_account() for _ in range(20)]
+    popular = w.popular_pool(20)
     for _ in range(n):
         bank = w.banks[int(w.rng.integers(0, len(w.banks)))]
         months = int(w.rng.integers(6, 31))

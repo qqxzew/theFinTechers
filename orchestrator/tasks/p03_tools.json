@@ -1,0 +1,14 @@
+{
+ "id": "p03_tools",
+ "goal": "Create copilot/tools/case_tools.py with `class CaseTools(cases: dict[str, dict], rules: dict[str, str])`. cases maps case_id -> structured case JSON (see CASE in tests/unit/test_copilot_core.py). All tools are READ-ONLY on the data and case-scoped: an unknown case_id raises KeyError. Methods: get_case(case_id) -> the case dict (a copy); get_signals(case_id) -> case['signals']; get_exculpatory(case_id) -> case['exculpatory']; get_features(case_id) -> case['features'] (already aggregated, return a copy); explain_rule(rule_id) -> rules[rule_id] or the string 'not available' if missing; propose_triage(case_id, triage: str, reason: str) -> {'status': 'proposal', 'final': False, 'case_id':..., 'triage':..., 'reason':...} and also append the proposal to self.proposals (list) - it never changes the case. spec() -> {'tools': [ {'toolSpec': {'name', 'description', 'inputSchema': {'json': {...JSON schema...}}}} ... ]} for EXACTLY these six tools: get_case, get_signals, get_exculpatory, get_features, explain_rule, propose_triage (Amazon Bedrock Converse toolConfig format; case_id/rule_id/triage/reason are strings). call(name, args: dict) -> JSON-serialisable result, dispatching to the methods and raising ValueError for unknown tool names. Read tests/unit/test_copilot_core.py (test_tools_are_case_scoped_and_return_no_raw_dumps).",
+ "read": [
+  "tests/unit/test_copilot_core.py"
+ ],
+ "write": [
+  "copilot/tools/case_tools.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_copilot_core.py -q -k tools"
+ ],
+ "max_steps": 16
+}

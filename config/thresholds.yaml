@@ -34,20 +34,26 @@ detectors:
   E3: {min_recurring: 0.7}
   E4: {min_popular_in: 0.7, popular_sender_degree: 100}
   E5: {min_reciprocity: 0.4}
-  VICTIM: {max_single_in: 50000.0, min_out: 100000.0, min_out_in_ratio: 3.0}
+  VICTIM: {max_single_in: 50000.0, min_out: 100000.0, min_out_in_ratio: 3.0, min_share_rare: 0.5}
+  E6: {min_top_exit: 0.85, max_single_in: 9000.0, min_senders: 3, min_life: 0.4, min_tenure: 180, max_cycles: 2}
+  E7: {min_top_exit: 0.95, min_k: 0.06, max_k: 0.18, min_in: 4, min_life: 0.4, min_tenure: 180}
+  E8: {max_senders: 5, max_drained: 0.6, min_life: 0.5, min_tenure: 365}
 cases:
   prob_scale: 60.0
   fp_max_priority: 30
   weights:
     bias: -4.0
-    points: {D1: 3.0, D2: 3.5, D3: 1.0, D4: 2.0, D5: 2.0, D6: 3.0, D7: 3.0, D8: 1.5, R-A: 0.5, R-B: 1.0, R-C: 2.0,
-             E1: -3.0, E2: -1.5, E3: -2.0, E4: -1.5, E5: -1.5}
+    points: {D1: 3.0, D2: 3.5, D3: 1.0, D4: 2.0, D5: 2.0, D6: 3.0, D7: 3.0, D8: 1.5, R-A: 0.5, R-B: 1.0, R-C: 2.0, X: 3.5,
+             E1: -3.0, E2: -1.5, E3: -2.0, E4: -1.5, E5: -1.5, E6: -3.0, E7: -2.0, E8: -2.0}
   explains:
     E1: [D1, D4, D5, D8, R-C]
     E2: [D1, D3, D5, R-A]
     E3: [D1, D2, D3, D4, D5, R-A, R-C]
     E4: [D1, D3, D4, R-A, R-C]
     E5: [D1, D5]
+    E6: [D1, D4, D5, R-C]
+    E7: [D4, D5, D7, R-C]
+    E8: [D1, D3, D4, R-A, R-C]
   priority_factors:
     aml_risk: {low: 0, medium: 5, high: 12}
     pep: 10
@@ -60,6 +66,6 @@ cases:
     amount_log_points: 15
     amount_ref: 10000.0
 token_export:
-  min_prob: 0.10        # candidate band lower bound (includes weakly suspicious)
+  min_prob: 0.05        # candidate band lower bound (includes weakly suspicious)
   min_set_size: 5
 radar_guards: {min_set_size: 5, max_tokens: 5000, max_sessions_per_hour: 20, max_unscored_share: 0.2}

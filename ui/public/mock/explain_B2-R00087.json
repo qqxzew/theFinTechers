@@ -1,0 +1,86 @@
+{
+  "cs": [
+    {
+      "text": "Účet přijal 22 plateb v celkové výši 388 000 Kč od 14 odesílatelů, které banka téměř nezná.",
+      "refs": [
+        "D4:R00087"
+      ]
+    },
+    {
+      "text": "Z každého cyklu si ponechá téměř přesně 5 %, zbytek pošle dál.",
+      "refs": [
+        "D7:R00087"
+      ]
+    },
+    {
+      "text": "Otisk sdílí 4 kandidáti ve 2 dalších bankách (shluk K1).",
+      "refs": [
+        "D6:c-41d7e0a2",
+        "cluster:K1"
+      ]
+    }
+  ],
+  "en": [
+    {
+      "text": "The account received 22 payments totalling 388,000 CZK from 14 senders the bank barely knows.",
+      "refs": [
+        "D4:R00087"
+      ]
+    },
+    {
+      "text": "It keeps almost exactly 5 % of each cycle and forwards the rest.",
+      "refs": [
+        "D7:R00087"
+      ]
+    },
+    {
+      "text": "The fingerprint is shared by 4 candidates in 2 other banks (cluster K1).",
+      "refs": [
+        "D6:c-41d7e0a2",
+        "cluster:K1"
+      ]
+    }
+  ],
+  "not_a_mom": {
+    "cs": [
+      {
+        "text": "Nejde o rodinné remitence: odesílatelé se nestřídají pravidelně a chybí příjem ze mzdy.",
+        "refs": []
+      }
+    ],
+    "en": [
+      {
+        "text": "Not family remittances: senders do not repeat regularly and there is no salary income.",
+        "refs": []
+      }
+    ]
+  },
+  "triage_justification": {
+    "cs": {
+      "text": "Návrh REVIEW: fan-in, pevná marže a zveřejněný shluk.",
+      "refs": [
+        "D4:R00087",
+        "D7:R00087",
+        "cluster:K1"
+      ]
+    },
+    "en": {
+      "text": "Proposed REVIEW: fan-in, fixed skim and a disclosed cluster.",
+      "refs": [
+        "D4:R00087",
+        "D7:R00087",
+        "cluster:K1"
+      ]
+    }
+  },
+  "violations": [
+    {
+      "check": "missing_refs",
+      "sentence_index": 0,
+      "lang": "not_a_mom.cs",
+      "detail": "Sentence in not_a_mom has no refs."
+    }
+  ],
+  "model_id": "eu.anthropic.claude-sonnet-4-5",
+  "cached": false
+}

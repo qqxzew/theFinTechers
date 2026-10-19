@@ -8,7 +8,7 @@ from redteam.world import World
 
 def plant_second_hand_seller(w: World, n: int = 5, instance: int = 0) -> None:
     """Plant n honest second-hand sellers: many small distinct-sender sales in, few shipping/platform payments out."""
-    popular_pool = [w.new_ext_account() for _ in range(20)]
+    popular_pool = w.popular_pool(20)
     for _ in range(n):
         bank_id = str(w.rng.choice(w.banks))
         contract_date = w.random_time() - timedelta(days=365 * int(w.rng.integers(1, 7)))

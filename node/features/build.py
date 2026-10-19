@@ -34,6 +34,13 @@ def _iqr(xs: list[float]) -> float | None:
     return q[2] - q[0]
 
 
+def _by_token(outs: list[dict]) -> dict[str, float]:
+    d: dict[str, float] = {}
+    for r in outs:
+        d[r["counterparty_token"]] = d.get(r["counterparty_token"], 0.0) + r["amount_czk"]
+    return d
+
+
 def _client_row(cid: str, rows: list[dict], deg: dict[str, int], cfg: dict, cyc: list[dict]) -> dict:
     rows = sorted(rows, key=lambda r: r["ts"])
     ins = [r for r in rows if r["direction"] == "in"]
@@ -58,6 +65,8 @@ def _client_row(cid: str, rows: list[dict], deg: dict[str, int], cfg: dict, cyc:
         if (in_total + out_total) else 0.0,
         "max_single_in": max((r["amount_czk"] for r in ins), default=0.0),
         "out_amounts": [r["amount_czk"] for r in outs],
+        "life_payment_share": (sum(1 for r in outs if deg.get(r["counterparty_token"], 1) >= pop_min) / len(outs)) if outs else 0.0,
+        "top_exit_share": (max(_by_token(outs).values()) / out_total) if out_total else 0.0,
     }
     # biggest inflow and how fast it is drained
     if ins:

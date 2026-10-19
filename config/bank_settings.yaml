@@ -1,0 +1,10 @@
+# PLACEHOLDER bank settings (synthetic). Sender and contact are SEPARATE blocks; the analyst's name never appears in the report body.
+placeholder: true
+sender:
+  bank_name: "Ukázková banka a.s. (SYNTHETIC)"
+  address: "doplní banka"
+  ico: "doplní banka"
+contact:                       # section VIII - from settings, never from the case/analyst
+  role: "Pověřená osoba (§ 22 zákona č. 253/2008 Sb.)"
+  email: "aml-contact@example.invalid"
+  phone: "doplní banka"

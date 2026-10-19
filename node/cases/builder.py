@@ -1,7 +1,7 @@
 """Assemble a Case from detector signals: score, prioritize, triage, route."""
 from __future__ import annotations
 
-from common.schemas import Case, Signal
+from common.schemas import Case, Signal, Triage
 from node.cases.priority import priority
 from node.cases.scoring import score_case
 from node.cases.triage import triage
@@ -21,6 +21,9 @@ def build_case(bank_id: str, client_id: str, signals: list[Signal], exculpatory:
     prob = score_case(suspicious, exculpatory, cfg["weights"])["prob"]
     prio = priority(prob, meta2, cfg)
     verdict, reasons = triage(suspicious, exculpatory, prio, route, cfg)
+    if meta.get("in_cluster"):
+        verdict = Triage.REVIEW
+        reasons = [*reasons, f"member of disclosed cluster {meta.get('cluster_id')}: never auto-closed"]
     return Case(
         case_id=case_id,
         bank_id=bank_id,
