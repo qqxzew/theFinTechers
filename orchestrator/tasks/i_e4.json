@@ -1,0 +1,15 @@
+{
+ "id": "i_e4",
+ "goal": "Read common/schemas.py (Signal model) and the named test function in tests/unit/test_innocence.py (see the CTX dict at its top; F comes from tests/unit/test_detectors.py - read the NORMAL dict there for the available feature names). The module defines DETECTOR_ID, VERSION = '1', SOURCE = 'own design (innocence layer)', and `detect(f: dict, ctx: dict) -> list[Signal]`; thresholds ONLY from ctx['cfg'][DETECTOR_ID]. Signal fields: signal_id=f'{DETECTOR_ID}:{client_id}', detector_id, version, client_id=f['client_id'], score in [0,1], evidence = list of feature-name strings used, explanation_template_key = lower-case snake id like 'e1_mom', source=SOURCE, exculpatory=True. Pure function, no I/O. Return [] if not firing. Create node/innocence/e4_institutional.py. DETECTOR_ID = 'E4'. Institutional counterparty: fires if f['popular_inflow_share'] >= cfg['min_popular_in'] OR (f['big_in_sender_degree'] is not None and f['big_in_sender_degree'] >= cfg['popular_sender_degree']). score = 0.8 if both conditions hold, else 0.6.",
+ "read": [
+  "common/schemas.py",
+  "tests/unit/test_innocence.py"
+ ],
+ "write": [
+  "node/innocence/e4_institutional.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_innocence.py -q -k test_e4_institutional"
+ ],
+ "max_steps": 16
+}

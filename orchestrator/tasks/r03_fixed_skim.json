@@ -1,0 +1,14 @@
+{
+ "id": "r03_fixed_skim",
+ "goal": "Read redteam/world.py first and use ONLY its API (World.new_client / add_tx / new_ext_account / label / random_time, w.rng is a numpy Generator, w.banks the bank ids). Docstring must cite the scheme as 'planted red-team scheme, synthetic, designed from public descriptions of Czech/CEE money-mule schemes'. Every client you create must get exactly one w.label(...) call. All timestamps are tz-aware UTC datetimes between 2026-07-01 and 2026-07-31. Amounts in CZK. Signature must be exactly as stated. Do not read tests other than the named test file. Create redteam/schemes/fixed_skim.py with `plant_fixed_skim(w: World, n: int = 4, k: float = 0.08, cycles: int = 4, instance: int = 0) -> None` (also import World from redteam.world). For each of n accounts (bank random from w.banks): contract_date 30..300 days before 2026-07-01; `cycles` cycles on distinct days (days spread over July): an inflow of 10000..60000 CZK from a fresh payer (new ext account); then 1..6 hours later (random per cycle) one outflow (direction 'out') of exactly inflow*(1-k) (+- 0.002*inflow noise) to an exit account chosen from a per-account pool of 2 new ext accounts. Label every account w.label(cid,'mule','fixed_skim',instance=instance).",
+ "read": [
+  "redteam/world.py"
+ ],
+ "write": [
+  "redteam/schemes/fixed_skim.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_redteam_schemes.py -q -k fixed_skim"
+ ],
+ "max_steps": 22
+}

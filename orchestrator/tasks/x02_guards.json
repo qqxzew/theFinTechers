@@ -1,0 +1,14 @@
+{
+ "id": "x02_guards",
+ "goal": "Create radar/guards.py with a `Decision` dataclass (allowed: bool, reason: str) and class `Guards(cfg: dict)` with method `check(bank_id: str, submission: list[dict], now: datetime) -> Decision`. submission items: {'token': str, 'score': float|None}. cfg keys: min_set_size, max_tokens, max_sessions_per_hour, max_unscored_share. Checks in this order, first failure returns Decision(False, reason) with reason text starting with the check name: 'min_set_size' (len(submission) < min_set_size), 'max_tokens' (len > max_tokens), 'unscored' (share of items with score None > max_unscored_share), 'rate' (this bank already had max_sessions_per_hour ACCEPTED checks in the hour before `now`). Only an accepted check is counted for the rate limit (store accepted timestamps per bank). Success returns Decision(True, 'ok'). Read tests/unit/test_radar.py (guards tests) first.",
+ "read": [
+  "tests/unit/test_radar.py"
+ ],
+ "write": [
+  "radar/guards.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_radar.py -q -k guards"
+ ],
+ "max_steps": 16
+}

@@ -1,0 +1,14 @@
+{
+ "id": "r04_invoice_mule",
+ "goal": "Read redteam/world.py first and use ONLY its API (World.new_client / add_tx / new_ext_account / label / random_time, w.rng is a numpy Generator, w.banks the bank ids). Docstring must cite the scheme as 'planted red-team scheme, synthetic, designed from public descriptions of Czech/CEE money-mule schemes'. Every client you create must get exactly one w.label(...) call. All timestamps are tz-aware UTC datetimes between 2026-07-01 and 2026-07-31. Amounts in CZK. Signature must be exactly as stated. Do not read tests other than the named test file. Create redteam/schemes/invoice_mule.py with `plant_invoice_mule(w: World, n: int = 3, instance: int = 0) -> None` (also import World from redteam.world). Business-to-personal invoice mule: for each of n accounts: client_type 'natural person', contract_form 'distant form', contract_date 5..60 days before 2026-07-01. Within one week in July (start day 2..20): 3..6 inflows of 40000..200000 CZK each from DISTINCT company payer accounts (distinct new ext accounts, each used once). After each inflow, within 12 hours, outflows of total 85..98% of that inflow as ONE or two 'remit_out' transactions abroad (countries random among LT,BG,CY,HU,PL) to rare exit accounts (new ext accounts). Label every account w.label(cid,'mule','invoice_mule',instance=instance).",
+ "read": [
+  "redteam/world.py"
+ ],
+ "write": [
+  "redteam/schemes/invoice_mule.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_redteam_schemes.py -q -k invoice_mule"
+ ],
+ "max_steps": 22
+}

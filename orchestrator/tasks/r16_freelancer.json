@@ -1,0 +1,14 @@
+{
+ "id": "r16_freelancer",
+ "goal": "Read redteam/world.py first and use ONLY its API (World.new_client / add_tx / new_ext_account / label / random_time; w.rng is a numpy Generator; w.banks are bank ids). Docstring: 'honest look-alike persona, synthetic, planted by the red team; must NOT be flagged as a mule'. Every client created gets exactly one w.label(cid,'honest','lookalike',persona='freelancer',instance=instance). Timestamps tz-aware UTC within 2026-07-01..2026-07-31. Amounts CZK. Signature exactly as stated, do not read other test files. Each client: bank random from w.banks; client_type 'natural person' unless stated. A 'popular' external account is one drawn from a shared pool you create INSIDE the function with w.new_ext_account() (pool of 20 for 'popular' use) so many clients reuse the same tokens. Create redteam/lookalikes/freelancer.py with `plant_freelancer(w: World, n: int = 4, instance: int = 0) -> None` (import World from redteam.world). Freelancer on a personal account: 2..4 recurring payer ext accounts (new per client), each sends 1..2 'in' payments of 20000..80000 CZK in July on varying days; the client spends over the following days: 6..14 'out' payments of 800..15000 CZK to the popular pool, never more than 60% of income within 24h. contract_date 1..5 years before; client_type 'natural person'.",
+ "read": [
+  "redteam/world.py"
+ ],
+ "write": [
+  "redteam/lookalikes/freelancer.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_redteam_lookalikes.py -q -k freelancer"
+ ],
+ "max_steps": 22
+}

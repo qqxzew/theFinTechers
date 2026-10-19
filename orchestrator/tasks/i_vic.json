@@ -1,0 +1,15 @@
+{
+ "id": "i_vic",
+ "goal": "Read common/schemas.py (Signal model) and the named test function in tests/unit/test_innocence.py (see the CTX dict at its top; F comes from tests/unit/test_detectors.py - read the NORMAL dict there for the available feature names). The module defines DETECTOR_ID, VERSION = '1', SOURCE = 'own design (innocence layer)', and `detect(f: dict, ctx: dict) -> list[Signal]`; thresholds ONLY from ctx['cfg'][DETECTOR_ID]. Signal fields: signal_id=f'{DETECTOR_ID}:{client_id}', detector_id, version, client_id=f['client_id'], score in [0,1], evidence = list of feature-name strings used, explanation_template_key = lower-case snake id like 'e1_mom', source=SOURCE, exculpatory=False. Pure function, no I/O. Return [] if not firing. Create node/innocence/victim.py. DETECTOR_ID = 'VICTIM'. Victim route (NOT exculpatory: exculpatory=False; it re-routes the case to victim protection): fires if f['max_single_in'] < cfg['max_single_in'] AND f['out_total'] >= cfg['min_out'] AND f['out_total'] >= cfg['min_out_in_ratio'] * max(f['in_total'], 1.0). score = min(1.0, 0.6 + 0.1*(out_total/max(in_total,1) - min_out_in_ratio)/ min_out_in_ratio), clipped to [0.6,1].",
+ "read": [
+  "common/schemas.py",
+  "tests/unit/test_innocence.py"
+ ],
+ "write": [
+  "node/innocence/victim.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_innocence.py -q -k test_victim_route"
+ ],
+ "max_steps": 16
+}

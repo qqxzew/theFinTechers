@@ -1,0 +1,15 @@
+{
+ "id": "i_e5",
+ "goal": "Read common/schemas.py (Signal model) and the named test function in tests/unit/test_innocence.py (see the CTX dict at its top; F comes from tests/unit/test_detectors.py - read the NORMAL dict there for the available feature names). The module defines DETECTOR_ID, VERSION = '1', SOURCE = 'own design (innocence layer)', and `detect(f: dict, ctx: dict) -> list[Signal]`; thresholds ONLY from ctx['cfg'][DETECTOR_ID]. Signal fields: signal_id=f'{DETECTOR_ID}:{client_id}', detector_id, version, client_id=f['client_id'], score in [0,1], evidence = list of feature-name strings used, explanation_template_key = lower-case snake id like 'e1_mom', source=SOURCE, exculpatory=True. Pure function, no I/O. Return [] if not firing. Create node/innocence/e5_reciprocity.py. DETECTOR_ID = 'E5'. Reciprocity: fires if f['reciprocity_share'] >= cfg['min_reciprocity']. score = min(1.0, 0.5 + 0.5*(v - thr)/(1 - thr)).",
+ "read": [
+  "common/schemas.py",
+  "tests/unit/test_innocence.py"
+ ],
+ "write": [
+  "node/innocence/e5_reciprocity.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_innocence.py -q -k test_e5_reciprocity"
+ ],
+ "max_steps": 16
+}

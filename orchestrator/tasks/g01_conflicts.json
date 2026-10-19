@@ -1,0 +1,14 @@
+{
+ "id": "g01_conflicts",
+ "goal": "Create escalation/conflicts.py with two functions. check_decision(decider: str, case: dict, cfg: dict) -> list[str]: violations in THIS order: 'decider_is_relationship_owner' if decider == case['relationship_owner']; 'decider_is_rule_author' if decider in case['rule_authors']; 'decider_is_first_triager' if decider == case['first_triager']. validate_approval(decider, approver, executor, priority, cfg) -> list[str]: 'four_eyes_required' if priority >= cfg['four_eyes_min_priority'] and (approver is None or approver == decider); then 'approver_is_executor' if approver is not None and approver == executor, OR (priority below four-eyes threshold AND approver == executor) - simply: 'approver_is_executor' whenever approver is not None and approver == executor. Order: four_eyes_required first, then approver_is_executor. Read tests/unit/test_governance.py first (test_no_self_review, test_approval_rules). Note in test_approval_rules the case decider='zoe', approver='zoe', executor='zoe', priority 80 expects ['four_eyes_required','approver_is_executor'].",
+ "read": [
+  "tests/unit/test_governance.py"
+ ],
+ "write": [
+  "escalation/conflicts.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_governance.py -q -k \"self_review or approval\""
+ ],
+ "max_steps": 14
+}

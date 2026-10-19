@@ -1,0 +1,14 @@
+{
+ "id": "g03_finreg_csv",
+ "goal": "Create export/finreg_csv.py with FINREG_COLUMNS = ['alert_id','alert_type','client_id','transaction_id','triage','priority','executive_role','executive_person','approver','reason','log'] and `to_finreg_rows(alerts: pl.DataFrame, cases: dict, decisions: dict) -> pl.DataFrame` and `write_finreg_csv(df, path)` (utf-8, ';' separator). alerts columns: alert_type, client_id, transaction_id (nullable). cases[client_id] = {'triage','priority','reasons': list[str],'log': str}; decisions[client_id] (may be missing) = {'executive_role','executive_person','approver'}. alert_id = f'{alert_type}-{client_id}' when transaction_id is null else f'{alert_type}-{transaction_id}'. reason = ' | '.join(case reasons). Missing decision -> executive_role/person/approver are empty strings ''. Output columns exactly FINREG_COLUMNS in order; priority as int. A client missing from cases -> triage 'REVIEW', priority 0, reason 'no case', log ''. Read tests/unit/test_governance.py (test_finreg_csv_rows).",
+ "read": [
+  "tests/unit/test_governance.py"
+ ],
+ "write": [
+  "export/finreg_csv.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_governance.py -q -k finreg"
+ ],
+ "max_steps": 14
+}

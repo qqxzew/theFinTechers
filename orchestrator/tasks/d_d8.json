@@ -1,0 +1,15 @@
+{
+ "id": "d_d8",
+ "goal": "Read common/schemas.py (Signal model) and the named test function in tests/unit/test_detectors.py, including the CTX and NORMAL dicts at its top. The module must define DETECTOR_ID (str), VERSION = '1', SOURCE (str: citation or 'own design'), and `detect(f: dict, ctx: dict) -> list[Signal]` where f is one client's feature dict and ctx['cfg'][DETECTOR_ID] holds thresholds (read ONLY these keys, never hard-code them). Return [] when the detector does not fire. A Signal: signal_id=f'{DETECTOR_ID}:{client_id}', detector_id, version, client_id=f['client_id'], score in [0,1], evidence = list of the feature names (strings) that drove the decision, explanation_template_key = a short snake_case key like 'd1_flow_through', source=SOURCE. Pure function: no I/O, no randomness, no imports from redteam or eval. Create node/detectors/d8_structuring.py. DETECTOR_ID = 'D8'. Structuring. Two functions. (1) find_pileup_thresholds(amounts: list[float]) -> list[float]: candidates T are multiples of 500 from 1000 to 100000; for each T, below = count of amounts in [0.95*T, T), above = count in [T, 1.05*T); T is a threshold if below >= 50 and below >= 5*max(above,1). Return sorted thresholds, but drop any threshold that lies within 5% of a smaller already-selected threshold. (2) detect(f, ctx): thresholds = ctx['pileup_thresholds']; for each T count amounts in f['out_amounts'] within [(1-cfg['band'])*T, T); take the T with the highest count; fire if count >= cfg['min_count'] AND count/len(out_amounts) >= cfg['min_share']. score = min(1.0, 0.4 + 0.1*count). SOURCE = 'own design (empirical pile-up discovery, no hard-coded threshold)'.",
+ "read": [
+  "common/schemas.py",
+  "tests/unit/test_detectors.py"
+ ],
+ "write": [
+  "node/detectors/d8_structuring.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_detectors.py -q -k structuring"
+ ],
+ "max_steps": 18
+}

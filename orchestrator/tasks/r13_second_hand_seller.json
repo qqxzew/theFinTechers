@@ -1,0 +1,14 @@
+{
+ "id": "r13_second_hand_seller",
+ "goal": "Read redteam/world.py first and use ONLY its API (World.new_client / add_tx / new_ext_account / label / random_time; w.rng is a numpy Generator; w.banks are bank ids). Docstring: 'honest look-alike persona, synthetic, planted by the red team; must NOT be flagged as a mule'. Every client created gets exactly one w.label(cid,'honest','lookalike',persona='second_hand_seller',instance=instance). Timestamps tz-aware UTC within 2026-07-01..2026-07-31. Amounts CZK. Signature exactly as stated, do not read other test files. Each client: bank random from w.banks; client_type 'natural person' unless stated. A 'popular' external account is one drawn from a shared pool you create INSIDE the function with w.new_ext_account() (pool of 20 for 'popular' use) so many clients reuse the same tokens. Create redteam/lookalikes/second_hand_seller.py with `plant_second_hand_seller(w: World, n: int = 5, instance: int = 0) -> None` (import World from redteam.world). Second-hand seller: 12..30 'in' transactions of 150..3000 CZK (max 3500) in July from at least 10 distinct sender accounts (new ext accounts, mostly distinct), at irregular times; 5..12 'out' payments of 300..2500 to the popular pool (shipping, platform fees); never drains the account. contract_date 1..6 years before.",
+ "read": [
+  "redteam/world.py"
+ ],
+ "write": [
+  "redteam/lookalikes/second_hand_seller.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_redteam_lookalikes.py -q -k second_hand_seller"
+ ],
+ "max_steps": 22
+}

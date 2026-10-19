@@ -1,0 +1,15 @@
+{
+ "id": "i_e1",
+ "goal": "Read common/schemas.py (Signal model) and the named test function in tests/unit/test_innocence.py (see the CTX dict at its top; F comes from tests/unit/test_detectors.py - read the NORMAL dict there for the available feature names). The module defines DETECTOR_ID, VERSION = '1', SOURCE = 'own design (innocence layer)', and `detect(f: dict, ctx: dict) -> list[Signal]`; thresholds ONLY from ctx['cfg'][DETECTOR_ID]. Signal fields: signal_id=f'{DETECTOR_ID}:{client_id}', detector_id, version, client_id=f['client_id'], score in [0,1], evidence = list of feature-name strings used, explanation_template_key = lower-case snake id like 'e1_mom', source=SOURCE, exculpatory=True. Pure function, no I/O. Return [] if not firing. Create node/innocence/e1_mom.py. DETECTOR_ID = 'E1'. Mom: fires if f['remit_top_recipient_count'] >= cfg['min_count'] AND f['remit_amount_cv'] is not None AND f['remit_amount_cv'] <= cfg['max_amount_cv'] AND f['recurring_income_share'] >= cfg['min_recurring']. score = 0.7 + 0.3*(1 - remit_amount_cv/max_amount_cv), clipped to [0.7,1].",
+ "read": [
+  "common/schemas.py",
+  "tests/unit/test_innocence.py"
+ ],
+ "write": [
+  "node/innocence/e1_mom.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_innocence.py -q -k test_e1_mom"
+ ],
+ "max_steps": 16
+}

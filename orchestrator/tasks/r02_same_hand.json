@@ -1,0 +1,14 @@
+{
+ "id": "r02_same_hand",
+ "goal": "Read redteam/world.py first and use ONLY its API (World.new_client / add_tx / new_ext_account / label / random_time, w.rng is a numpy Generator, w.banks the bank ids). Docstring must cite the scheme as 'planted red-team scheme, synthetic, designed from public descriptions of Czech/CEE money-mule schemes'. Every client you create must get exactly one w.label(...) call. All timestamps are tz-aware UTC datetimes between 2026-07-01 and 2026-07-31. Amounts in CZK. Signature must be exactly as stated. Do not read tests other than the named test file. Create redteam/schemes/same_hand.py with `plant_same_hand(w: World, n: int = 12, instance: int = 0) -> None` (also import World from redteam.world). ONE operator controls n accounts spread round-robin over w.banks (so at least 2 banks when n>=2). Draw operator parameters ONCE: lag_h in 1.5..4.0 hours; commission k in 0.05..0.12; an active window start hour h0 in 17..21 (UTC) so all operator actions happen between h0 and h0+3; a pool of 3 shared rare exit accounts (new ext accounts) used by ALL accounts. Each account: contract_date 10..120 days before 2026-07-01, form 'distant form' with prob 0.5, expected_volume 20000..80000; q2 args small. Each account runs 4..8 cycles on distinct days in July: an inflow of 20000..80000 CZK from a fresh payer (new ext account) at hour h0+uniform(0,1); then at inflow time + lag_h hours (+-10 minutes jitter) ONE outflow (direction 'out') of amount inflow*(1-k_acc) to one of the 3 shared exit accounts (random choice), where k_acc = k + uniform(-0.003,0.003) fixed per account. Label every account w.label(cid,'mule','same_hand',instance=instance).",
+ "read": [
+  "redteam/world.py"
+ ],
+ "write": [
+  "redteam/schemes/same_hand.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_redteam_schemes.py -q -k same_hand"
+ ],
+ "max_steps": 22
+}

@@ -1,0 +1,14 @@
+{
+ "id": "r05_victim",
+ "goal": "Read redteam/world.py first and use ONLY its API (World.new_client / add_tx / new_ext_account / label / random_time, w.rng is a numpy Generator, w.banks the bank ids). Docstring must cite the scheme as 'planted red-team scheme, synthetic, designed from public descriptions of Czech/CEE money-mule schemes'. Every client you create must get exactly one w.label(...) call. All timestamps are tz-aware UTC datetimes between 2026-07-01 and 2026-07-31. Amounts in CZK. Signature must be exactly as stated. Do not read tests other than the named test file. Create redteam/schemes/victim.py with `plant_victim(w: World, n: int = 4, instance: int = 0) -> None` (also import World from redteam.world). Victims draining their OWN savings (fake-banker scheme): for each of n: established client, contract_date 2..8 years before 2026-07-01, form 'in person', expected_volume 100000..300000 with q2_volume = 3x expected, q2_count 60..150; normal small life: 5..15 small inflows (1000..15000, each strictly below 20000) and 5..15 small outflows (500..8000) spread over July to popular ext accounts. In addition, over a 1..3 day period (start day 5..25): 2..5 outflows of 40000..250000 CZK each (direction 'out' or 'remit_out') to NEW rare ext accounts, total at least 100000. NO inflow of 50000 or more may exist for these clients. Label every account w.label(cid,'victim','victim',instance=instance).",
+ "read": [
+  "redteam/world.py"
+ ],
+ "write": [
+  "redteam/schemes/victim.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_redteam_schemes.py -q -k victim"
+ ],
+ "max_steps": 22
+}

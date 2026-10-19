@@ -1,0 +1,14 @@
+{
+ "id": "g02_matrix",
+ "goal": "Create escalation/matrix.py with `route(meta: dict, matrix: dict) -> dict`. matrix['rules'] is an ordered list of {'when': {...}, 'role': str}. A rule matches if ALL its 'when' conditions hold: 'pep' (bool equals meta['pep']), 'cluster' (bool equals meta['cluster']), 'priority_min' (meta['priority'] >= value), 'alert_type' (meta['alert_type'] == value). Empty 'when' matches everything. First matching rule wins. Return {'role': role, 'rule_index': i, 'matrix_is_placeholder': bool(matrix.get('placeholder', False))}. If nothing matches raise ValueError. Also add `load_matrix(path) -> dict` using yaml.safe_load. Read tests/unit/test_governance.py (test_routing_first_match_wins).",
+ "read": [
+  "tests/unit/test_governance.py"
+ ],
+ "write": [
+  "escalation/matrix.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_governance.py -q -k routing"
+ ],
+ "max_steps": 14
+}

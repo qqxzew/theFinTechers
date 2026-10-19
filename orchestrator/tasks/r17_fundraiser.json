@@ -1,0 +1,14 @@
+{
+ "id": "r17_fundraiser",
+ "goal": "Read redteam/world.py first and use ONLY its API (World.new_client / add_tx / new_ext_account / label / random_time; w.rng is a numpy Generator; w.banks are bank ids). Docstring: 'honest look-alike persona, synthetic, planted by the red team; must NOT be flagged as a mule'. Every client created gets exactly one w.label(cid,'honest','lookalike',persona='fundraiser',instance=instance). Timestamps tz-aware UTC within 2026-07-01..2026-07-31. Amounts CZK. Signature exactly as stated, do not read other test files. Each client: bank random from w.banks; client_type 'natural person' unless stated. A 'popular' external account is one drawn from a shared pool you create INSIDE the function with w.new_ext_account() (pool of 20 for 'popular' use) so many clients reuse the same tokens. Create redteam/lookalikes/fundraiser.py with `plant_fundraiser(w: World, n: int = 3, instance: int = 0) -> None` (import World from redteam.world). Fundraiser for a relative: 15..40 'in' donations of 200..5000 CZK from distinct sender accounts (new ext accounts) over 3..8 days, then ONE 'remit_out' of 92..100% of the total to a clinic ext account abroad (country DE or AT) within 1..4 days after the last donation. contract_date 1..6 years before.",
+ "read": [
+  "redteam/world.py"
+ ],
+ "write": [
+  "redteam/lookalikes/fundraiser.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_redteam_lookalikes.py -q -k fundraiser"
+ ],
+ "max_steps": 22
+}

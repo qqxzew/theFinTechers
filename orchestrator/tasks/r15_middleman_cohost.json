@@ -1,0 +1,14 @@
+{
+ "id": "r15_middleman_cohost",
+ "goal": "Read redteam/world.py first and use ONLY its API (World.new_client / add_tx / new_ext_account / label / random_time; w.rng is a numpy Generator; w.banks are bank ids). Docstring: 'honest look-alike persona, synthetic, planted by the red team; must NOT be flagged as a mule'. Every client created gets exactly one w.label(cid,'honest','lookalike',persona='middleman_cohost',instance=instance). Timestamps tz-aware UTC within 2026-07-01..2026-07-31. Amounts CZK. Signature exactly as stated, do not read other test files. Each client: bank random from w.banks; client_type 'natural person' unless stated. A 'popular' external account is one drawn from a shared pool you create INSIDE the function with w.new_ext_account() (pool of 20 for 'popular' use) so many clients reuse the same tokens. Create redteam/lookalikes/middleman_cohost.py with `plant_middleman_cohost(w: World, n: int = 3, instance: int = 0) -> None` (import World from redteam.world). Fixed-commission middleman (co-host of a rental): receives 4..8 'in' of 8000..30000 CZK from distinct guest accounts spread over July; after each (1..48h later) forwards the amount*(1-k) with k = 0.10..0.14 fixed per client (+-0.003 noise) as 'out' to ONE host ext account (the same for the client all month, new). contract_date 6..30 months before. Plus 5..10 small everyday payments to the popular pool.",
+ "read": [
+  "redteam/world.py"
+ ],
+ "write": [
+  "redteam/lookalikes/middleman_cohost.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_redteam_lookalikes.py -q -k middleman_cohost"
+ ],
+ "max_steps": 22
+}

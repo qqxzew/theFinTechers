@@ -1,0 +1,14 @@
+{
+ "id": "r14_group_collection",
+ "goal": "Read redteam/world.py first and use ONLY its API (World.new_client / add_tx / new_ext_account / label / random_time; w.rng is a numpy Generator; w.banks are bank ids). Docstring: 'honest look-alike persona, synthetic, planted by the red team; must NOT be flagged as a mule'. Every client created gets exactly one w.label(cid,'honest','lookalike',persona='group_collection',instance=instance). Timestamps tz-aware UTC within 2026-07-01..2026-07-31. Amounts CZK. Signature exactly as stated, do not read other test files. Each client: bank random from w.banks; client_type 'natural person' unless stated. A 'popular' external account is one drawn from a shared pool you create INSIDE the function with w.new_ext_account() (pool of 20 for 'popular' use) so many clients reuse the same tokens. Create redteam/lookalikes/group_collection.py with `plant_group_collection(w: World, n: int = 4, instance: int = 0) -> None` (import World from redteam.world). Group collection paying one organiser: organiser receives 10..25 'in' of 500..2500 CZK from DISTINCT sender accounts over 2..5 days, then exactly ONE 'out' of 95..100% of the total to one venue/supplier ext account (new), 1..3 days after the last inflow. contract_date 1..6 years before; plus 4..8 small everyday payments to the popular pool.",
+ "read": [
+  "redteam/world.py"
+ ],
+ "write": [
+  "redteam/lookalikes/group_collection.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_redteam_lookalikes.py -q -k group_collection"
+ ],
+ "max_steps": 22
+}

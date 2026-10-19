@@ -1,0 +1,14 @@
+{
+ "id": "x01_clustering",
+ "goal": "Create radar/clustering.py with `build_clusters(rows: list[dict]) -> list[dict]`. Each row: token_id, bank_id, cand_ref, rarity (0..1). Build a bipartite graph: nodes are ('c', bank_id, cand_ref) and ('t', token_id); an edge for each row. Use networkx connected_components. For each component return a dict with keys: cluster_id (12 hex chars = hashlib.sha256 of '|'.join(sorted member node strings like 'c:B1:c1' and 't:T1')).hexdigest()[:12], deterministic and independent of row order), banks (sorted list of distinct bank_ids of the candidate nodes), candidates (sorted list of (bank_id, cand_ref) tuples), tokens (sorted list of token_ids), score, disclosed. disclosed = len(banks) >= 2 and len(candidates) >= 3. score = 0.3*min(1,(n_banks-1)/2) + 0.3*min(1,(n_candidates-2)/8) + 0.4*mean_rarity, clipped to [0,1] where mean_rarity is the mean of the MAXIMUM rarity seen per token in the component (group rows by token_id). Read tests/unit/test_radar.py (clustering tests) first. Sort the returned list by score descending then cluster_id.",
+ "read": [
+  "tests/unit/test_radar.py"
+ ],
+ "write": [
+  "radar/clustering.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_radar.py -q -k \"cluster or components or monotone\""
+ ],
+ "max_steps": 16
+}

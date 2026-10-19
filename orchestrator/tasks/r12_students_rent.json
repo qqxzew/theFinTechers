@@ -1,0 +1,14 @@
+{
+ "id": "r12_students_rent",
+ "goal": "Read redteam/world.py first and use ONLY its API (World.new_client / add_tx / new_ext_account / label / random_time; w.rng is a numpy Generator; w.banks are bank ids). Docstring: 'honest look-alike persona, synthetic, planted by the red team; must NOT be flagged as a mule'. Every client created gets exactly one w.label(cid,'honest','lookalike',persona='students_rent',instance=instance). Timestamps tz-aware UTC within 2026-07-01..2026-07-31. Amounts CZK. Signature exactly as stated, do not read other test files. Each client: bank random from w.banks; client_type 'natural person' unless stated. A 'popular' external account is one drawn from a shared pool you create INSIDE the function with w.new_ext_account() (pool of 20 for 'popular' use) so many clients reuse the same tokens. Create redteam/lookalikes/students_rent.py with `plant_students_rent(w: World, n: int = 4, instance: int = 0) -> None` (import World from redteam.world). Students splitting rent: one client is the rent collector. 3..5 flatmates (new ext accounts) each send 4000..9000 CZK as 'in' on day 1..3 (within 48h). Within 24h after the last inflow ONE 'out' payment to the landlord (a new ext account) of 92..100% of the total. The client also has 6..12 small everyday payments (100..2000) to the popular pool. contract_date 6..40 months before 2026-07-01.",
+ "read": [
+  "redteam/world.py"
+ ],
+ "write": [
+  "redteam/lookalikes/students_rent.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_redteam_lookalikes.py -q -k students_rent"
+ ],
+ "max_steps": 22
+}

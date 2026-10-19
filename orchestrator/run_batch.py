@@ -19,6 +19,7 @@ def one(prefix: str) -> dict:
 
 
 if __name__ == "__main__":
-    with ThreadPoolExecutor(max_workers=6) as ex:
+    sys.stdout.reconfigure(encoding="utf-8")
+    with ThreadPoolExecutor(max_workers=12) as ex:
         for r in ex.map(one, sys.argv[1:]):
             print(json.dumps(r, ensure_ascii=False))
