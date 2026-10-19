@@ -87,7 +87,11 @@ export default function Layout() {
           </div>
 
           <div className="flex flex-wrap items-center gap-1.5" aria-label="data labels">
-            {meta && <Chip tone="warn">{meta.data_label === 'SYNTHETIC' ? t('chip.synthetic') : meta.data_label}</Chip>}
+            {meta && (
+              <Chip tone="warn" title={meta.data_label} className="max-w-[18rem] overflow-hidden text-ellipsis">
+                {/^SYNTHETIC( DATA)?$/i.test(meta.data_label) ? t('chip.synthetic') : meta.data_label}
+              </Chip>
+            )}
             {meta?.fx_placeholder && <Chip tone="warn">{t('chip.fx')}</Chip>}
             {meta?.matrix_placeholder && <Chip tone="warn">{t('chip.matrix')}</Chip>}
             {meta && (
@@ -119,7 +123,13 @@ export default function Layout() {
                 placeholder={t('top.name_ph')}
                 value={identity.name}
                 onChange={(e) => setIdentity({ ...identity, name: e.target.value })}
+                list="top-staff"
               />
+              <datalist id="top-staff">
+                {(meta?.staff ?? []).map((s) => (
+                  <option key={s} value={s} />
+                ))}
+              </datalist>
               <label className="sr-only" htmlFor="id-role">
                 {t('top.role')}
               </label>

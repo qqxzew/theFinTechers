@@ -270,8 +270,8 @@ function EvidenceValue({ k, v }: { k: string; v: unknown }) {
   if (Array.isArray(v) && v.every((x) => typeof x === 'string'))
     return (
       <span className="inline-flex flex-wrap gap-1">
-        {(v as string[]).map((x) => (
-          <Chip key={x} mono tone="outline">
+        {(v as string[]).map((x, i) => (
+          <Chip key={i} mono tone="outline">
             {x}
           </Chip>
         ))}
@@ -379,7 +379,7 @@ function Timeline({ data }: { data: CaseDetail }) {
               labelFormatter={(_: unknown, p: readonly { payload?: { ts: string } }[]) => (p?.[0]?.payload ? new Date(p[0].payload.ts).toLocaleString(lang === 'cs' ? 'cs-CZ' : 'en-GB') : '')}
               formatter={(v: unknown, _n: unknown, p: { payload?: { cp: string; dir: string } }) => [`${num(Math.abs(Number(v)))} CZK · ${p.payload?.cp ?? ""}`, t(`c.${p.payload?.dir ?? "in"}` as I18nKey)]}
             />
-            <RBar dataKey="v" isAnimationActive={false}>
+            <RBar dataKey="v" isAnimationActive={false} maxBarSize={28}>
               {rows.map((r) => (
                 <Cell key={r.i} fill={color(r.dir)} />
               ))}
@@ -421,16 +421,16 @@ function RefChips({ refs, onRef, signalIds }: { refs: string[]; onRef: (r: strin
   if (!refs.length) return <Chip tone="bad">no refs</Chip>;
   return (
     <>
-      {refs.map((r) => {
+      {refs.map((r, j) => {
         const clickable = resolveRef(r, signalIds) !== null;
         return clickable ? (
-          <button key={r} type="button" onClick={() => onRef(r)} className="rounded" aria-label={`highlight ${r}`}>
+          <button key={`${r}-${j}`} type="button" onClick={() => onRef(r)} className="rounded" aria-label={`highlight ${r}`}>
             <Chip tone="navy" mono className="hover:bg-navy/20">
               {r}
             </Chip>
           </button>
         ) : (
-          <Chip key={r} tone="neutral" mono>
+          <Chip key={`${r}-${j}`} tone="neutral" mono>
             {r}
           </Chip>
         );

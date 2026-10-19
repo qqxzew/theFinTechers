@@ -8,65 +8,65 @@
       "local_graph": {
         "nodes": [
           {
-            "id": "B1:c-c933576a",
-            "label": "c-c933",
+            "id": "B1:c-e2c3e28a",
+            "label": "c-e2c3",
             "kind": "client"
           },
           {
-            "id": "B1:c-d82767fd",
-            "label": "c-d827",
+            "id": "B1:c-1bd7380b",
+            "label": "c-1bd7",
             "kind": "client"
           },
           {
-            "id": "B1:c-5c459c81",
-            "label": "c-5c45",
+            "id": "B1:c-5b5f0af8",
+            "label": "c-5b5f",
             "kind": "counterparty_rare"
           },
           {
-            "id": "B1:c-542be8e7",
-            "label": "c-542b",
+            "id": "B1:c-6da7ee14",
+            "label": "c-6da7",
             "kind": "counterparty_rare"
           },
           {
-            "id": "B1:c-70914148",
-            "label": "c-7091",
+            "id": "B1:c-45dc4019",
+            "label": "c-45dc",
             "kind": "counterparty_rare"
           },
           {
-            "id": "B1:c-b69b5df4",
-            "label": "c-b69b",
+            "id": "B1:c-0290bd1f",
+            "label": "c-0290",
             "kind": "counterparty_rare"
           },
           {
-            "id": "B1:c-21169a71",
-            "label": "c-2116",
+            "id": "B1:c-17594602",
+            "label": "c-1759",
             "kind": "counterparty_rare"
           }
         ],
         "edges": [
           {
-            "source": "B1:c-c933576a",
-            "target": "B1:c-d82767fd"
+            "source": "B1:c-e2c3e28a",
+            "target": "B1:c-1bd7380b"
           },
           {
-            "source": "B1:c-d82767fd",
-            "target": "B1:c-5c459c81"
+            "source": "B1:c-1bd7380b",
+            "target": "B1:c-5b5f0af8"
           },
           {
-            "source": "B1:c-5c459c81",
-            "target": "B1:c-542be8e7"
+            "source": "B1:c-1bd7380b",
+            "target": "B1:c-6da7ee14"
           },
           {
-            "source": "B1:c-5c459c81",
-            "target": "B1:c-70914148"
+            "source": "B1:c-1bd7380b",
+            "target": "B1:c-45dc4019"
           },
           {
-            "source": "B1:c-c933576a",
-            "target": "B1:c-b69b5df4"
+            "source": "B1:c-6da7ee14",
+            "target": "B1:c-0290bd1f"
           },
           {
-            "source": "B1:c-b69b5df4",
-            "target": "B1:c-21169a71"
+            "source": "B1:c-5b5f0af8",
+            "target": "B1:c-17594602"
           }
         ]
       }
@@ -79,47 +79,47 @@
       "local_graph": {
         "nodes": [
           {
-            "id": "B2:c-caa6cea2",
-            "label": "c-caa6",
+            "id": "B2:c-adf9adfe",
+            "label": "c-adf9",
             "kind": "client"
           },
           {
-            "id": "B2:c-ead67cf0",
-            "label": "c-ead6",
+            "id": "B2:c-088dbb5b",
+            "label": "c-088d",
             "kind": "client"
           },
           {
-            "id": "B2:c-d7bec787",
-            "label": "c-d7be",
+            "id": "B2:c-2abecdac",
+            "label": "c-2abe",
             "kind": "counterparty_rare"
           },
           {
-            "id": "B2:c-f585cf62",
-            "label": "c-f585",
+            "id": "B2:c-b43ce7ce",
+            "label": "c-b43c",
             "kind": "counterparty_rare"
           },
           {
-            "id": "B2:c-0c931b1b",
-            "label": "c-0c93",
+            "id": "B2:c-ed72dbd7",
+            "label": "c-ed72",
             "kind": "counterparty_rare"
           }
         ],
         "edges": [
           {
-            "source": "B2:c-caa6cea2",
-            "target": "B2:c-ead67cf0"
+            "source": "B2:c-adf9adfe",
+            "target": "B2:c-088dbb5b"
           },
           {
-            "source": "B2:c-caa6cea2",
-            "target": "B2:c-d7bec787"
+            "source": "B2:c-adf9adfe",
+            "target": "B2:c-2abecdac"
           },
           {
-            "source": "B2:c-caa6cea2",
-            "target": "B2:c-f585cf62"
+            "source": "B2:c-088dbb5b",
+            "target": "B2:c-b43ce7ce"
           },
           {
-            "source": "B2:c-f585cf62",
-            "target": "B2:c-0c931b1b"
+            "source": "B2:c-adf9adfe",
+            "target": "B2:c-ed72dbd7"
           }
         ]
       }
@@ -132,38 +132,38 @@
       "local_graph": {
         "nodes": [
           {
-            "id": "B3:c-66a62373",
-            "label": "c-66a6",
+            "id": "B3:c-07dfe082",
+            "label": "c-07df",
             "kind": "client"
           },
           {
-            "id": "B3:c-e3b32351",
-            "label": "c-e3b3",
+            "id": "B3:c-436068a6",
+            "label": "c-4360",
             "kind": "client"
           },
           {
-            "id": "B3:c-8b486d3c",
-            "label": "c-8b48",
+            "id": "B3:c-be321108",
+            "label": "c-be32",
             "kind": "counterparty_rare"
           },
           {
-            "id": "B3:c-53dd7c24",
-            "label": "c-53dd",
+            "id": "B3:c-4d884fed",
+            "label": "c-4d88",
             "kind": "counterparty_rare"
           }
         ],
         "edges": [
           {
-            "source": "B3:c-66a62373",
-            "target": "B3:c-e3b32351"
+            "source": "B3:c-07dfe082",
+            "target": "B3:c-436068a6"
           },
           {
-            "source": "B3:c-e3b32351",
-            "target": "B3:c-8b486d3c"
+            "source": "B3:c-436068a6",
+            "target": "B3:c-be321108"
           },
           {
-            "source": "B3:c-e3b32351",
-            "target": "B3:c-53dd7c24"
+            "source": "B3:c-07dfe082",
+            "target": "B3:c-4d884fed"
           }
         ]
       }
@@ -361,147 +361,143 @@
   },
   "wire": [
     {
-      "session": "B1xB2",
+      "session": "B1:B2",
       "msg": "A->B blind",
       "from": "B1",
       "n": 636,
       "sample": [
-        "ba56fabec34ba496103112892d6311c5d135d44b0cf0f99f5acbc0e3a4a56be4",
-        "0b12a8c9f8a5149f3975e439de4cbf527fba14ce1741aa32ceb2ff26f7d26c5d",
-        "3de6f7517dc246d8e0e0d327a36613e828a6e5756ed4af5143f4823e606aa48d",
-        "c1b31a2e197e60918cc7f3366b839adcbe7375afe79b24d578fb7a3571a46bb4"
+        "ba56fabec34ba496103112892d6311c5d135d44b0cf0f99f5acbc0e3a4a56be40b12a8c9f8a5149f3975e439de4cbf527fba14ce1741aa32ceb2ff26f7d26c5d3de6f7517dc246d8e0e0d327a36613e828a6e5756ed4af5143f4823e606aa48dc1b31a2e197e60918cc7f3366b839adcbe7375afe79b24d578fb7a3571a46bb4c5cd415a40257eecb862fe34e13ce3077623695c43be36edd0b5edc7c381dee20958fbb0cdf0cb2232309510af1ef81ab9c0f35401598c1ffe3e0bb03ff9cd059481aa930dbd9f7b1836d52220ebe477845713c3c994302217d7f8ee08c10b868e158fac855a132dd8f2a94af7b02b882d5340e45290aa7d1cb900b84e96a3cd",
+        "526008273e3e6b5985b24ed46dee8bc54f94775121a79fc3b3b966179126495d35352f3fd1a2f0c34273adadc0d1066e7d4aa4b76aef01045e1c57a11a574acb4cbae7962ac7ae65fcd18a16bce9b4550157973a9620268371ae92e6a1a9c40705a80dfa7c3576d28056b5cb99abaa167acbb078fd26f2e1eb0278ef6727b0a712451e91cc9d53667ccbf198af38dc350a98546293faceb44d88fc385404c252d503f941737f816c34961dca9d1ec24d9849566978c6c9fffc36a8e96e2d637ae9f0c99be0b7516b87f0ef83d41e0e56e6ac65e8126759adfef3746e19a13711873beba8c9b8c0fb24b2d21f9893c4d40f3527fe5cf2da18a93f13481ae2d75c"
       ]
     },
     {
-      "session": "B1xB2",
-      "msg": "B->A double_blind",
+      "session": "B1:B2",
+      "msg": "B->A double",
       "from": "B2",
       "n": 636,
       "sample": [
-        "c5cd415a40257eecb862fe34e13ce3077623695c43be36edd0b5edc7c381dee2",
-        "0958fbb0cdf0cb2232309510af1ef81ab9c0f35401598c1ffe3e0bb03ff9cd05",
-        "9481aa930dbd9f7b1836d52220ebe477845713c3c994302217d7f8ee08c10b86",
-        "8e158fac855a132dd8f2a94af7b02b882d5340e45290aa7d1cb900b84e96a3cd"
+        "53f4a2704bd4402311db9001e3ba3e62e5edee134b716d70112e4609e548c33a22dde459951ba5e02ae8349d7e007051ea600505bf76340388aa09f4ff462be3c96bb5819229884bf97a5ae7721071b2fe0441701f29d0c54d6944e9f113632bce5e84434be0f24d2e96a781eef3824d6db5eaf80f94f48905b715bd519b9297333ad925d3080bed1ba62d72c12f179a5ccc4e478a9840a395b5133e6d6a615aa7f257650b066fc7d140cae53ba2a89f0781153687ede8746b52f8a1719630464a4edd3581d7b49ef90e42ec73c9591ed1586f137a9a9d8e76a32a0a8503f7988f1c6c8d763e8be93b729f879b87d26f9290653f1dac1ead2f7804f50a040949",
+        "ef6a6d8cc47b99c1b88d5b0b8f937776f75450d7eea47fc2e3e599cbbf14cfd6a5d74cea8c487326c563727e0d554d1bbaa64a4cb631f01097b8db8caf481ef946c1e6879c4146bf0baa34af726af37b91b7213b593df9d4094ad71c031c8c7cf5d330f99cf3716a349e14dffee997aab893f788ede797c85a166aff61b5eef976da9be90e32a6d7e05a5838d852e1fb3702a02aa9b1af17173018a7f47bff3152bd04d93b6d96fed6996585d3b0dad1266f88f43dd4de1693f0fe37993df1c104bc78adfafd706d964507f950da521bdaa1a616ef77a4aa0d9348a00c258da57dd06180c08ddf201f2945344dc2fda66adf8605c70b753f8fa7a8d9ea278e56"
       ]
     },
     {
-      "session": "B1xB2",
+      "session": "B1:B2",
       "msg": "B->A blind",
       "from": "B2",
       "n": 395,
       "sample": [
-        "526008273e3e6b5985b24ed46dee8bc54f94775121a79fc3b3b966179126495d",
-        "35352f3fd1a2f0c34273adadc0d1066e7d4aa4b76aef01045e1c57a11a574acb",
-        "4cbae7962ac7ae65fcd18a16bce9b4550157973a9620268371ae92e6a1a9c407",
-        "05a80dfa7c3576d28056b5cb99abaa167acbb078fd26f2e1eb0278ef6727b0a7"
+        "acf5ff70fed95b87f11b595850def58328592cdb16ec47e4ff1ddf40772e5b685c6fceade66602cbaeba4c22c867efc52428f2f82d8a1a46d598fdd678297d7aa9bcc5af92f9bc61bd941af2030a2ef23623e7d7b8a6316a01196b82571fdb33d287c5174e47209b3d4c4b941a3a1d96e100a12d172c09a50f0f465a09e5406da76cc46aa78ab251b6377e1a82f22959f13628be993dd12dc6e198dc339e11133cfcb3957bd78e737068f69b0e47d528c0032805aee0a708246375745ae3c1c34e7ecd11c61b13688d1b899bd50b94a785cf58722bd61096dadb6d4b71c845c75d46e5c235e58967600f9561812a1075441686b01285ee63311e47eaab8191eb",
+        "68fa2ec1296ff5f676e6a7c98647eb0e2606da0b2e6508af50c6470c892ed8ab2f1844efbe241fa869ed75b3ce148f3b3014505b093cb165abaa5501a02e9df636e8cffda86404a05dd15ef0a312097c70f56afcd57861ea5b418e88f2ac4d201d212b7a073fa533df201a68d561b1f905961596aef17fdb0a52e020bc9f797e1915e681b533937ebf111dfd55f2649e86aa0dbe775513625ccb16c8acd2c0863e8b6f1c2954f99501eaa35e3c058a85e0846caf362934b927355dad7dfb8f7b1ce939675ac78b220c1f62faeab85cfdc4ddb550f0c4e6b6ef2c9b123020b69e81c5ebec2a6cc8ed998f3eae64569d13e3dde2200c920bdd415d85005a59fdf5"
       ]
     },
     {
-      "session": "B1xB2",
+      "session": "B1:B2",
       "msg": "A->B back",
       "from": "B1",
       "n": 395,
       "sample": [
-        "12451e91cc9d53667ccbf198af38dc350a98546293faceb44d88fc385404c252",
-        "d503f941737f816c34961dca9d1ec24d9849566978c6c9fffc36a8e96e2d637a",
-        "e9f0c99be0b7516b87f0ef83d41e0e56e6ac65e8126759adfef3746e19a13711",
-        "873beba8c9b8c0fb24b2d21f9893c4d40f3527fe5cf2da18a93f13481ae2d75c"
+        "b872c933576ad82767fd05c459c819542be8e7f709141489b69b5df4121169a71fcaa6cea2ead67cf0ad7bec7871f585cf6220c931b1be66a62373e3b3235128b486d3ce53dd7c2482a6289c9b5fc0fdda37f609792f211e2eea80cc325f6e26991cc6e98dfd1b6d34ba14feda7da4994ad9ee7d243fddbb86c691cbd2ace6c0dc00303e7be43a1043020ab0c0afecf3c89a4cb7d7ece700aeeef9746f06775da56c6acef46ea0cf18405a789ea62fb4316e9dc45d69a0b7448f549eb518ecad795b400eb9e0bb338cebf04ef2e97ffd4fdf7858e60a043a5d3f43dd3f69705af6516229a3d0060738e9f086df19fe74a236094d4bed97d0ae98fdc84e63e05e",
+        "fc7ea0d66c8e3c71eb8ffd02711220358bf6864642fb6e1aee209cb0f2598ef5df64335eda4f3e0f69b3f11e6e128191f3cc76125401facce95e11d1bffbc5bf9009e2a3294e7cfadebf2299b6658f9ce505c5ba9676c550f4339fcffc057b575ed69e96d6cd6d62527f5c25a679bb1148bcfe34ba14504dea502ee2541b243b45633ca8f3f5004e5afd4142d6f77e7de60b49d7ea0ec48b462ca15ccf50505ae471a87e4b6a5f886f972bda3f44b46abccef2e733e83791ca2912067b1207ec83e4260a8f4d83aa0e0c9e3a9b844bebbbbfd5bb6f85c24ab2396cfb13b9bb7dbfd570ff87cc6e530efb252297010c0507748baaaae102c157bfb0b607bb7894"
       ]
     },
     {
-      "session": "B1xB3",
+      "session": "B1:B3",
       "msg": "A->B blind",
       "from": "B1",
-      "n": 502,
+      "n": 560,
       "sample": [
-        "f4a2704bd4402311db9001e3ba3e62e5edee134b716d70112e4609e548c33a22",
-        "dde459951ba5e02ae8349d7e007051ea600505bf76340388aa09f4ff462be3c9",
-        "6bb5819229884bf97a5ae7721071b2fe0441701f29d0c54d6944e9f113632bce",
-        "5e84434be0f24d2e96a781eef3824d6db5eaf80f94f48905b715bd519b929733"
+        "f0dcdc781a8c5a41c45593de35af3a90f8edf20e119a20bed78b957a7aab29445d784b6ceba50b913fff2a2ccfad029fa0d415b66da0f97dccbea35641a4b36f38b91233bb26fdda1a12ae9d2ce3e472f89fbd8bdb31ddc932e5775d52ad76ff8dbf818134a9a9f8b112a5fab907d7de80e46d45c748196fb93e0f76ae636ed4b24aaa15702918b0fd719a340788d237dcea78a523810c0ff35fbbeabead9c6d7347f8149ed5f27ebc8289cf33cf718ce84dbfb63a4dbda6f6f7aaaac92deb8ba137344c0ed821f014e83dd3556ce6caa8adc12ca3ca36647f35f2fa7e291e9742c99525e23b4394004b9d075f934477d1662a269ac5e143b94b97e0673b5c2c",
+        "4857abd141c9036fc72e334b402835a7bd6ec992f2cb8e6bbdce50f5fa0cf0ddda6ad036afefe04220e25c6c23738fad1fcc1d798fc5a977dddf2b6a7378e54b60f7b9dc6e7cb8dea9288c52816cccf047b8a52bade68f2dd08d9e3f262d115abbcc81faf8e295d4c4ea70059587e7e65253b4fb81313424514bae90963eb58f8754f9ae5eaaea2d37764dd6f6639e47cfed71ae6bbe6234d5068b2645f536261b4dcddf24387705c2b8d385c040b4b03032c1180c7480fc2e36813e0b2eb60ab0d04381782b1f71ccd29eead8d2d9beb7a834df95fcfbb7960e810cd4d72fc23a3558456510bbba8ab92eb48f2b45209879de24ebf5d738e195ca96350e5989"
       ]
     },
     {
-      "session": "B1xB3",
-      "msg": "B->A double_blind",
+      "session": "B1:B3",
+      "msg": "B->A double",
       "from": "B3",
-      "n": 502,
+      "n": 560,
       "sample": [
-        "3ad925d3080bed1ba62d72c12f179a5ccc4e478a9840a395b5133e6d6a615aa7",
-        "f257650b066fc7d140cae53ba2a89f0781153687ede8746b52f8a1719630464a",
-        "4edd3581d7b49ef90e42ec73c9591ed1586f137a9a9d8e76a32a0a8503f7988f",
-        "1c6c8d763e8be93b729f879b87d26f9290653f1dac1ead2f7804f50a040949ef"
+        "448feef5cded868c827c303ac70b8008e51685795001e25d006c89f816001840f303ae94bbf8d957dc02341a0d872ae48e0a81a8093b480bfabbf0b99dd23f0c275a4500b87171184bf06a411389de0e5dc3e77ede3111d0b3dbf6dd60812c327d774298a29ff4ec223d83637aa7b1c717e62c8a5af4018794e2261aee370a12ebe6bbf4ffce9d3f532eea83156d1300d1a31c90cd9407efbe8a2bfb97816292dae3b7c062f0aa79fde05001bd1aa4980a6383c688d4e00bcd07269a36298821ff80fa4e8d7ab9ddcd88b23b8d9ac4930a6de077a23c271dc9bf4db841545231f0ba503a89aaedf85c84330f1aaedec95a244cfb16ca486a058c01bdd4effbf5",
+        "959cd929b58aadf1cf88ea736ba55eaa4c788466201106cc35e7ff14fee7c16be6c198b2c135ce7b1d74f8865880a374d7d4e822395aaa9e59e34a7f16a7bd0a2c680a15f79302f1008c60c268005d03e74220bfcb6d87de484de80744900d6369c81dc47c23f08cd45b77c896b97a12e74c2d4c329aa0e34586cf2e26f32f549ed341d4434fac692bd6fefb01248b3faa5c4e6844c4d13a8d9c893fc2589e37e85f01fcdc87255ede7c5e3cde485c622e1bdd925fc1cde65049972daa1e6b7ac27904b8dabd8bd0cd082d3d711da20d21e1a1c6dc2efa70dd5aaade39e901d2227b53fce4ea6c42de92d8d1e4f55eb4fe00253fccee7ca54244dac834d3e118"
       ]
     },
     {
-      "session": "B1xB3",
+      "session": "B1:B3",
       "msg": "B->A blind",
       "from": "B3",
-      "n": 459,
+      "n": 617,
       "sample": [
-        "6a6d8cc47b99c1b88d5b0b8f937776f75450d7eea47fc2e3e599cbbf14cfd6a5",
-        "d74cea8c487326c563727e0d554d1bbaa64a4cb631f01097b8db8caf481ef946",
-        "c1e6879c4146bf0baa34af726af37b91b7213b593df9d4094ad71c031c8c7cf5",
-        "d330f99cf3716a349e14dffee997aab893f788ede797c85a166aff61b5eef976"
+        "0e4588bdd3a482fc5b22e18ae4fe57295364da1fc18d8668a4d6456a37d3dda0df5afda650b59dadfc10fcf1d1cb5e0798c6fc67f43206b15f8e960de172c0664aedf62d66433c8bb68483ba2e8ae785fe8f33f88cb7f22ba0eee36789c9ec8fbead48c96e0d3bd3aae59a7a2cd899c29bd1a2738361cb59d3f9f4dbd61ec5a674eb7a2a73d6faa0ca20f2a6fcd2363e492502702df6bcff8290014c994496f367b3a2e1f135a22f9433fb11cd2a92c46c6c611ffbf5c434f4d1091bad0f6f52116c52d69418bffea79676339ee1b94fc9af1f4daf213017b562f32e2c9a7678290f36837e732c736515f30d0ea1fc55bc49e839fda6c7f29aca64500a11c839",
+        "23cdc3d35166f6c599e15bf4715f41c2be35d217e065a0a7925ef7ec62c619708f67a363e6701aa5f8970efa4651976b118066102f4cbebd771860480d5d7aff221f0ea865e81425415ca1035fce7c1b12b3790ed5c74afea1089e0861a45b54d589d9a5ecab4b69924a76b91999f4e9241979b36a3c5fdeefb0d1cad1b552923bb08f1894ad5a4041496d5dac0b7f63ad807227801712dd669ff0f3d62f9f5457b2ecdf2125363f8c607e1b0f8679f6eb9ee97a159f45471af348c408b1b3ceccebfb182f4b8ba86b25d983764de03b00b6e5b617e2ef59a754924fc248dc21a98c3405b1f53eaa2e282b1f088c57a95a61ea080c73979da50642f13c562a4a"
       ]
     },
     {
-      "session": "B1xB3",
+      "session": "B1:B3",
       "msg": "A->B back",
       "from": "B1",
-      "n": 459,
+      "n": 617,
       "sample": [
-        "da9be90e32a6d7e05a5838d852e1fb3702a02aa9b1af17173018a7f47bff3152",
-        "bd04d93b6d96fed6996585d3b0dad1266f88f43dd4de1693f0fe37993df1c104",
-        "bc78adfafd706d964507f950da521bdaa1a616ef77a4aa0d9348a00c258da57d",
-        "d06180c08ddf201f2945344dc2fda66adf8605c70b753f8fa7a8d9ea278e56ac"
+        "8605e34b0ed9ab5032e2cbf0d73dea40a4463224f5b0355c402ff971a657aefe5ff6ed97cd1d9ff5e1c2158d9229ebd67e4d7214436e39fc5c8a846feac480f1a043c6197d49eb5c9406e19a15e656d7f6e6e33087d23be6b21381d2d3db3bff79f7d9a3ad12f29a930e5955705de4471b940106dbecf6d9e92d885e1b85532daedc2e149093c5b214ab2e6c3b73974f532a9c70503e52657442c2dfdbc2a632c5bb70a30adcabb01b31888e1d1f9fd4862853446668cc7b621759b969007f8f197eca41ecc6c884628eeb0a0372e5d06144642d74cba805b7e38c0d7bdafe391a086a0501fc737e1d418eca9197b5600f80437395ddce6af4c7b8695996830d",
+        "bde0bab56a9f417ff5984d6e9f5f0dd7d5a463ce1f9487d9de7d19ecb7bff9b83aaf992077ce0e0cb5d283dc0736b83eab691e09324bd8419830e677095c6c369ef506cc81e1b4ad44f16878b1dac9418398e6247e793e7f51e0d30679f63fc5061fbfd9797c79dfd9aefd327ed6000ddfaf6f967880d487c6af41b8f3dca9bff4e3d144e172d7d492d698a7c34e1e5fb2e4f397659adde00856c2545633c61d79dbd20e4258e627522628e42bedecc98fe9c06c6b7473e6ae88e2971bd8ab68d34296474bec0ed1d6f2a305e2890eeb60fdf4160da312c506f3fd36961d696ef2c582b98730d1cbad2cb230a4f2b566e1032320fcee5f3f7218b43e702c8753"
       ]
     },
     {
-      "session": "B2xB3",
+      "session": "B2:B3",
       "msg": "A->B blind",
       "from": "B2",
-      "n": 702,
+      "n": 441,
       "sample": [
-        "ff70fed95b87f11b595850def58328592cdb16ec47e4ff1ddf40772e5b685c6f",
-        "ceade66602cbaeba4c22c867efc52428f2f82d8a1a46d598fdd678297d7aa9bc",
-        "c5af92f9bc61bd941af2030a2ef23623e7d7b8a6316a01196b82571fdb33d287",
-        "c5174e47209b3d4c4b941a3a1d96e100a12d172c09a50f0f465a09e5406da76c"
+        "1e63b155ac8f5f18a92064f372fe2bc7d252592ec9fde83f56f482c9b3ea0e970f0be50db9b5857bb967d82fbeeba4902d099171fcc6adb4d7b4e607f181b0bb1605e78e3986956dbdcc71e9e35569789e61160c13a982367390e998a52865c745579fdb6297dd3d45f6350c44f0b350a527cba61de09d49a91e0a5c8ae56c50576f4ed550c5b0bc27b56f941995bdd4df4d1ecd91d63353a819452346e900900b3d0d043b2c0fdfeb12d6b0440a771d59f1cb3e0cada151a3c1633248843da34617260ac37a9b5cbd5b55d7ff93e3c951e27000db3347d4c6f0004c8f3e33d87af2e3bc94ff36ef83ddb403ca9fd965f7b81a76693016fe7b425d83c3cd03f2",
+        "e2f395b52d6561b5865e296122b54ce9497fea961cf9ad8713773a9b08d1a2fa994ff0c0a02570771721882a3f3a0b3449a4dd3433c28ff962ca28cde8379ec68f5eb6f9f4fe588068a0374345187d0e5b1eaf8686d2759da69da1dc17f5257f8080b42d6e7f2c3fee2c5b4d5b0fc727332953282832b6e36d6391e8c8062c987a91977a2057d697fce5a52921035b728419d4cd71c89f66dcb6df3f7a541f258634d3507c0860b03d983cc9ced992c19f40a50f76c769e1edcec9df56a8c1b30a322cce481026aa1e9a1862828e5373d019a4b0b3d62449fda210300a838a7b5b942ecc998635049ac2f16a78a97b4e7993be2114f4a0c916efde3c91dbaf76"
       ]
     },
     {
-      "session": "B2xB3",
-      "msg": "B->A double_blind",
+      "session": "B2:B3",
+      "msg": "B->A double",
       "from": "B3",
-      "n": 702,
+      "n": 441,
       "sample": [
-        "c46aa78ab251b6377e1a82f22959f13628be993dd12dc6e198dc339e11133cfc",
-        "b3957bd78e737068f69b0e47d528c0032805aee0a708246375745ae3c1c34e7e",
-        "cd11c61b13688d1b899bd50b94a785cf58722bd61096dadb6d4b71c845c75d46",
-        "e5c235e58967600f9561812a1075441686b01285ee63311e47eaab8191eb68fa"
+        "e78b767804e1308ddda93eaba8f6e87bf8971a6e2f0464678175d8a22b61896a84c06ef124f01f21d6c9d4099aacfb64058f40ed468a2f5e1fa2927432cdcaaf239023697a94fa8c1992dff37eac39b86f2b489096a828d74521ea8b37f24b9317dc5a284b928d2a89b23858cd5e1172a1caf020f56aaa1b9caed046c0a74b41cb46b65501ddc6300ccac5f5a74870f0d2e60f72b471b02406feb2a6b7af60059f6c630e6f534445dc1c014f14d454613571132e5dd27c32498c0a2ab5d29fa093c044c275e91d03503caa476380ade07d3f0b05784cde7a430fd32fcf6afcb21e8df60c26301df4c20eb2302a6a7918008321846ea01613b6fa7afd7dad2117",
+        "1e988272c8036207dc6e7066f08499a6ad88b46bb3a8d42c9ca2c06af36ca166616a30c66619d5c23249ab526d5b3e7563ec81bacc8b39dc82ee3a100fd04d2db18214b36391933131b1d6fa78a8abf7adef4b41f97b6ce6466f676f5880ec153868c061acf1ebbc464ee5d024cba198772ee910bf2e87ccfc4db5d365cb04535ac26330007f950da5a994f70c0768f3736968b9e1dd67ae1dfa49ad35a5b10939154b2e4e7e91f440d878d4c705c7cbe1205d9638ecdac87dd494b1693c11852abe3c7f3d2897fb38f83ddaa77add1ab7d544a5ae7d646c2481f8698ce06ed70b0989b9b75824fd9478f35f79516ac06529d363c9b43560812af3b62b400d07"
       ]
     },
     {
-      "session": "B2xB3",
+      "session": "B2:B3",
       "msg": "B->A blind",
       "from": "B3",
-      "n": 492,
+      "n": 668,
       "sample": [
-        "2ec1296ff5f676e6a7c98647eb0e2606da0b2e6508af50c6470c892ed8ab2f18",
-        "44efbe241fa869ed75b3ce148f3b3014505b093cb165abaa5501a02e9df636e8",
-        "cffda86404a05dd15ef0a312097c70f56afcd57861ea5b418e88f2ac4d201d21",
-        "2b7a073fa533df201a68d561b1f905961596aef17fdb0a52e020bc9f797e1915"
+        "0c97b74f5a94ea9bccd8a0ea78b0d2dbc0e0eaaa1855907c389037504cb60069f557d814ca3e68a40493eda106dbb3e61fb17fc56dd072bcc089327561b22f0f7c594ef4173eafd9801108f503f154e3b5a3853fdef4ec00921a3d437d5be27a1364ad91e12d379db9e2a5285ef501b21285dac20e7bf29e46adf72b49356d1781751b6dfe02fb7f39003439b0d0557004b9606a23fa47b4f29e02da1f36150f7cf57f136f2ebfae1c0520e24ecd465634454d28ec112002697c9fece03ab1719125c546861c9f95797aee371d441118d12306c35dec6198cc4cfdac17991c565696b977ad2271d254081b94c650c32ffc23fd0307cce72d0a363ce3608763ce",
+        "115a7178f906ba52ae3025449ad8219408bcf26a922de6015827c976d3de56d5ea75614e4628e8849818cfe88e76b64fcc6677a0d4ff4a159fcb709d7da9daec6945bff6ba23e4d8873fcb64f6650441c9b33696d4979b753d8866e699529d008706dfbca200f5ae53c9019cde8526dd1c90d3f11ba53d14a2aacbe903d828e9fdd0c72404aca78873181b44f886daa06b08f8bc5f61ac2732e3190d5617ca45910057db121265084973930512dc2db963445280f1d85f528ba9283315b165577896871c612413e69f776378aa9b8791439908f7ea765fbd730eaaaaf8e7dce11cc44c087306ffc23a1f50336f511f9b3f617b681d74881dbf1fd64fde98652e"
       ]
     },
     {
-      "session": "B2xB3",
+      "session": "B2:B3",
       "msg": "A->B back",
       "from": "B2",
-      "n": 492,
+      "n": 668,
       "sample": [
-        "e681b533937ebf111dfd55f2649e86aa0dbe775513625ccb16c8acd2c0863e8b",
-        "6f1c2954f99501eaa35e3c058a85e0846caf362934b927355dad7dfb8f7b1ce9",
-        "39675ac78b220c1f62faeab85cfdc4ddb550f0c4e6b6ef2c9b123020b69e81c5",
-        "ebec2a6cc8ed998f3eae64569d13e3dde2200c920bdd415d85005a59fdf5b872"
+        "27a5d52b5364dc55a9eaf3deeb70d9da5780f93e1f6dc5555e4e22d2c58cec1fdce7a12c67a5c88ecded96e39ba939b0374a2a2456227c23b822c81d4ede9a00547d83b4512e57e9de7da737234a95c2c8b1ba1fcd39fbfc102a33aaac57165957d1645c1aac9570ec84037059cbbabd6fe7fe16bb500c1ca8fa466bd0fc3068ee68e616bac759d1b79cea242e665beca9296afd2d50c539a0732b08bb348c864a8d72da34a3a46ef99fea8f4e0c16ac5703ef6169556f42d00d6563e9f3983dc7508127abdb44d8373ded7343e57b86169b0e70113ca0ad4b85ed68bff399e4d757658a9a539ee641090293f5a8551c6c224fde8a029d3c9224fe10906a1f9e",
+        "b3fee146264f82ff6b3f037dc276930d847dc86c987ce42f8c026f0cb83d9753a5cf2164c1303cefdb04f92f89e361fc502c0164785c5b9c177cdeb416f1c951bad57e1a3bdea084b5ed4c9bc4b3d314177a8884bc0228971db54c3edc9b6dd74e6550680a8460e4179e3a69c1ca7a9681a5d8fe516cd6b730a36ae67d71347cedfa132d9c089f761aa24af7d8e2bb22a5c4bb55131e06b298ff7a73db4108339add7030f7a0ed72bbae0b3e4abab2bc706c7a1e3fe8d9454e753d7e5f981b52effa4e5a6fc6a39ab16de74111e69ead4f23b2b06c813f7c516725476e401de3651fff4bb9d2d8089dd8474bf75cc60777150171acd4bb54f848fc132bd111c7"
+      ]
+    },
+    {
+      "session": "coordinator",
+      "msg": "match rows",
+      "from": "banks",
+      "n": 14,
+      "sample": [
+        {
+          "token_id": "79f980f39c1b6aeb",
+          "bank_id": "B1",
+          "cand_ref": "fe1c4e436147",
+          "rarity": 0.25
+        },
+        {
+          "token_id": "9834442de0a8784d",
+          "bank_id": "B2",
+          "cand_ref": "3ccffe3c1167",
+          "rarity": 0.33
+        }
       ]
     }
   ],
@@ -512,8 +508,8 @@
     },
     "staj_psi": {
       "raw_records_exposed": 0,
-      "blinded_elements": 6372,
-      "bytes_exchanged": 203904,
+      "blinded_elements": 6634,
+      "bytes_exchanged": 212288,
       "match_rows_to_coordinator": 14
     },
     "naive_raw_sharing": {

@@ -1,0 +1,26 @@
+{
+  "answer": [
+    {
+      "text": "D5 fired because 93 % of the outgoing amount went to rare counterparties while recurring income share was 0 %.",
+      "refs": [
+        "D5:R00123",
+        "features.share_rare"
+      ]
+    },
+    {
+      "text": "Total outgoing amount was 612,000 CZK.",
+      "refs": [
+        "features.out_total_czk"
+      ]
+    },
+    {
+      "text": "Rare counterparties are accounts that at most 3 clients of this bank interact with.",
+      "refs": [
+        "D5:R00123"
+      ]
+    }
+  ],
+  "violations": [],
+  "model_id": "eu.anthropic.claude-sonnet-4-5 (MOCK)",
+  "attempts": 1
+}

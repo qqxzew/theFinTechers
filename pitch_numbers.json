@@ -1,0 +1,14 @@
+{
+ "synthetic": true,
+ "dataset": "red-team world (CNB-derived background + planted schemes), mean of held-out seeds [505, 606]",
+ "isolated_f1": 0.925,
+ "staj_psi_f1": 0.9382,
+ "naive_raw_sharing_f1": 0.9456,
+ "psi_raw_records_exposed": 0,
+ "naive_raw_records_exposed": 219346,
+ "psi_bytes": 164352,
+ "naive_bytes": 19428946,
+ "cnb_rule_a_share_of_clients_default": 0.85,
+ "cnb_cases_auto_closed_fp": 4659,
+ "cnb_cases_review": 11
+}

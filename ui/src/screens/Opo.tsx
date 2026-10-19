@@ -2,12 +2,50 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { getOpo, opoExportUrl, putSectionV } from '../api';
 import { rememberCase } from '../components/Layout';
-import { Card, Chip, ErrorBox, Loading, PageHeader, ViolationList } from '../components/ui';
+import { Card, Chip, ErrorBox, PageHeader, ViolationList } from '../components/ui';
 import { useI18n } from '../i18n';
 import { useAsync } from '../state';
 import type { OpoDraft, Sentence } from '../types';
 
 const HUMAN_SECTIONS = new Set(['VI', 'IX']);
+const isHuman = (no: string, text: string) => HUMAN_SECTIONS.has(no) || /DOPLNÍ ČLOVĚK/i.test(text);
+
+/** The first GET drafts section V with an LLM (1-2 min): show elapsed time so the wait is legible. */
+function OpoLoading() {
+  const { t } = useI18n();
+  const [s, setS] = useState(0);
+  useEffect(() => {
+    const start = Date.now();
+    const h = window.setInterval(() => setS(Math.floor((Date.now() - start) / 1000)), 500);
+    return () => window.clearInterval(h);
+  }, []);
+  return (
+    <div role="status" aria-live="polite" className="card flex flex-wrap items-center gap-3 p-5 text-sm">
+      <span className="h-4 w-4 animate-spin rounded-full border-2 border-line border-t-teal" aria-hidden="true" />
+      <span>{t('o.loading')}</span>
+      <span className="ml-auto tnum text-muted">
+        {t('o.elapsed')} {Math.floor(s / 60)}:{String(s % 60).padStart(2, '0')}
+      </span>
+    </div>
+  );
+}
+
+function CollapsibleViolations({ items, title }: { items: Record<string, unknown>[]; title: string }) {
+  const { t } = useI18n();
+  const [all, setAll] = useState(false);
+  if (!items?.length) return null;
+  const shown = all ? items : items.slice(0, 5);
+  return (
+    <div>
+      <ViolationList items={shown} title={title} total={items.length} />
+      {items.length > 5 && (
+        <button type="button" className="btn-secondary mt-1.5 py-0.5 text-xs" onClick={() => setAll((a) => !a)}>
+          {all ? t('o.show_less') : `${t('o.show_all')} (${items.length})`}
+        </button>
+      )}
+    </div>
+  );
+}
 
 export default function OpoScreen() {
   const { id } = useParams();
@@ -47,15 +85,22 @@ export default function OpoScreen() {
         <Link to={`/case/${id}`} className="btn-secondary">
           ← {id}
         </Link>
-        <a className="btn-primary" href={opoExportUrl(id)} download={`OPO_${id}.md`}>
-          {t('o.export_md')}
-        </a>
+        {/* Only offer export once the draft exists: export.md would otherwise start a second LLM draft. */}
+        {o.data ? (
+          <a className="btn-primary" href={opoExportUrl(id)} download={`OPO_${id}.md`}>
+            {t('o.export_md')}
+          </a>
+        ) : (
+          <button className="btn-primary" disabled>
+            {t('o.export_md')}
+          </button>
+        )}
       </PageHeader>
       <div role="note" className="rounded-md border border-warn/40 bg-warnsoft px-4 py-2.5 text-sm font-semibold text-warn">
         {t('o.banner')}
       </div>
       {o.loading && !o.data ? (
-        <Loading />
+        <OpoLoading />
       ) : o.error ? (
         <ErrorBox error={o.error} message={t('o.not_found')} onRetry={o.reload} />
       ) : o.data ? (
@@ -73,7 +118,7 @@ function OpoView({ id, data, setData }: { id: string; data: OpoDraft; setData: (
         <h2 className="text-base font-semibold">{data.title}</h2>
         {data.sections.map((s) =>
           s.no === 'V' ? (
-            <SectionV key={s.no} id={id} title={s.title} data={data} setData={setData} />
+            <SectionV key={s.no} id={id} title={s.title} text={s.text} data={data} setData={setData} />
           ) : (
             <Card
               key={s.no}
@@ -83,9 +128,9 @@ function OpoView({ id, data, setData }: { id: string; data: OpoDraft; setData: (
                   {s.title}
                 </span>
               }
-              right={HUMAN_SECTIONS.has(s.no) ? <Chip tone="warn">{t('o.human')}</Chip> : undefined}
+              right={isHuman(s.no, s.text) ? <Chip tone="warn">{t('o.human')}</Chip> : undefined}
             >
-              {HUMAN_SECTIONS.has(s.no) ? (
+              {isHuman(s.no, s.text) ? (
                 <div className="rounded-md border border-dashed border-warn/50 bg-warnsoft/40 p-3 text-sm text-warn">
                   {t('o.human_note')}
                   {s.text && <p className="mt-2 text-ink">{s.text}</p>}
@@ -104,7 +149,7 @@ function OpoView({ id, data, setData }: { id: string; data: OpoDraft; setData: (
   );
 }
 
-function SectionV({ id, title, data, setData }: { id: string; title: string; data: OpoDraft; setData: (d: OpoDraft) => void }) {
+function SectionV({ id, title, text, data, setData }: { id: string; title: string; text: string; data: OpoDraft; setData: (d: OpoDraft) => void }) {
   const { t } = useI18n();
   const [rows, setRows] = useState<Sentence[]>(data.section_v_sentences);
   const [busy, setBusy] = useState(false);
@@ -140,7 +185,13 @@ function SectionV({ id, title, data, setData }: { id: string; title: string; dat
       right={<Chip tone="teal">{t('o.editable')}</Chip>}
     >
       <div className="space-y-3">
-        <ViolationList items={data.section_v_violations} title={t('o.violations')} />
+        <CollapsibleViolations items={data.section_v_violations} title={t('o.violations')} />
+        {rows.length === 0 && text && (
+          <div className="rounded-md border border-dashed border-line bg-paper/60 p-3 text-sm">
+            <p className="label mb-1">{t('o.v_fallback')}</p>
+            <p className="whitespace-pre-wrap">{text}</p>
+          </div>
+        )}
         {rows.map((s, i) => (
           <div key={i} className="rounded-md border border-line p-2.5">
             <label className="label" htmlFor={`sv-${i}`}>
@@ -150,8 +201,8 @@ function SectionV({ id, title, data, setData }: { id: string; title: string; dat
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
               <span className="text-[11px] text-muted">{t('o.refs')}:</span>
               {s.refs.length ? (
-                s.refs.map((r) => (
-                  <Chip key={r} tone="navy" mono>
+                s.refs.map((r, j) => (
+                  <Chip key={`${r}-${j}`} tone="navy" mono>
                     {r}
                   </Chip>
                 ))

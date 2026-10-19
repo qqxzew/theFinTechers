@@ -38,6 +38,7 @@ write('meta.json', {
   chain: { ok: true, length: 0, head: '' }, // filled below
   roles: ['analyst_l1', 'analyst_l2', 'aml_officer', 'mlro'],
   four_eyes_min_priority: 70,
+  staff: ['Tomáš Svoboda', 'Lucie Černá', 'Eva Horáková', 'Karel Beneš', 'Petr Dvořák', 'Jana Nováková', 'Ondřej Malý'],
 });
 
 // ---------------------------------------------------------------- shared definitions
@@ -54,6 +55,14 @@ const RULE_DEFS = {
   D7: 'D7 fixed skim: constant retained share per cycle.',
   D8: 'D8 structuring: outgoing amounts cluster just below a threshold.',
   X: 'X cross-bank cluster: blinded-token overlap with candidates in other banks (disclosed only if >= 2 banks and >= 3 candidates).',
+};
+const GLOSSARY = {
+  in_total_czk: 'sum of incoming amounts in July, CZK',
+  out_total_czk: 'sum of outgoing amounts in July, CZK',
+  n_tx: 'number of transactions',
+  days_since_contract: 'days between contract date and 2026-07-31',
+  declared_income_czk: 'declared monthly income from the client profile, CZK',
+  is_pep: 'politically exposed person flag (modifier for escalation)',
 };
 const RULES_POOL = ['R-A', 'R-B', 'R-C', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8'];
 const ROLE_FOR = (p, pep) => (pep ? 'mlro' : p >= 85 ? 'mlro' : p >= 70 ? 'aml_officer' : p >= 40 ? 'analyst_l2' : 'analyst_l1');
@@ -160,7 +169,9 @@ const full = [];
     ],
     features: { in_total_czk: 655300, out_total_czk: 612000, n_tx: 54, days_since_contract: 6, declared_income_czk: 24000, is_pep: false, age_band: '18-24', segment: 'retail' },
     triage_reasons: ['D1 and D5 both above threshold', 'No exculpatory signal above 0.5', 'Cross-bank cluster K1 disclosed (3 banks, 5 candidates)'],
-    cluster: { cluster_id: 'K1', n_other_banks: 2, n_other_candidates: 4, lag_ret_concentration: 0.87 },
+    cluster: { cluster_id: 'K1', n_other_banks: 2, n_other_candidates: 4, lag_ret_concentration: 0.87, matched_exit_accounts: ['XSK000166', 'XSK000168'] },
+    feature_glossary: GLOSSARY,
+    data_label: 'SYNTHETIC DATA - no real customer',
     rule_definitions: RULE_DEFS, timeline: tl, local_graph: graphFromTimeline(client, tl),
     explanation: {
       cs: [
@@ -202,14 +213,17 @@ const full = [];
   full.push({
     case_id: id, client_ref: client, bank_id: 'B2', priority: 81, triage: 'REVIEW', route: 'mule_review',
     signals: [
-      sig('D4', rid, 0.84, { n_senders_rare: 14, in_total: 388000, n_in: 22 }, '{n_in} inflows totalling {in_total} CZK from {n_senders_rare} rare senders.'),
-      sig('D7', rid, 0.77, { cycle_retentions: [0.05, 0.05, 0.049, 0.051, 0.05] }, 'Constant retained share per cycle: {cycle_retentions}.'),
-      sig('D6', client, 0.79, { exit_tokens_low: 2, lag_median_h: 6.1, retention_median: 0.05, n_peers: 4 }, 'Fingerprint matches {n_peers} other candidates.'),
+      // Real backend style: template is an id; the UI shows rule_definitions[detector_id] as the sentence.
+      sig('D4', rid, 0.84, { n_senders_rare: 14, in_total: 388000, n_in: 22 }, 'd4_fan_in'),
+      sig('D7', rid, 0.77, { cycle_retentions: [0.05, 0.05, 0.049, 0.051, 0.05] }, 'd7_fixed_skim'),
+      sig('D6', client, 0.79, { exit_tokens_low: ['XCZ000105', 'XCZ000106'], lag_median_h: 6.1, retention_median: 0.05,
+        hour_hist: [0.33, 0.17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0, 0] }, 'd6_same_hand', ['group_size=4', 'lift_vs_shuffled=7.6']),
     ],
     exculpatory: [],
     features: { in_total_czk: 388000, out_total_czk: 368600, n_tx: 40, days_since_contract: 21, declared_income_czk: 31000, is_pep: false, segment: 'retail' },
     triage_reasons: ['D4 fan-in above threshold', 'D7 fixed skim 5 %', 'Cluster K1 disclosed'],
-    cluster: { cluster_id: 'K1', n_other_banks: 2, n_other_candidates: 4, lag_ret_concentration: 0.87 },
+    cluster: { cluster_id: 'K1', n_other_banks: 2, n_other_candidates: 4, lag_ret_concentration: 0.87, matched_exit_accounts: ['XCZ000105', 'XCZ000106'] },
+    feature_glossary: GLOSSARY,
     rule_definitions: RULE_DEFS, timeline: tl, local_graph: graphFromTimeline(client, tl),
     explanation: null, explanation_violations: [],
     escalation: { role: 'aml_officer', rule_index: 3, matrix_is_placeholder: true },
@@ -413,6 +427,27 @@ write('explain_B2-R00087.json', {
   cached: false,
 });
 
+// ask mocks (POST /api/cases/{id}/ask) - refs use the real backend style ('features.x', 'D5:R00123')
+write('ask_B1-R00123.json', {
+  answer: [
+    S('D5 fired because 93 % of the outgoing amount went to rare counterparties while recurring income share was 0 %.', ['D5:R00123', 'features.share_rare']),
+    S('Total outgoing amount was 612,000 CZK.', ['features.out_total_czk']),
+    S('Rare counterparties are accounts that at most 3 clients of this bank interact with.', ['D5:R00123']),
+  ],
+  violations: [],
+  model_id: 'eu.anthropic.claude-sonnet-4-5 (MOCK)',
+  attempts: 1,
+});
+write('ask_default.json', {
+  answer: [
+    S('MOCK answer: the rule fired because its evidence fields exceeded the configured thresholds.', []),
+    S('See the rule definitions block for the exact condition.', ['features.in_total_czk']),
+  ],
+  violations: [{ kind: 'missing_refs', sentence: 0, detail: 'Sentence has no refs (MOCK).' }],
+  model_id: 'mock',
+  attempts: 2,
+});
+
 // ---------------------------------------------------------------- queue (48 items)
 const items = full.map((c) => ({
   case_id: c.case_id, bank_id: c.bank_id, client_ref: c.client_ref, priority: c.priority, triage: c.triage, route: c.route,
@@ -450,6 +485,7 @@ write('queue.json', {
     victim_protection: items.filter((x) => x.route === 'victim_protection').length,
   },
   items,
+  total_matching: items.length,
 });
 
 // ---------------------------------------------------------------- OPO drafts
@@ -503,15 +539,18 @@ tokens.forEach((t) => cg.nodes.push({ id: t, label: t, kind: 'token' }));
 const tokEdges = [[0, 0], [0, 1], [1, 0], [1, 2], [2, 1], [2, 3], [3, 2], [3, 3], [4, 3], [4, 4], [0, 5], [4, 5]];
 tokEdges.forEach(([ci, ti]) => cg.edges.push({ source: cands[ci][1], target: tokens[ti] }));
 const wire = [];
-for (const sess of ['B1xB2', 'B1xB3', 'B2xB3']) {
-  const [a, b] = sess.split('x');
+for (const sess of ['B1:B2', 'B1:B3', 'B2:B3']) {
+  const [a, b] = sess.split(':');
   const na = int(380, 720), nb = int(380, 720);
   const steps = [
-    ['A->B blind', a, na], ['B->A double_blind', b, na], ['B->A blind', b, nb], ['A->B back', a, nb],
+    ['A->B blind', a, na], ['B->A double', b, na], ['B->A blind', b, nb], ['A->B back', a, nb],
   ];
-  for (const [msg, from, n] of steps) wire.push({ session: sess, msg, from, n, sample: Array.from({ length: 4 }, () => hex(64)) });
+  for (const [msg, from, n] of steps) wire.push({ session: sess, msg, from, n, sample: Array.from({ length: 2 }, () => hex(512)) });
 }
-const blinded = wire.reduce((a, w) => a + w.n, 0);
+// coordinator session: match rows (keyed token ids + candidate pseudonyms), as in the real backend
+wire.push({ session: 'coordinator', msg: 'match rows', from: 'banks', n: 14,
+  sample: [{ token_id: hex(16), bank_id: 'B1', cand_ref: hex(12), rarity: 0.25 }, { token_id: hex(16), bank_id: 'B2', cand_ref: hex(12), rarity: 0.33 }] });
+const blinded = wire.filter((w) => w.session !== 'coordinator').reduce((a, w) => a + w.n, 0);
 write('radar.json', {
   banks: [
     { bank_id: 'B1', n_cases: 19, n_review: 12, n_candidates_exported: 7, local_graph: bankGraph('B1', 7) },
@@ -539,14 +578,35 @@ const conf = (tp, fp, fn) => {
   const p = tp / (tp + fp), r = tp / (tp + fn);
   return { tp, fp, fn, precision: +p.toFixed(3), recall: +r.toFixed(3), f1: +((2 * p * r) / (p + r)).toFixed(3) };
 };
+const ov = (tp, fp, fn) => ({ ...conf(tp, fp, fn), n_mules: 36, n_accounts: 3000 });
 write('metrics.json', {
   dataset: 'staj-synth-v0.3 (MOCK)',
   seed: 20261019,
   synthetic: true,
   modes: {
-    isolated: { overall: { ...conf(17, 9, 19), n_mules: 36, n_accounts: 3000 }, exposure: { raw_records_exposed: 0 } },
-    staj_psi: { overall: { ...conf(29, 7, 7), n_mules: 36, n_accounts: 3000 }, exposure: { raw_records_exposed: 0, blinded_elements: blinded } },
-    naive_raw_sharing: { overall: { ...conf(31, 7, 5), n_mules: 36, n_accounts: 3000 }, exposure: { raw_records_exposed: 48210 } },
+    isolated: {
+      overall: ov(17, 9, 19),
+      rank: { average_precision: 0.61, precision_at_k: 0.583, k: 36, mules_without_case: 4 },
+      overall_any_priority: ov(30, 31, 6),
+      per_bank: { B1: { ...conf(7, 3, 6), n_mules: 13, n_accounts: 1000 }, B2: { ...conf(6, 3, 6), n_mules: 12, n_accounts: 1000 }, B3: { ...conf(4, 3, 7), n_mules: 11, n_accounts: 1000 } },
+      best_single_bank_f1: 0.583,
+      mean_bank_f1: 0.489,
+      exposure: { raw_records_exposed: 0, bytes_exchanged: 0 },
+    },
+    staj_psi: {
+      overall: ov(29, 7, 7),
+      rank: { average_precision: 0.86, precision_at_k: 0.806, k: 36, mules_without_case: 1 },
+      overall_any_priority: ov(34, 29, 2),
+      exposure: { mode: 'staj_psi', raw_records_exposed: 0, blinded_elements: blinded },
+      clusters_disclosed: 1,
+      refused: { K2: 'only 2 candidates (< 3)' },
+    },
+    naive_raw_sharing: {
+      overall: ov(31, 7, 5),
+      rank: { average_precision: 0.88, precision_at_k: 0.833, k: 36, mules_without_case: 0 },
+      overall_any_priority: ov(35, 27, 1),
+      exposure: { raw_records_exposed: 48210 },
+    },
   },
   breakdown: {
     'scheme:fan_in_star': { n: 12, flagged_as_mule_case: 11, routed_to_victim_protection: 0, rate: 0.917 },
@@ -557,40 +617,52 @@ write('metrics.json', {
     'persona:shared_flat': { n: 80, flagged_as_mule_case: 4, routed_to_victim_protection: 0, rate: 0.05 },
     'persona:airbnb_cohost': { n: 40, flagged_as_mule_case: 3, routed_to_victim_protection: 0, rate: 0.075 },
     'persona:gig_earner': { n: 60, flagged_as_mule_case: 2, routed_to_victim_protection: 0, rate: 0.033 },
-    'persona:new_job': { n: 50, flagged_as_mule_case: 1, routed_to_victim_protection: 0, rate: 0.02 },
     'victim:safe_account_scam': { n: 9, flagged_as_mule_case: 1, routed_to_victim_protection: 7, rate: 0.778 },
     'victim:investment_scam': { n: 6, flagged_as_mule_case: 0, routed_to_victim_protection: 4, rate: 0.667 },
+    'other:background': { n: 2600, flagged_as_mule_case: 5, routed_to_victim_protection: 0, rate: 0.0019 },
   },
+  // Like the real backend: no 'full' row; the UI compares against modes.staj_psi.overall.
   ablations: {
-    full: conf(29, 7, 7),
-    without_innocence_layer: conf(30, 41, 6),
-    without_radar: conf(17, 9, 19),
-    without_d6_d7: conf(23, 8, 13),
+    without_innocence_layer: { ...ov(30, 41, 6) },
+    without_radar: { ...ov(17, 9, 19) },
+    without_D6_D7: { ...ov(23, 8, 13) },
   },
   failures: {
     worst_false_positives: [
-      { case_id: 'B2-R00544', client_ref: 'c-88a1f0d2', persona: 'airbnb_cohost', priority: 77, signals: ['D4', 'D5'], why: 'Many one-off guest payments look like fan-in; E7 co-host signal below threshold.' },
-      { case_id: 'B1-R00602', client_ref: 'c-13c9be47', persona: 'shared_flat', priority: 71, signals: ['D1', 'D8'], why: 'Rent split just below 15 000 CZK looks like structuring.' },
-      { case_id: 'B3-R00718', client_ref: 'c-f04e7a3b', persona: 'mom_remitter', priority: 64, signals: ['D5'], why: 'Remittance recipient changed bank mid-period; E1 lost the recurring recipient.' },
+      { client_id: 'R00544', label: 'honest', scheme: null, persona: 'airbnb_cohost', priority: 77, triage: 'REVIEW', signals: ['D4:R00544', 'D5:R00544'], exculpatory: ['E7:R00544'],
+        reasons: ['B2-R00544: priority 77 >= 40', 'B2-R00544: D4:R00544 unexplained', 'B2-R00544: D5:R00544 explained by E7:R00544'] },
+      { client_id: 'R00602', label: 'honest', scheme: null, persona: 'shared_flat', priority: 71, triage: 'REVIEW', signals: ['D1:R00602', 'D8:R00602'], exculpatory: [],
+        reasons: ['B1-R00602: priority 71 >= 40', 'B1-R00602: D8:R00602 unexplained'] },
     ],
     false_negatives: [
-      { client_ref: 'c-6b0d92e5', bank_id: 'B3', scheme: 'slow_mule', max_priority: 31, missed_because: 'Lag 9 days and 30 % retention; D1 lag threshold is 72 h.' },
-      { client_ref: 'c-c27a4f18', bank_id: 'B2', scheme: 'slow_mule', max_priority: 28, missed_because: 'Exits to popular exchange (not rare), D5 silent.' },
-      { client_ref: 'c-90ef1d6c', bank_id: 'B1', scheme: 'chain_relay', max_priority: 44, missed_because: 'Single-bank chain; no radar overlap, below operating point.' },
+      { client_id: 'R00911', label: 'mule', scheme: 'slow_mule', persona: null, priority: 31, triage: 'REVIEW', signals: ['D3:R00911'], exculpatory: [],
+        reasons: ['B3-R00911: priority 31 < 40 (below operating point)'] },
     ],
   },
   cnb: {
+    dataset: 'CNB-like background (MOCK)',
+    synthetic: true,
     n_clients: 3000,
     n_tx: 214503,
-    rule_a_alerts_per_unit: { per_calendar_month: 41, per_rolling_30d: 57, per_calendar_week: 12 },
+    rule_a_alerts_per_unit: { 'expected=monthly,q2=monthly': 41, 'expected=monthly,q2=quarterly': 57, 'expected=yearly,q2=yearly': 12 },
+    alerts_by_type: { A: 57, B: 23, C: 64 },
     rule_b_alerts: 23,
     rule_c_alerts: 64,
     rule_c_triage: { FP: 38, REVIEW: 26 },
-    priority_hist: ['0-10', '10-20', '20-30', '30-40', '40-50', '50-60', '60-70', '70-80', '80-90', '90-100'].map((bin, i) => ({ bin, count: [14, 22, 19, 11, 9, 8, 7, 6, 4, 3][i] })),
-    mom_persona: { n: 120, fp_rate: 0.025 },
+    cases: 120,
+    triage: { FP: 94, REVIEW: 26 },
+    routes: { mule_review: 117, victim_protection: 3 },
+    signals_by_detector: { 'R-A': 57, D3: 31, D1: 4 },
+    priority_hist: ['0-9', '10-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '90-100'].map((bin, i) => ({ bin, count: [14, 22, 19, 11, 9, 8, 7, 6, 4, 3][i] })),
+    operating_point_min_priority: 40,
+    actionable_review: 12,
+    mom_persona: { definition: 'client with >= 2 remittances to the same recipient (MOCK)', n: 120, fp_rate: 0.025, review_any_priority: 3, review_actionable: 3, fp_rate_any_priority: 0.025 },
     sample_sheet_url: '/mock/review_sheet_30.csv',
   },
-  operating_point: { definition: 'Case counts as flagged when priority >= min_priority and triage = REVIEW.', min_priority: 40 },
+  operating_point: { definition: 'case triage REVIEW, route mule_review and priority >= 40', min_priority: 40 },
+  // Optional sections (backend may add later); the UI renders them generically.
+  headline_held_out_mean: { staj_psi: { precision: 0.79, recall: 0.82, f1: 0.805 }, isolated: { precision: 0.66, recall: 0.47, f1: 0.55 } },
+  ring_size_sweep: [3, 4, 5, 6, 8].map((ring) => ({ ring_size: ring, recall_isolated: +(0.2 + ring * 0.03).toFixed(2), recall_staj_psi: +(0.55 + ring * 0.05).toFixed(2) })),
 });
 write('review_sheet_30.csv', 'case_id,client_ref,priority,triage,reviewer_verdict,notes\n' +
   items.slice(0, 30).map((x) => `${x.case_id},${x.client_ref},${x.priority},${x.triage},,`).join('\n') + '\n');
@@ -607,11 +679,11 @@ for (let seq = 0; seq < 137; seq++) {
   const action = actions[actor] ?? pick(['decision', 'opo_draft_saved', 'decision']);
   const caseId = pick(items).case_id;
   const why = action === 'pipeline_run' ? 'Nightly batch over staj-synth-v0.3' : action === 'triage_proposal' ? `Proposed triage for ${caseId}` :
-    action === 'explain' ? `Generated explanation for ${caseId}` : action === 'radar_session' ? `PSI session ${pick(['B1xB2', 'B1xB3', 'B2xB3'])}` :
+    action === 'explain' ? `Generated explanation for ${caseId}` : action === 'radar_session' ? `PSI session ${pick(['B1:B2', 'B1:B3', 'B2:B3'])}` :
     action === 'decision' ? `Human decision on ${caseId}` : `Section V edited for ${caseId}`;
   const input_hash = sha(`${seq}|${caseId}|${action}`);
   const e = { seq, ts: new Date(t).toISOString().replace('.000', ''), actor, action, why, rule_version: 'rules@1.3.0',
-    model_version: ['explain', 'triage_proposal'].includes(action) ? 'eu.anthropic.claude-sonnet-4-5' : null, input_hash, prev_hash: prev };
+    model_version: ['explain', 'triage_proposal'].includes(action) ? 'eu.anthropic.claude-sonnet-4-5' : null, input_hash, extra: action === 'radar_session' ? { matches: int(3, 12) } : {}, prev_hash: prev };
   e.hash = sha(prev + JSON.stringify(e));
   prev = e.hash;
   entries.push(e);

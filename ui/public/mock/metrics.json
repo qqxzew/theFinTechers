@@ -14,8 +14,59 @@
         "n_mules": 36,
         "n_accounts": 3000
       },
+      "rank": {
+        "average_precision": 0.61,
+        "precision_at_k": 0.583,
+        "k": 36,
+        "mules_without_case": 4
+      },
+      "overall_any_priority": {
+        "tp": 30,
+        "fp": 31,
+        "fn": 6,
+        "precision": 0.492,
+        "recall": 0.833,
+        "f1": 0.619,
+        "n_mules": 36,
+        "n_accounts": 3000
+      },
+      "per_bank": {
+        "B1": {
+          "tp": 7,
+          "fp": 3,
+          "fn": 6,
+          "precision": 0.7,
+          "recall": 0.538,
+          "f1": 0.609,
+          "n_mules": 13,
+          "n_accounts": 1000
+        },
+        "B2": {
+          "tp": 6,
+          "fp": 3,
+          "fn": 6,
+          "precision": 0.667,
+          "recall": 0.5,
+          "f1": 0.571,
+          "n_mules": 12,
+          "n_accounts": 1000
+        },
+        "B3": {
+          "tp": 4,
+          "fp": 3,
+          "fn": 7,
+          "precision": 0.571,
+          "recall": 0.364,
+          "f1": 0.444,
+          "n_mules": 11,
+          "n_accounts": 1000
+        }
+      },
+      "best_single_bank_f1": 0.583,
+      "mean_bank_f1": 0.489,
       "exposure": {
-        "raw_records_exposed": 0
+        "raw_records_exposed": 0,
+        "bytes_exchanged": 0
       }
     },
     "staj_psi": {
@@ -29,9 +80,30 @@
         "n_mules": 36,
         "n_accounts": 3000
       },
+      "rank": {
+        "average_precision": 0.86,
+        "precision_at_k": 0.806,
+        "k": 36,
+        "mules_without_case": 1
+      },
+      "overall_any_priority": {
+        "tp": 34,
+        "fp": 29,
+        "fn": 2,
+        "precision": 0.54,
+        "recall": 0.944,
+        "f1": 0.687,
+        "n_mules": 36,
+        "n_accounts": 3000
+      },
       "exposure": {
+        "mode": "staj_psi",
         "raw_records_exposed": 0,
-        "blinded_elements": 6372
+        "blinded_elements": 6634
+      },
+      "clusters_disclosed": 1,
+      "refused": {
+        "K2": "only 2 candidates (< 3)"
       }
     },
     "naive_raw_sharing": {
@@ -42,6 +114,22 @@
         "precision": 0.816,
         "recall": 0.861,
         "f1": 0.838,
+        "n_mules": 36,
+        "n_accounts": 3000
+      },
+      "rank": {
+        "average_precision": 0.88,
+        "precision_at_k": 0.833,
+        "k": 36,
+        "mules_without_case": 0
+      },
+      "overall_any_priority": {
+        "tp": 35,
+        "fp": 27,
+        "fn": 1,
+        "precision": 0.565,
+        "recall": 0.972,
+        "f1": 0.714,
         "n_mules": 36,
         "n_accounts": 3000
       },
@@ -99,12 +187,6 @@
       "routed_to_victim_protection": 0,
       "rate": 0.033
     },
-    "persona:new_job": {
-      "n": 50,
-      "flagged_as_mule_case": 1,
-      "routed_to_victim_protection": 0,
-      "rate": 0.02
-    },
     "victim:safe_account_scam": {
       "n": 9,
       "flagged_as_mule_case": 1,
@@ -116,24 +198,24 @@
       "flagged_as_mule_case": 0,
       "routed_to_victim_protection": 4,
       "rate": 0.667
+    },
+    "other:background": {
+      "n": 2600,
+      "flagged_as_mule_case": 5,
+      "routed_to_victim_protection": 0,
+      "rate": 0.0019
     }
   },
   "ablations": {
-    "full": {
-      "tp": 29,
-      "fp": 7,
-      "fn": 7,
-      "precision": 0.806,
-      "recall": 0.806,
-      "f1": 0.806
-    },
     "without_innocence_layer": {
       "tp": 30,
       "fp": 41,
       "fn": 6,
       "precision": 0.423,
       "recall": 0.833,
-      "f1": 0.561
+      "f1": 0.561,
+      "n_mules": 36,
+      "n_accounts": 3000
     },
     "without_radar": {
       "tp": 17,
@@ -141,83 +223,93 @@
       "fn": 19,
       "precision": 0.654,
       "recall": 0.472,
-      "f1": 0.548
+      "f1": 0.548,
+      "n_mules": 36,
+      "n_accounts": 3000
     },
-    "without_d6_d7": {
+    "without_D6_D7": {
       "tp": 23,
       "fp": 8,
       "fn": 13,
       "precision": 0.742,
       "recall": 0.639,
-      "f1": 0.687
+      "f1": 0.687,
+      "n_mules": 36,
+      "n_accounts": 3000
     }
   },
   "failures": {
     "worst_false_positives": [
       {
-        "case_id": "B2-R00544",
-        "client_ref": "c-88a1f0d2",
+        "client_id": "R00544",
+        "label": "honest",
+        "scheme": null,
         "persona": "airbnb_cohost",
         "priority": 77,
+        "triage": "REVIEW",
         "signals": [
-          "D4",
-          "D5"
+          "D4:R00544",
+          "D5:R00544"
         ],
-        "why": "Many one-off guest payments look like fan-in; E7 co-host signal below threshold."
+        "exculpatory": [
+          "E7:R00544"
+        ],
+        "reasons": [
+          "B2-R00544: priority 77 >= 40",
+          "B2-R00544: D4:R00544 unexplained",
+          "B2-R00544: D5:R00544 explained by E7:R00544"
+        ]
       },
       {
-        "case_id": "B1-R00602",
-        "client_ref": "c-13c9be47",
+        "client_id": "R00602",
+        "label": "honest",
+        "scheme": null,
         "persona": "shared_flat",
         "priority": 71,
+        "triage": "REVIEW",
         "signals": [
-          "D1",
-          "D8"
+          "D1:R00602",
+          "D8:R00602"
         ],
-        "why": "Rent split just below 15 000 CZK looks like structuring."
-      },
-      {
-        "case_id": "B3-R00718",
-        "client_ref": "c-f04e7a3b",
-        "persona": "mom_remitter",
-        "priority": 64,
-        "signals": [
-          "D5"
-        ],
-        "why": "Remittance recipient changed bank mid-period; E1 lost the recurring recipient."
+        "exculpatory": [],
+        "reasons": [
+          "B1-R00602: priority 71 >= 40",
+          "B1-R00602: D8:R00602 unexplained"
+        ]
       }
     ],
     "false_negatives": [
       {
-        "client_ref": "c-6b0d92e5",
-        "bank_id": "B3",
+        "client_id": "R00911",
+        "label": "mule",
         "scheme": "slow_mule",
-        "max_priority": 31,
-        "missed_because": "Lag 9 days and 30 % retention; D1 lag threshold is 72 h."
-      },
-      {
-        "client_ref": "c-c27a4f18",
-        "bank_id": "B2",
-        "scheme": "slow_mule",
-        "max_priority": 28,
-        "missed_because": "Exits to popular exchange (not rare), D5 silent."
-      },
-      {
-        "client_ref": "c-90ef1d6c",
-        "bank_id": "B1",
-        "scheme": "chain_relay",
-        "max_priority": 44,
-        "missed_because": "Single-bank chain; no radar overlap, below operating point."
+        "persona": null,
+        "priority": 31,
+        "triage": "REVIEW",
+        "signals": [
+          "D3:R00911"
+        ],
+        "exculpatory": [],
+        "reasons": [
+          "B3-R00911: priority 31 < 40 (below operating point)"
+        ]
       }
     ]
   },
   "cnb": {
+    "dataset": "CNB-like background (MOCK)",
+    "synthetic": true,
     "n_clients": 3000,
     "n_tx": 214503,
     "rule_a_alerts_per_unit": {
-      "per_calendar_month": 41,
-      "per_rolling_30d": 57,
-      "per_calendar_week": 12
+      "expected=monthly,q2=monthly": 41,
+      "expected=monthly,q2=quarterly": 57,
+      "expected=yearly,q2=yearly": 12
+    },
+    "alerts_by_type": {
+      "A": 57,
+      "B": 23,
+      "C": 64
     },
     "rule_b_alerts": 23,
     "rule_c_alerts": 64,
@@ -225,41 +317,55 @@
       "FP": 38,
       "REVIEW": 26
     },
+    "cases": 120,
+    "triage": {
+      "FP": 94,
+      "REVIEW": 26
+    },
+    "routes": {
+      "mule_review": 117,
+      "victim_protection": 3
+    },
+    "signals_by_detector": {
+      "R-A": 57,
+      "D3": 31,
+      "D1": 4
+    },
     "priority_hist": [
       {
-        "bin": "0-10",
+        "bin": "0-9",
         "count": 14
       },
       {
-        "bin": "10-20",
+        "bin": "10-19",
         "count": 22
       },
       {
-        "bin": "20-30",
+        "bin": "20-29",
         "count": 19
       },
       {
-        "bin": "30-40",
+        "bin": "30-39",
         "count": 11
       },
       {
-        "bin": "40-50",
+        "bin": "40-49",
         "count": 9
       },
       {
-        "bin": "50-60",
+        "bin": "50-59",
         "count": 8
       },
       {
-        "bin": "60-70",
+        "bin": "60-69",
         "count": 7
       },
       {
-        "bin": "70-80",
+        "bin": "70-79",
         "count": 6
       },
       {
-        "bin": "80-90",
+        "bin": "80-89",
         "count": 4
       },
       {
@@ -267,14 +373,59 @@
         "count": 3
       }
     ],
+    "operating_point_min_priority": 40,
+    "actionable_review": 12,
     "mom_persona": {
+      "definition": "client with >= 2 remittances to the same recipient (MOCK)",
       "n": 120,
-      "fp_rate": 0.025
+      "fp_rate": 0.025,
+      "review_any_priority": 3,
+      "review_actionable": 3,
+      "fp_rate_any_priority": 0.025
     },
     "sample_sheet_url": "/mock/review_sheet_30.csv"
   },
   "operating_point": {
-    "definition": "Case counts as flagged when priority >= min_priority and triage = REVIEW.",
+    "definition": "case triage REVIEW, route mule_review and priority >= 40",
     "min_priority": 40
-  }
+  },
+  "headline_held_out_mean": {
+    "staj_psi": {
+      "precision": 0.79,
+      "recall": 0.82,
+      "f1": 0.805
+    },
+    "isolated": {
+      "precision": 0.66,
+      "recall": 0.47,
+      "f1": 0.55
+    }
+  },
+  "ring_size_sweep": [
+    {
+      "ring_size": 3,
+      "recall_isolated": 0.29,
+      "recall_staj_psi": 0.7
+    },
+    {
+      "ring_size": 4,
+      "recall_isolated": 0.32,
+      "recall_staj_psi": 0.75
+    },
+    {
+      "ring_size": 5,
+      "recall_isolated": 0.35,
+      "recall_staj_psi": 0.8
+    },
+    {
+      "ring_size": 6,
+      "recall_isolated": 0.38,
+      "recall_staj_psi": 0.85
+    },
+    {
+      "ring_size": 8,
+      "recall_isolated": 0.44,
+      "recall_staj_psi": 0.95
+    }
+  ]
 }

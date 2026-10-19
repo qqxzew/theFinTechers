@@ -68,6 +68,15 @@ def _number_ok(value: float, is_percent: bool, case_numbers: list[float]) -> boo
     return any(abs(value - cv) <= 0.005 * abs(cv) for cv in case_numbers)
 
 
+_SIGNAL_PARTS = {"score", "notes", "evidence", "source", "template", "detector_id"}
+
+
+def _inside_valid_signal(ref: str, valid_refs: set[str]) -> bool:
+    """'<signal_id>.<part>' or '<signal_id>.evidence.<key>' points inside a signal that exists."""
+    parts = re.split(r"[.\s]+", ref.strip(), maxsplit=1)    # "D6:R1.notes", "D6:R1 evidence.x" (models vary the separator)
+    return len(parts) == 2 and parts[0] in valid_refs and re.split(r"[.\s]+", parts[1])[0] in _SIGNAL_PARTS
+
+
 def validate_draft(
     draft: dict,
     case: dict,
@@ -97,7 +106,7 @@ def validate_draft(
             )
 
         for ref in sentence.get("refs", []):
-            if ref not in valid_refs:
+            if ref not in valid_refs and not _inside_valid_signal(ref, valid_refs):
                 violations.append(
                     {"kind": "unknown_reference", "sentence": i, "detail": f"unknown ref {ref!r}"}
                 )

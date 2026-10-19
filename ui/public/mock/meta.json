@@ -13,7 +13,7 @@
   "chain": {
     "ok": true,
     "length": 137,
-    "head": "1013075e16e95b2d3ca8876835cca70301559aed70a896b9ea8e41f211a83793"
+    "head": "97f0736de0cf7eab6ff6ca4033994db394d1e67d34e2f81fb74f34c372508263"
   },
   "roles": [
     "analyst_l1",
@@ -21,5 +21,14 @@
     "aml_officer",
     "mlro"
   ],
-  "four_eyes_min_priority": 70
+  "four_eyes_min_priority": 70,
+  "staff": [
+    "Tomáš Svoboda",
+    "Lucie Černá",
+    "Eva Horáková",
+    "Karel Beneš",
+    "Petr Dvořák",
+    "Jana Nováková",
+    "Ondřej Malý"
+  ]
 }

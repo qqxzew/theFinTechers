@@ -167,7 +167,7 @@ export function PageHeader({ title, children }: { title: string; children?: Reac
   );
 }
 
-export const short = (h: string | null | undefined, n = 10) => (h ? `${h.slice(0, n)}…` : '–');
+export const short = (h: string | null | undefined, n = 10) => (!h ? '–' : h.length <= n + 1 ? h : `${h.slice(0, n)}…`);
 
 export function fmtScalar(v: unknown, num: (n: number, d?: number) => string): string {
   if (v === null || v === undefined) return '–';
@@ -179,12 +179,12 @@ export function fmtScalar(v: unknown, num: (n: number, d?: number) => string): s
 }
 
 /** Generic renderer for violation objects the server returns; never hides any field. */
-export function ViolationList({ items, title }: { items: unknown[]; title: string }) {
+export function ViolationList({ items, title, total }: { items: unknown[]; title: string; total?: number }) {
   if (!items.length) return null;
   return (
     <div role="alert" className="rounded-md border border-warn/40 bg-warnsoft p-3 text-sm">
       <p className="font-semibold text-warn">
-        {title} ({items.length})
+        {title} ({total ?? items.length})
       </p>
       <ul className="mt-2 space-y-1.5">
         {items.map((v, i) => (

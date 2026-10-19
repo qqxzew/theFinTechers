@@ -120,6 +120,17 @@ export default function QueueScreen() {
         </p>
       </form>
 
+      {q.data && q.data.total_matching !== undefined && q.data.total_matching > q.data.items.length && (
+        <div role="note" className="mb-3 flex flex-wrap items-center gap-3 rounded-md border border-warn/40 bg-warnsoft px-4 py-2 text-sm text-warn">
+          <span className="tnum">{t('q.capped', { n: num(q.data.items.length), total: num(q.data.total_matching) })}</span>
+          {filters.triage !== 'REVIEW' && (
+            <button type="button" className="btn-secondary py-0.5 text-xs" onClick={() => setF('triage', 'REVIEW')}>
+              {t('q.only_review')}
+            </button>
+          )}
+        </div>
+      )}
+
       <div className="card overflow-hidden">
         {q.loading && !q.data ? (
           <Loading />

@@ -92,7 +92,14 @@ export default function AuditScreen() {
                           {e.action}
                         </Chip>
                       </td>
-                      <td className="td max-w-[320px] text-sm">{e.why}</td>
+                      <td className="td max-w-[360px] text-sm">
+                        {e.why}
+                        {e.extra && Object.keys(e.extra).length > 0 && (
+                          <span className="mono mt-0.5 block break-all text-[11px] text-muted" title={t('a.extra')}>
+                            {JSON.stringify(e.extra)}
+                          </span>
+                        )}
+                      </td>
                       <td className="td mono text-muted">{e.model_version ?? '–'}</td>
                       <td className="td mono" title={e.input_hash}>
                         {short(e.input_hash, 8)}
@@ -123,6 +130,9 @@ export default function AuditScreen() {
             </span>
             <button className="btn-secondary py-1" disabled={offset + PAGE >= total} onClick={() => setOffset(offset + PAGE)}>
               {t('common.next')} →
+            </button>
+            <button className="btn-secondary py-1" disabled={offset + PAGE >= total} onClick={() => setOffset(Math.max(0, (pages - 1) * PAGE))}>
+              {t('common.latest')} ⇥
             </button>
           </span>
         </nav>

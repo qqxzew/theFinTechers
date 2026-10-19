@@ -15,9 +15,9 @@
   "expected=yearly,q2=yearly": 5489
  },
  "alerts_by_type": {
+  "B": 4,
   "A": 4669,
-  "C": 16,
-  "B": 4
+  "C": 16
  },
  "rule_b_alerts": 4,
  "rule_c_alerts": 16,

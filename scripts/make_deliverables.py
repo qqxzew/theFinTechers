@@ -72,7 +72,7 @@ def main() -> None:
     for c in top:
         jobs.append((build_case_json(c, feats[c.client_id], None), f"CNB_{c.case_id}"))
     # (b) the five highest-priority REVIEW cases of the demo red-team world (planted mules, one per bank where possible)
-    st = build_state("data/redteam/seed101", audit_path="eval/out/audit_deliverables_world.jsonl")
+    st = build_state("data/redteam/seed505", audit_path="eval/out/audit_deliverables_world.jsonl")
     seen: dict[str, int] = {}
     for cid, c in sorted(st.cases.items(), key=lambda kv: -kv[1].priority):
         if c.triage.value == "REVIEW" and c.route == "mule_review" and seen.get(c.bank_id, 0) < 2 and len(seen) <= 3:

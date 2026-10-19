@@ -45,7 +45,7 @@ class DemoState:
     decisions: dict = field(default_factory=dict)
     proposals: dict = field(default_factory=dict)
     tools: CaseTools | None = None
-    metrics_path: str = "eval/out/redteam_seed101.json"
+    metrics_path: str = "eval/out/redteam_seed505.json"
     cnb_path: str = "eval/out/cnb_eval.json"
 
     def owner_of(self, client_id: str) -> str:
@@ -77,7 +77,7 @@ class DemoState:
         return self.case_jsons[case_id]
 
 
-def build_state(world: str = "data/redteam/seed101", audit_path: str = "eval/out/audit_demo.jsonl", fresh: bool = True) -> DemoState:
+def build_state(world: str = "data/redteam/seed505", audit_path: str = "eval/out/audit_demo.jsonl", fresh: bool = True) -> DemoState:
     cfg = load_config()
     tx, cl, _ = load_world(world, with_labels=False)   # the API process never reads labels
     results = run_banks(tx, cl, cfg)

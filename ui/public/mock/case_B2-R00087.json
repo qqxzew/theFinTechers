@@ -16,7 +16,7 @@
         "n_in": 22
       },
       "notes": [],
-      "template": "{n_in} inflows totalling {in_total} CZK from {n_senders_rare} rare senders.",
+      "template": "d4_fan_in",
       "source": "node/detectors/d4_fan_in.py@1.0 · config/thresholds.yaml#d4"
     },
     {
@@ -33,7 +33,7 @@
         ]
       },
       "notes": [],
-      "template": "Constant retained share per cycle: {cycle_retentions}.",
+      "template": "d7_fixed_skim",
       "source": "node/detectors/d7_fixed_skim.py@1.0 · config/thresholds.yaml#d7"
     },
     {
@@ -41,13 +41,44 @@
       "detector_id": "D6",
       "score": 0.79,
       "evidence": {
-        "exit_tokens_low": 2,
+        "exit_tokens_low": [
+          "XCZ000105",
+          "XCZ000106"
+        ],
         "lag_median_h": 6.1,
         "retention_median": 0.05,
-        "n_peers": 4
+        "hour_hist": [
+          0.33,
+          0.17,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.5,
+          0,
+          0
+        ]
       },
-      "notes": [],
-      "template": "Fingerprint matches {n_peers} other candidates.",
+      "notes": [
+        "group_size=4",
+        "lift_vs_shuffled=7.6"
+      ],
+      "template": "d6_same_hand",
       "source": "node/detectors/d6_same_hand.py@0.9 · radar/clustering.py"
     }
   ],
@@ -70,7 +101,19 @@
     "cluster_id": "K1",
     "n_other_banks": 2,
     "n_other_candidates": 4,
-    "lag_ret_concentration": 0.87
+    "lag_ret_concentration": 0.87,
+    "matched_exit_accounts": [
+      "XCZ000105",
+      "XCZ000106"
+    ]
+  },
+  "feature_glossary": {
+    "in_total_czk": "sum of incoming amounts in July, CZK",
+    "out_total_czk": "sum of outgoing amounts in July, CZK",
+    "n_tx": "number of transactions",
+    "days_since_contract": "days between contract date and 2026-07-31",
+    "declared_income_czk": "declared monthly income from the client profile, CZK",
+    "is_pep": "politically exposed person flag (modifier for escalation)"
   },
   "rule_definitions": {
     "R-A": "Rule A (CNB pilot): inflow followed by >= 80 % outflow within 48 h, aggregated per unit.",

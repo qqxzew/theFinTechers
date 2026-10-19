@@ -65,8 +65,23 @@ export function getMeta(): Promise<Meta> {
   return USING_MOCKS ? getJson(`${MOCK}/meta.json`) : getJson(`${API_BASE}/api/meta`);
 }
 
+// Short-lived cache so identical queue requests (StrictMode double effects, filter-option lookup)
+// share one network call. Decisions invalidate it.
+const queueCache = new Map<string, { at: number; p: Promise<QueueResponse> }>();
+export function invalidateQueue() {
+  queueCache.clear();
+}
+
 export async function getQueue(f: QueueFilters = {}): Promise<QueueResponse> {
-  if (!USING_MOCKS) return getJson(`${API_BASE}/api/queue${qs({ ...f })}`);
+  if (!USING_MOCKS) {
+    const url = `${API_BASE}/api/queue${qs({ ...f })}`;
+    const hit = queueCache.get(url);
+    if (hit && Date.now() - hit.at < 15000) return hit.p;
+    const p = getJson<QueueResponse>(url);
+    p.catch(() => queueCache.delete(url));
+    queueCache.set(url, { at: Date.now(), p });
+    return p;
+  }
   const data = await getJson<QueueResponse>(`${MOCK}/queue.json`);
   const items = data.items
     .map((it) => {
@@ -124,7 +139,11 @@ export async function askCase(id: string, question: string): Promise<AskResponse
 }
 
 export async function postDecision(id: string, body: DecisionRequest): Promise<DecisionResponse> {
-  if (!USING_MOCKS) return sendJson('POST', `/api/cases/${encodeURIComponent(id)}/decision`, body);
+  if (!USING_MOCKS) {
+    const r = await sendJson<DecisionResponse>('POST', `/api/cases/${encodeURIComponent(id)}/decision`, body);
+    if (r.ok) invalidateQueue();
+    return r;
+  }
   // MOCK of the server-side checks (the real server is the authority).
   const c = await getJson<CaseDetail & { _mock?: { relationship_owner: string; rule_authors: string[]; first_triager: string } }>(
     `${MOCK}/case_${id}.json`,

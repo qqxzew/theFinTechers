@@ -18,7 +18,7 @@ worlds:      ## generate seeded red-team worlds (dev 7,101; held-out 202,303)
 eval:        ## full reproducible evaluation -> eval/report.json, eval/report.md, pitch_numbers.json
 	$(PY) -m eval.run_all
 
-api:         ## FastAPI backend on :8000 (demo world = STAJ_WORLD, default data/redteam/seed101)
+api:         ## FastAPI backend on :8000 (demo world = STAJ_WORLD, default data/redteam/seed505)
 	$(PY) -m api.server
 
 ui:          ## Vite dev server on :5173 against the real API

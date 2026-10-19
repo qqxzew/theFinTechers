@@ -34,7 +34,10 @@ export default function Graph({ graph, height = 280, layout = 'concentric', aria
     const surface = cssColor('--surface');
     const ids = new Set(graph.nodes.map((n) => n.id));
     const els: ElementDefinition[] = [
-      ...graph.nodes.map((n) => ({ data: { id: n.id, label: n.kind === 'client' || n.kind === 'bank' || n.label.length <= 9 ? n.label : n.label.slice(0, 8) + '…', kind: n.kind } })),
+      ...graph.nodes.map((n) => {
+        const base = n.kind === 'client' || n.kind === 'bank' || n.label.length <= 9 ? n.label : n.label.slice(0, 8) + '…';
+        return { data: { id: n.id, label: n.kind === 'candidate' && n.bank ? `${n.bank} · ${base}` : base, kind: n.kind } };
+      }),
       ...graph.edges
         .filter((e) => ids.has(e.source) && ids.has(e.target))
         .map((e, i) => ({ data: { id: `e${i}`, source: e.source, target: e.target, label: showAmounts ? fmtK(e.amount_czk) : '', dir: e.direction ?? '' } })),

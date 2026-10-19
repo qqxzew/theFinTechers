@@ -27,8 +27,10 @@ def run(n: int, overlap: float = 0.1) -> dict:
 
 if __name__ == "__main__":
     sizes = [int(x) for x in sys.argv[1:]] or [1000, 10000, 100000]
-    res = [run(n) for n in sizes]
-    for r in res:
-        print(r, flush=True)
+    res = []
+    for n in sizes:
+        res.append(run(n))
+        print(res[-1], flush=True)
+        json.dump({"synthetic": True, "runs": res}, open("eval/out/psi_bench.json", "w"), indent=1)
     json.dump({"synthetic": True, "note": "one machine, Python pow() with 256-bit exponents on the 2048-bit RFC 3526 group, process pool", "runs": res},
               open("eval/out/psi_bench.json", "w"), indent=1)

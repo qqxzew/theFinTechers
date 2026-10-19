@@ -305,7 +305,13 @@
   "min_priority": 30
  },
  "breakdown_isolated": {
-  "honest/freelancer": {
+  "honest/migrant_remit": {
+   "n": 10,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "honest/second_hand_seller": {
    "n": 10,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
@@ -317,23 +323,11 @@
    "routed_to_victim_protection": 1,
    "rate": 0.0027
   },
-  "mule/day_zero": {
-   "n": 8,
-   "flagged_as_mule_case": 8,
+  "mule/same_hand_stealth": {
+   "n": 16,
+   "flagged_as_mule_case": 16,
    "routed_to_victim_protection": 0,
    "rate": 1.0
-  },
-  "mule/same_hand": {
-   "n": 27,
-   "flagged_as_mule_case": 27,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
-  "honest/students_rent": {
-   "n": 6,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
   },
   "mule/fixed_skim": {
    "n": 6,
@@ -347,23 +341,41 @@
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
-  "honest/migrant_remit": {
-   "n": 10,
+  "honest/students_rent": {
+   "n": 6,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
   },
-  "honest/second_hand_seller": {
-   "n": 10,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "mule/same_hand_stealth": {
-   "n": 16,
-   "flagged_as_mule_case": 16,
+  "mule/day_zero": {
+   "n": 8,
+   "flagged_as_mule_case": 8,
    "routed_to_victim_protection": 0,
    "rate": 1.0
+  },
+  "honest/freelancer": {
+   "n": 10,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "honest/fundraiser": {
+   "n": 6,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "mule/same_hand": {
+   "n": 27,
+   "flagged_as_mule_case": 27,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/middleman_cohost": {
+   "n": 6,
+   "flagged_as_mule_case": 1,
+   "routed_to_victim_protection": 0,
+   "rate": 0.1667
   },
   "victim/victim": {
    "n": 8,
@@ -376,52 +388,28 @@
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
-  },
-  "honest/fundraiser": {
-   "n": 6,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "honest/middleman_cohost": {
-   "n": 6,
-   "flagged_as_mule_case": 1,
-   "routed_to_victim_protection": 0,
-   "rate": 0.1667
   }
  },
  "breakdown_staj_psi": {
-  "honest/group_collection": {
-   "n": 6,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "mule/same_hand": {
-   "n": 27,
-   "flagged_as_mule_case": 27,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
   "honest/migrant_remit": {
    "n": 10,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
   },
-  "mule/invoice_mule": {
-   "n": 6,
-   "flagged_as_mule_case": 6,
+  "mule/same_hand_stealth": {
+   "n": 16,
+   "flagged_as_mule_case": 16,
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
-  "honest/second_hand_seller": {
-   "n": 10,
-   "flagged_as_mule_case": 0,
+  "honest/middleman_cohost": {
+   "n": 6,
+   "flagged_as_mule_case": 1,
    "routed_to_victim_protection": 0,
-   "rate": 0.0
+   "rate": 0.1667
   },
-  "honest/students_rent": {
+  "honest/group_collection": {
    "n": 6,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
@@ -433,67 +421,41 @@
    "routed_to_victim_protection": 0,
    "rate": 0.0
   },
-  "background/cnb_background": {
-   "n": 3000,
-   "flagged_as_mule_case": 8,
-   "routed_to_victim_protection": 1,
-   "rate": 0.0027
-  },
   "victim/victim": {
    "n": 8,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 7,
    "rate": 0.875
   },
+  "background/cnb_background": {
+   "n": 3000,
+   "flagged_as_mule_case": 8,
+   "routed_to_victim_protection": 1,
+   "rate": 0.0027
+  },
+  "mule/invoice_mule": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
   "mule/day_zero": {
    "n": 8,
    "flagged_as_mule_case": 8,
    "routed_to_victim_protection": 0,
    "rate": 1.0
+  },
+  "honest/second_hand_seller": {
+   "n": 10,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
   },
   "honest/fundraiser": {
    "n": 6,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
-  },
-  "honest/middleman_cohost": {
-   "n": 6,
-   "flagged_as_mule_case": 1,
-   "routed_to_victim_protection": 0,
-   "rate": 0.1667
-  },
-  "mule/fixed_skim": {
-   "n": 6,
-   "flagged_as_mule_case": 6,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
-  "mule/same_hand_stealth": {
-   "n": 16,
-   "flagged_as_mule_case": 16,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  }
- },
- "breakdown_staj_psi_any_priority": {
-  "honest/group_collection": {
-   "n": 6,
-   "flagged_as_mule_case": 4,
-   "routed_to_victim_protection": 0,
-   "rate": 0.6667
-  },
-  "honest/migrant_remit": {
-   "n": 10,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "mule/day_zero": {
-   "n": 8,
-   "flagged_as_mule_case": 8,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
   },
   "mule/same_hand": {
    "n": 27,
@@ -502,6 +464,32 @@
    "rate": 1.0
   },
   "mule/fixed_skim": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/students_rent": {
+   "n": 6,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  }
+ },
+ "breakdown_staj_psi_any_priority": {
+  "honest/students_rent": {
+   "n": 6,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "mule/fixed_skim": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/fundraiser": {
    "n": 6,
    "flagged_as_mule_case": 6,
    "routed_to_victim_protection": 0,
@@ -525,27 +513,33 @@
    "routed_to_victim_protection": 0,
    "rate": 0.0
   },
-  "honest/fundraiser": {
+  "honest/group_collection": {
    "n": 6,
-   "flagged_as_mule_case": 6,
+   "flagged_as_mule_case": 4,
    "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
-  "mule/same_hand_stealth": {
-   "n": 16,
-   "flagged_as_mule_case": 16,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
-  "honest/students_rent": {
-   "n": 6,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
+   "rate": 0.6667
   },
   "mule/invoice_mule": {
    "n": 6,
    "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/middleman_cohost": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/migrant_remit": {
+   "n": 10,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "mule/same_hand": {
+   "n": 27,
+   "flagged_as_mule_case": 27,
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
@@ -555,9 +549,15 @@
    "routed_to_victim_protection": 7,
    "rate": 0.875
   },
-  "honest/middleman_cohost": {
-   "n": 6,
-   "flagged_as_mule_case": 6,
+  "mule/same_hand_stealth": {
+   "n": 16,
+   "flagged_as_mule_case": 16,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "mule/day_zero": {
+   "n": 8,
+   "flagged_as_mule_case": 8,
    "routed_to_victim_protection": 0,
    "rate": 1.0
   }

@@ -29,10 +29,12 @@ def draft_section_v(llm: LLM, case: dict, budget: Budget | None = None, max_retr
     system = PROMPT.read_text(encoding="utf-8")
     messages = [{"role": "user", "content": [{"text": "<CASE_JSON>\n" + json.dumps(case, ensure_ascii=False) + "\n</CASE_JSON>"}]}]
     last: list[dict] = []
+    kept: list[dict] = []     # last parseable draft: shown to the human WITH its QA findings instead of being thrown away
     for attempt in range(max_retries + 1):
         r = llm.call(role, system, messages, max_tokens=4000, budget=budget, agent="narrative")
         try:
             sents = [Sentence.model_validate(s) for s in extract_json(r.text)["sentences"]]
+            kept = [s.model_dump() for s in sents]
             last = validate_draft({"sentences": [s.model_dump() for s in sents]}, case, analyst_names=[])
             if not last:
                 return {"sentences": [s.model_dump() for s in sents], "violations": [], "model_id": r.model_id, "attempts": attempt + 1}
@@ -41,7 +43,7 @@ def draft_section_v(llm: LLM, case: dict, budget: Budget | None = None, max_retr
             fb = f"Invalid output ({str(e)[:200]}). Return STRICT JSON only."
             last = [{"kind": "schema", "detail": str(e)[:200]}]
         messages += [{"role": "assistant", "content": r.content}, {"role": "user", "content": [{"text": fb}]}]
-    return {"sentences": [], "violations": last, "model_id": r.model_id, "attempts": max_retries + 1}
+    return {"sentences": kept, "violations": last, "model_id": r.model_id, "attempts": max_retries + 1, "unresolved": True}
 
 
 def build_opo(case: dict, section_v: dict, settings: dict, audit_head: str, today: str) -> dict:

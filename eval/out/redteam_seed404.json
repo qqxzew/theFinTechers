@@ -305,17 +305,17 @@
   "min_priority": 30
  },
  "breakdown_isolated": {
-  "victim/victim": {
-   "n": 8,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 7,
-   "rate": 0.875
-  },
-  "honest/fundraiser": {
-   "n": 6,
+  "honest/freelancer": {
+   "n": 10,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
+  },
+  "mule/same_hand": {
+   "n": 25,
+   "flagged_as_mule_case": 25,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
   },
   "background/cnb_background": {
    "n": 3000,
@@ -323,15 +323,9 @@
    "routed_to_victim_protection": 1,
    "rate": 0.0013
   },
-  "honest/middleman_cohost": {
-   "n": 6,
-   "flagged_as_mule_case": 1,
-   "routed_to_victim_protection": 0,
-   "rate": 0.1667
-  },
-  "mule/same_hand": {
-   "n": 25,
-   "flagged_as_mule_case": 25,
+  "mule/day_zero": {
+   "n": 8,
+   "flagged_as_mule_case": 8,
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
@@ -341,32 +335,8 @@
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
-  "mule/day_zero": {
-   "n": 8,
-   "flagged_as_mule_case": 8,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
-  "mule/fixed_skim": {
-   "n": 6,
-   "flagged_as_mule_case": 6,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
   "honest/second_hand_seller": {
    "n": 10,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "honest/freelancer": {
-   "n": 10,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "honest/students_rent": {
-   "n": 6,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
@@ -377,22 +347,76 @@
    "routed_to_victim_protection": 0,
    "rate": 0.0
   },
-  "mule/invoice_mule": {
+  "mule/fixed_skim": {
    "n": 6,
    "flagged_as_mule_case": 6,
    "routed_to_victim_protection": 0,
    "rate": 1.0
+  },
+  "honest/middleman_cohost": {
+   "n": 6,
+   "flagged_as_mule_case": 1,
+   "routed_to_victim_protection": 0,
+   "rate": 0.1667
   },
   "honest/group_collection": {
    "n": 6,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
+  },
+  "honest/students_rent": {
+   "n": 6,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "honest/fundraiser": {
+   "n": 6,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "mule/invoice_mule": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "victim/victim": {
+   "n": 8,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 7,
+   "rate": 0.875
   }
  },
  "breakdown_staj_psi": {
-  "honest/second_hand_seller": {
-   "n": 10,
+  "honest/middleman_cohost": {
+   "n": 6,
+   "flagged_as_mule_case": 1,
+   "routed_to_victim_protection": 0,
+   "rate": 0.1667
+  },
+  "background/cnb_background": {
+   "n": 3000,
+   "flagged_as_mule_case": 4,
+   "routed_to_victim_protection": 1,
+   "rate": 0.0013
+  },
+  "mule/same_hand": {
+   "n": 25,
+   "flagged_as_mule_case": 25,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "mule/invoice_mule": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/students_rent": {
+   "n": 6,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
@@ -403,21 +427,15 @@
    "routed_to_victim_protection": 0,
    "rate": 0.0
   },
-  "honest/group_collection": {
-   "n": 6,
+  "honest/second_hand_seller": {
+   "n": 10,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
   },
-  "mule/invoice_mule": {
-   "n": 6,
-   "flagged_as_mule_case": 6,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
-  "mule/same_hand": {
-   "n": 25,
-   "flagged_as_mule_case": 25,
+  "mule/day_zero": {
+   "n": 8,
+   "flagged_as_mule_case": 8,
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
@@ -427,32 +445,8 @@
    "routed_to_victim_protection": 7,
    "rate": 0.875
   },
-  "mule/same_hand_stealth": {
-   "n": 18,
-   "flagged_as_mule_case": 18,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
-  "background/cnb_background": {
-   "n": 3000,
-   "flagged_as_mule_case": 4,
-   "routed_to_victim_protection": 1,
-   "rate": 0.0013
-  },
-  "mule/fixed_skim": {
-   "n": 6,
-   "flagged_as_mule_case": 6,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
   "honest/migrant_remit": {
    "n": 10,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "honest/students_rent": {
-   "n": 6,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
@@ -463,25 +457,11 @@
    "routed_to_victim_protection": 0,
    "rate": 0.0
   },
-  "mule/day_zero": {
-   "n": 8,
-   "flagged_as_mule_case": 8,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
-  "honest/middleman_cohost": {
+  "honest/group_collection": {
    "n": 6,
-   "flagged_as_mule_case": 1,
+   "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
-   "rate": 0.1667
-  }
- },
- "breakdown_staj_psi_any_priority": {
-  "mule/day_zero": {
-   "n": 8,
-   "flagged_as_mule_case": 8,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
+   "rate": 0.0
   },
   "mule/fixed_skim": {
    "n": 6,
@@ -489,11 +469,31 @@
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
+  "mule/same_hand_stealth": {
+   "n": 18,
+   "flagged_as_mule_case": 18,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  }
+ },
+ "breakdown_staj_psi_any_priority": {
+  "background/cnb_background": {
+   "n": 3000,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 1,
+   "rate": 0.002
+  },
   "honest/freelancer": {
    "n": 10,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
+  },
+  "mule/invoice_mule": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
   },
   "honest/students_rent": {
    "n": 6,
@@ -501,9 +501,9 @@
    "routed_to_victim_protection": 0,
    "rate": 0.0
   },
-  "honest/middleman_cohost": {
-   "n": 6,
-   "flagged_as_mule_case": 6,
+  "mule/same_hand_stealth": {
+   "n": 18,
+   "flagged_as_mule_case": 18,
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
@@ -512,6 +512,12 @@
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
+  },
+  "mule/fixed_skim": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
   },
   "honest/group_collection": {
    "n": 6,
@@ -519,9 +525,33 @@
    "routed_to_victim_protection": 0,
    "rate": 0.3333
   },
+  "victim/victim": {
+   "n": 8,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 7,
+   "rate": 0.875
+  },
   "honest/fundraiser": {
    "n": 6,
    "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "mule/day_zero": {
+   "n": 8,
+   "flagged_as_mule_case": 8,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/middleman_cohost": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "mule/same_hand": {
+   "n": 25,
+   "flagged_as_mule_case": 25,
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
@@ -530,36 +560,6 @@
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
-  },
-  "mule/invoice_mule": {
-   "n": 6,
-   "flagged_as_mule_case": 6,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
-  "mule/same_hand_stealth": {
-   "n": 18,
-   "flagged_as_mule_case": 18,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
-  "background/cnb_background": {
-   "n": 3000,
-   "flagged_as_mule_case": 6,
-   "routed_to_victim_protection": 1,
-   "rate": 0.002
-  },
-  "mule/same_hand": {
-   "n": 25,
-   "flagged_as_mule_case": 25,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
-  "victim/victim": {
-   "n": 8,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 7,
-   "rate": 0.875
   }
  },
  "failures_staj_psi": {

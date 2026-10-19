@@ -97,8 +97,21 @@
     "cluster_id": "K1",
     "n_other_banks": 2,
     "n_other_candidates": 4,
-    "lag_ret_concentration": 0.87
+    "lag_ret_concentration": 0.87,
+    "matched_exit_accounts": [
+      "XSK000166",
+      "XSK000168"
+    ]
   },
+  "feature_glossary": {
+    "in_total_czk": "sum of incoming amounts in July, CZK",
+    "out_total_czk": "sum of outgoing amounts in July, CZK",
+    "n_tx": "number of transactions",
+    "days_since_contract": "days between contract date and 2026-07-31",
+    "declared_income_czk": "declared monthly income from the client profile, CZK",
+    "is_pep": "politically exposed person flag (modifier for escalation)"
+  },
+  "data_label": "SYNTHETIC DATA - no real customer",
   "rule_definitions": {
     "R-A": "Rule A (CNB pilot): inflow followed by >= 80 % outflow within 48 h, aggregated per unit.",
     "R-B": "Rule B (CNB pilot): first incoming payment above 50 000 CZK within 30 days of account opening.",

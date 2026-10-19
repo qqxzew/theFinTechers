@@ -1,0 +1,23 @@
+{
+  "answer": [
+    {
+      "text": "MOCK answer: the rule fired because its evidence fields exceeded the configured thresholds.",
+      "refs": []
+    },
+    {
+      "text": "See the rule definitions block for the exact condition.",
+      "refs": [
+        "features.in_total_czk"
+      ]
+    }
+  ],
+  "violations": [
+    {
+      "kind": "missing_refs",
+      "sentence": 0,
+      "detail": "Sentence has no refs (MOCK)."
+    }
+  ],
+  "model_id": "mock",
+  "attempts": 2
+}

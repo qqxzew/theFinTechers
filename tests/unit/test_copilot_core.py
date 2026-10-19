@@ -87,3 +87,10 @@ def test_tools_are_case_scoped_and_return_no_raw_dumps():
     assert json.dumps(tools.spec())  # JSON-serialisable Converse toolConfig
     assert all(t["toolSpec"]["name"] in {"get_case", "get_signals", "get_exculpatory", "get_features", "explain_rule", "propose_triage"}
                for t in tools.spec()["tools"])
+
+
+def test_reference_inside_a_signal_is_valid():
+    d = {"sentences": [{"text": "Rare exits.", "refs": ["D5:R00001.evidence.share_rare", "D1:R00001.notes"]},
+                       {"text": "Bad.", "refs": ["D9:R00001.notes", "D1:R00001.nonsense"]}]}
+    kinds = [(v["sentence"], v["kind"]) for v in validate_draft(d, CASE, analyst_names=[])]
+    assert kinds == [(1, "unknown_reference"), (1, "unknown_reference")]

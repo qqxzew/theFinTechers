@@ -4,7 +4,7 @@
  "runs": [
   {
    "tokens_per_bank": 1000,
-   "seconds": 23.4,
+   "seconds": 14.28,
    "messages": 4,
    "elements": 4000,
    "bytes": 1024000,
@@ -13,11 +13,20 @@
   },
   {
    "tokens_per_bank": 10000,
-   "seconds": 83.8,
+   "seconds": 22.91,
    "messages": 4,
    "elements": 40000,
    "bytes": 10240000,
    "matches": 1000,
+   "cpu_count": 12
+  },
+  {
+   "tokens_per_bank": 100000,
+   "seconds": 193.88,
+   "messages": 4,
+   "elements": 400000,
+   "bytes": 102400000,
+   "matches": 10000,
    "cpu_count": 12
   }
  ]

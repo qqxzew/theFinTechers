@@ -54,6 +54,38 @@ def _pow_chunk(args: tuple[list[int], int]) -> list[int]:
     return [pow(b, k, P) for b in bases]
 
 
+def _check_pow_chunk(args: tuple[list[str], int]) -> list[int]:
+    """Decode hex group elements, REJECT any outside the prime-order subgroup (Jacobi symbol), and raise them to k."""
+    hexes, k = args
+    out = []
+    for h in hexes:
+        x = int(h, 16)
+        if not 1 < x < P - 1 or _jacobi(x, P) != 1:
+            raise ValueError("element not in the prime-order subgroup")
+        out.append(pow(x, k, P))
+    return out
+
+
+def check_and_modexp_many(hexes: list[str], k: int) -> list[int]:
+    """Validate-and-exponentiate untrusted elements (the only place a peer's element meets our secret exponent), parallel for big batches."""
+    global _POOL
+    workers = os.cpu_count() or 1
+    if len(hexes) < PARALLEL_MIN or workers < 2:
+        return _check_pow_chunk((hexes, k))
+    if _POOL is None:
+        _POOL = ProcessPoolExecutor(max_workers=workers)
+    size = -(-len(hexes) // workers)
+    return [v for part in _POOL.map(_check_pow_chunk, [(hexes[i:i + size], k) for i in range(0, len(hexes), size)]) for v in part]
+
+
+def _plain(s: str) -> int:
+    """Decode an element used for EQUALITY comparison only (it never meets our secret exponent), so no subgroup test is needed."""
+    x = int(s, 16)
+    if not 1 < x < P - 1:
+        raise ValueError("element out of range")
+    return x
+
+
 def modexp_many(bases: list[int], k: int) -> list[int]:
     """[b^k mod P for b in bases], spread over CPU cores for large batches (same results as the serial loop)."""
     global _POOL
@@ -113,7 +145,7 @@ class PsiParty:
 
     def respond(self, incoming: list[str], cardinality_only: bool = False) -> tuple[list[str], list[str]]:
         """Responder: raise the initiator's elements to k (same order, or shuffled for cardinality-only) and send own blinded set."""
-        double = modexp_many([_dec(e) for e in incoming], self._k)
+        double = check_and_modexp_many(incoming, self._k)
         self._peer_double = set(double)
         if cardinality_only:
             self._rng.shuffle(double)
@@ -121,9 +153,9 @@ class PsiParty:
 
     def finish(self, double_blinded_mine: list[str], other_blinded: list[str], cardinality_only: bool = False) -> tuple[set[str] | int, list[str]]:
         """Initiator: intersect. Returns (tokens | cardinality, own double-blinding of the responder's set in received order)."""
-        theirs_double = modexp_many([_dec(e) for e in other_blinded], self._k)
+        theirs_double = check_and_modexp_many(other_blinded, self._k)
         lookup = set(theirs_double)
-        mine = [_dec(e) for e in double_blinded_mine]
+        mine = [_plain(e) for e in double_blinded_mine]
         back = [_enc(v) for v in theirs_double]
         if cardinality_only:
             return sum(1 for v in mine if v in lookup), back
@@ -134,4 +166,4 @@ class PsiParty:
     def learn_from_return(self, returned: list[str]) -> set[str]:
         """Responder: given the initiator's double-blinding of the responder's own set (in the order sent by blind()), learn the intersection."""
         mine = {v for v in self._peer_double}
-        return {self.tokens[self._perm[j]] for j, e in enumerate(returned) if _dec(e) in mine}
+        return {self.tokens[self._perm[j]] for j, e in enumerate(returned) if _plain(e) in mine}
