@@ -15,10 +15,11 @@ from radar.guards import Guards
 from radar.sessions import BankNode, run_radar
 
 
-def load_world(path: str) -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame]:
+def load_world(path: str, with_labels: bool = True) -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame | None]:
+    """Banks get tx + clients; labels (hidden ground truth) only when the caller is the evaluation."""
     tx = pl.read_parquet(f"{path}/tx.parquet")
     cl = pl.read_parquet(f"{path}/clients.parquet").with_columns(pl.col("contract_date").dt.replace_time_zone(None))
-    lab = pl.read_parquet(f"{path}/labels.parquet")
+    lab = pl.read_parquet(f"{path}/labels.parquet") if with_labels else None
     return tx, cl, lab
 
 
@@ -51,6 +52,21 @@ def _metrics(cases: dict[str, object], labels: pl.DataFrame, clients_subset: set
     r = tp / (tp + fn) if tp + fn else 0.0
     return {"tp": tp, "fp": fp, "fn": fn, "precision": round(p, 4), "recall": round(r, 4), "f1": round(2 * p * r / (p + r), 4) if p + r else 0.0,
             "n_mules": len(mule_ids), "n_accounts": len(all_ids)}
+
+
+def _rank(cases: dict[str, object], labels: pl.DataFrame) -> dict:
+    """Threshold-free view: rank every mule_review case by priority; average precision and precision/recall at K = number of mules."""
+    mules = set(labels.filter(pl.col("label") == "mule")["client_id"])
+    ranked = sorted((c for c in cases.values() if c.route == "mule_review"), key=lambda c: (-c.priority, c.client_id))
+    hits, ap = 0, 0.0
+    for i, c in enumerate(ranked, 1):
+        if c.client_id in mules:
+            hits += 1
+            ap += hits / i
+    k = len(mules)
+    top = {c.client_id for c in ranked[:k]}
+    return {"average_precision": round(ap / k, 4) if k else 0.0, "precision_at_k": round(len(top & mules) / k, 4) if k else 0.0,
+            "k": k, "mules_without_case": len(mules - {c.client_id for c in ranked})}
 
 
 def _breakdown(cases: dict[str, object], labels: pl.DataFrame, min_priority: int = 0) -> dict:
@@ -106,13 +122,13 @@ def evaluate(path: str, cfg: dict | None = None, audit_path: str | None = None) 
     out = {
         "world": path, "synthetic": True, "n_tx": tx.height, "n_clients": cl.height,
         "modes": {
-            "isolated": {"overall": _metrics(cases_iso, lab, None, tau), "overall_any_priority": _metrics(cases_iso, lab), "per_bank": per_bank, "per_bank_any_priority": per_bank_any,
+            "isolated": {"overall": _metrics(cases_iso, lab, None, tau), "rank": _rank(cases_iso, lab), "overall_any_priority": _metrics(cases_iso, lab), "per_bank": per_bank, "per_bank_any_priority": per_bank_any,
                          "best_single_bank_f1": max(m["f1"] for m in per_bank.values()),
                          "mean_bank_f1": round(sum(m["f1"] for m in per_bank.values()) / len(per_bank), 4),
                          "exposure": {"raw_records_exposed": 0, "bytes_exchanged": 0}},
-            "staj_psi": {"overall": _metrics(cases_psi, lab, None, tau), "overall_any_priority": _metrics(cases_psi, lab), "exposure": radar.exposure,
+            "staj_psi": {"overall": _metrics(cases_psi, lab, None, tau), "rank": _rank(cases_psi, lab), "overall_any_priority": _metrics(cases_psi, lab), "exposure": radar.exposure,
                          "clusters_disclosed": sum(1 for c in radar.clusters if c["disclosed"]), "refused": radar.refused},
-            "naive_raw_sharing": {"overall": _metrics(cases_naive, lab, None, tau), "overall_any_priority": _metrics(cases_naive, lab),
+            "naive_raw_sharing": {"overall": _metrics(cases_naive, lab, None, tau), "rank": _rank(cases_naive, lab), "overall_any_priority": _metrics(cases_naive, lab),
                                   "exposure": {"raw_records_exposed": tx.height, "bytes_exchanged": int(tx.estimated_size())}},
         },
         "operating_point": {"definition": f"case triage REVIEW, route mule_review and priority >= {tau}", "min_priority": tau},

@@ -5,8 +5,8 @@ import os
 from dataclasses import dataclass, field
 
 import boto3
-from botocore.config import Config
 import yaml
+from botocore.config import Config
 
 
 def load_models(path: str = "config/models.yaml") -> dict:

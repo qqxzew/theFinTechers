@@ -20,6 +20,7 @@ class AgentRun:
     stop_reason: str = ""
     tool_calls: int = 0
     cost_usd: float = 0.0
+    ungrounded_refs: list = field(default_factory=list)   # signal ids cited in the final text that do not exist in the case
 
 
 def run_agent(llm: LLM, agent: str, role: str, system: str, task: str, tools: CaseTools, budget: Budget, audit=None) -> AgentRun:
@@ -37,7 +38,12 @@ def run_agent(llm: LLM, agent: str, role: str, system: str, task: str, tools: Ca
             for u in r.tool_uses:
                 try:
                     out = tools.call(u["name"], u["input"])
-                    payload = {"json": out} if isinstance(out, (dict, list)) else {"text": str(out)}
+                    if isinstance(out, dict):
+                        payload = {"json": out}
+                    elif isinstance(out, list):
+                        payload = {"json": {"result": out}}      # Bedrock requires a JSON OBJECT in toolResult.json
+                    else:
+                        payload = {"text": str(out)}
                     status = "success"
                 except Exception as e:  # noqa: BLE001 - a bad tool call is returned to the model, not fatal
                     payload, status = {"text": f"ERROR: {e}"}, "error"

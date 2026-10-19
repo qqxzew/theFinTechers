@@ -1,0 +1,52 @@
+[importlinter]
+root_packages =
+    node
+    radar
+    copilot
+    audit
+    escalation
+    export
+    api
+    eval
+    ingest
+    common
+    redteam
+
+[importlinter:contract:blue-cannot-import-red]
+name = Blue team must never import the red-team generator
+type = forbidden
+source_modules =
+    node
+    radar
+    copilot
+    audit
+    escalation
+    export
+    api
+    ingest
+    common
+forbidden_modules =
+    redteam
+
+[importlinter:contract:red-cannot-import-blue]
+name = Red team must not import detector code
+type = forbidden
+source_modules =
+    redteam
+forbidden_modules =
+    node
+    radar
+    copilot
+    escalation
+    export
+    api
+    eval
+
+[importlinter:contract:node-has-no-labels-or-eval]
+name = Bank-node code must not import the evaluation harness (labels live there)
+type = forbidden
+source_modules =
+    node
+    radar
+forbidden_modules =
+    eval

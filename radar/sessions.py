@@ -65,7 +65,7 @@ def run_radar(nodes: list[BankNode], guards: Guards, epoch_key: bytes, audit: Au
         if not d.allowed:
             refused[n.bank_id] = d.reason
             if audit:
-                audit.append(actor=f"radar", action="submission_refused", why=d.reason, rule_version="guards-1", model_version=None,
+                audit.append(actor="radar", action="submission_refused", why=d.reason, rule_version="guards-1", model_version=None,
                              input_hash=hashlib.sha256(n.bank_id.encode()).hexdigest()[:16], bank=n.bank_id)
         else:
             live.append(n)

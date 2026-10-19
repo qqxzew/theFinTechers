@@ -207,5 +207,3 @@ Id кластера в `redteam_seed101.json` (`26ca23fd2a71`, те же 8 ка�
 
 
 
-ZK PROOFS
-bubbemaps 

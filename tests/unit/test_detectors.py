@@ -1,5 +1,4 @@
 """Detector unit tests on hand-built feature dicts. Each detector has a positive case and an honest look-alike that must NOT fire."""
-import pytest
 
 from common.schemas import Signal
 

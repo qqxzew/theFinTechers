@@ -2,7 +2,7 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from radar.psi.dh_psi import P, Q, PsiParty, hash_to_group
+from radar.psi.dh_psi import P, PsiParty, Q, hash_to_group
 
 tok = st.text(alphabet="ABCDEFGH0123456789:", min_size=1, max_size=12)
 

@@ -16,11 +16,9 @@ from api.state import RULE_AUTHOR, STAFF, DemoState, build_state
 from audit.log import verify_chain
 from copilot.bedrock_client import LLM
 from copilot.budgets import Budget
-from copilot.case_json import RULES_TEXT
 from copilot.explain import explain_case
 from copilot.model_registry import ModelRegistry, load_models
 from copilot.opo_draft import build_opo, draft_section_v, load_settings, to_markdown
-from copilot.tools.case_tools import CaseTools
 from escalation.conflicts import check_decision, validate_approval
 from escalation.matrix import route
 

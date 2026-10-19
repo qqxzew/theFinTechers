@@ -1,0 +1,11 @@
+# One image for the bank-node service and the radar coordinator (different command per compose service).
+# A real deployment would build the node image per bank and run it inside that bank's own infrastructure.
+FROM python:3.12-slim
+WORKDIR /app
+RUN pip install --no-cache-dir pyyaml pydantic polars duckdb networkx cryptography fastapi uvicorn numpy httpx tzdata
+COPY . .
+# the image ships no data: a node gets its world through a read-only mount, the radar (same image) gets none
+RUN rm -rf /app/data /app/eval/out /app/.venv /app/ui/node_modules
+ENV PYTHONPATH=/app HOST=0.0.0.0
+# default: bank node (bank id, secret, epoch key, port and world come from the environment)
+CMD ["python", "-m", "node.service"]

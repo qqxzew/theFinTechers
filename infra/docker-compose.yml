@@ -1,0 +1,76 @@
+# HONEST STATUS (see docs/DISTRIBUTED.md):
+#  - node-b1/b2/b3 and radar are separate containers/processes talking HTTP/JSON. Each node is told its bank id and loads ONLY its own
+#    bank's rows (it filters the shared synthetic world itself; labels.parquet is never read). In this demo all three mount the same
+#    read-only world directory - a real deployment gives every bank its own storage, its own key store and mutual TLS.
+#  - Each node sits on its own network with the radar only (net-b1/b2/b3): nodes cannot reach each other, only the coordinator.
+#  - The radar gets node URLs only; it never receives the epoch key or a bank secret (no STAJ_EPOCH_KEY in its environment).
+#  - "api" is still the existing single-process demo backend (it runs its own in-process copy of the 3 nodes + radar for the UI);
+#    the UI is not yet wired to the distributed services.
+#  - No TLS, no per-bank KMS, no Clean Rooms / Nitro Enclaves: simulated on one host.
+x-node: &node
+  build: {context: .., dockerfile: infra/Dockerfile.node}
+  healthcheck:
+    test: ["CMD", "python", "-c", "import os,urllib.request; urllib.request.urlopen('http://127.0.0.1:%s/health' % os.environ['PORT'])"]
+    interval: 10s
+    timeout: 5s
+    retries: 120
+    start_period: 30s
+
+services:
+  node-b1:
+    <<: *node
+    environment: {STAJ_BANK_ID: B1, PORT: "8101", STAJ_WORLD: /app/world, STAJ_BANK_SECRET: "${STAJ_SECRET_B1:-secret-B1}",
+                  STAJ_EPOCH_KEY: "${STAJ_EPOCH_KEY:-demo-epoch-key-change-me}", STAJ_NODE_AUDIT: /app/eval/out/audit_node_B1.jsonl}
+    volumes: ["../${STAJ_WORLD:-data/redteam/seed101}:/app/world:ro", "audit-b1:/app/eval/out"]   # own audit volume per bank
+    networks: [net-b1]
+  node-b2:
+    <<: *node
+    environment: {STAJ_BANK_ID: B2, PORT: "8102", STAJ_WORLD: /app/world, STAJ_BANK_SECRET: "${STAJ_SECRET_B2:-secret-B2}",
+                  STAJ_EPOCH_KEY: "${STAJ_EPOCH_KEY:-demo-epoch-key-change-me}", STAJ_NODE_AUDIT: /app/eval/out/audit_node_B2.jsonl}
+    volumes: ["../${STAJ_WORLD:-data/redteam/seed101}:/app/world:ro", "audit-b2:/app/eval/out"]   # own audit volume per bank
+    networks: [net-b2]
+  node-b3:
+    <<: *node
+    environment: {STAJ_BANK_ID: B3, PORT: "8103", STAJ_WORLD: /app/world, STAJ_BANK_SECRET: "${STAJ_SECRET_B3:-secret-B3}",
+                  STAJ_EPOCH_KEY: "${STAJ_EPOCH_KEY:-demo-epoch-key-change-me}", STAJ_NODE_AUDIT: /app/eval/out/audit_node_B3.jsonl}
+    volumes: ["../${STAJ_WORLD:-data/redteam/seed101}:/app/world:ro", "audit-b3:/app/eval/out"]   # own audit volume per bank
+    networks: [net-b3]
+  radar:
+    build: {context: .., dockerfile: infra/Dockerfile.node}
+    command: ["python", "-m", "radar.service"]
+    environment: {PORT: "8200", STAJ_NODE_URLS: "B1=http://node-b1:8101,B2=http://node-b2:8102,B3=http://node-b3:8103",
+                  STAJ_RADAR_AUDIT: /app/eval/out/audit_radar.jsonl}
+    volumes: ["radar-audit:/app/eval/out"]
+    ports: ["8200:8200"]           # POST http://localhost:8200/run, GET /clusters, GET /wire
+    networks: [net-b1, net-b2, net-b3, front]
+    depends_on:
+      node-b1: {condition: service_healthy}
+      node-b2: {condition: service_healthy}
+      node-b3: {condition: service_healthy}
+  api:
+    build: {context: .., dockerfile: infra/Dockerfile.api}
+    environment: {AWS_PROFILE: "${AWS_PROFILE:-hackathon}", STAJ_WORLD: "${STAJ_WORLD:-data/redteam/seed101}", HOST: 0.0.0.0}
+    volumes: ["../data:/app/data", "~/.aws:/root/.aws:ro"]
+    ports: ["8000:8000"]
+    networks: [front]
+  ui:
+    image: node:22-slim
+    working_dir: /app/ui
+    volumes: ["../ui:/app/ui"]
+    environment: {VITE_API_BASE: "http://localhost:8000"}
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports: ["5173:5173"]
+    depends_on: [api]
+    networks: [front]
+
+networks:
+  net-b1: {}
+  net-b2: {}
+  net-b3: {}
+  front: {}
+
+volumes:
+  audit-b1: {}
+  audit-b2: {}
+  audit-b3: {}
+  radar-audit: {}

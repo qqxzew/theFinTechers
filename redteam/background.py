@@ -7,7 +7,6 @@ from __future__ import annotations
 
 from datetime import UTC
 
-import numpy as np
 import polars as pl
 
 from ingest.cnb_clients import load_clients
@@ -43,5 +42,5 @@ def add_background(w: World, cnb_tx: str, cnb_clients: str, n_per_bank: int, fx:
                      "tx_id": f"RT{w._n_tx:08d}", "bank_id": bank_of[r["client_id"]], "client_id": new, "own_account": new,
                      "source_dataset": "redteam"})
     deg = sub.group_by("counterparty_token").agg(pl.col("client_id").n_unique().alias("d"))
-    w.popular_tokens = deg.filter(pl.col("d") >= max(100, n_per_bank * len(w.banks) // 5))["counterparty_token"].to_list()
+    w.popular_tokens = deg.filter(pl.col("d") >= max(100, n_per_bank * len(w.banks) // 5))["counterparty_token"].sort().to_list()
     return len(remap)

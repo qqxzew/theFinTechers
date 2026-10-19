@@ -67,7 +67,7 @@ class DemoState:
 
 def build_state(world: str = "data/redteam/seed101", audit_path: str = "eval/out/audit_demo.jsonl", fresh: bool = True) -> DemoState:
     cfg = load_config()
-    tx, cl, _labels_unused = load_world(world)   # labels are never loaded into the API state
+    tx, cl, _ = load_world(world, with_labels=False)   # the API process never reads labels
     results = run_banks(tx, cl, cfg)
     if fresh and os.path.exists(audit_path):
         os.remove(audit_path)

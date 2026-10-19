@@ -1,0 +1,69 @@
+# IBM AMLworld (HI-Small) evaluation config. SYNTHETIC data. Generic laundering patterns, NOT Czech mule schemes.
+# All weights below are HAND-SET (not fitted on labels). Only `threshold` is chosen by code on the calibration window
+# (days 2022-09-01..09-09) and then applied unchanged to the other windows. See docs/IBM_EVAL.md.
+
+dataset:
+  name: "IBM AMLworld HI-Small (Altman et al., NeurIPS 2023 Datasets & Benchmarks), Kaggle ealtman2019/ibm-transactions-for-anti-money-laundering-aml"
+  transactions: data/raw/ibm/HI-Small_Trans.csv
+  patterns: data/raw/ibm/HI-Small_Patterns.txt
+  synthetic: true
+
+n_banks: 5
+seed: 20261019
+
+# Windows (UTC, inclusive start, exclusive end).
+windows:
+  calibration: {start: "2022-09-01", end: "2022-09-10"}   # days 1-9: the ONLY place labels are used for a choice (the threshold)
+  heldout: {start: "2022-09-10", end: "2022-09-19"}       # days 10-18: never used for any choice
+  full: {start: "2022-09-01", end: "2022-09-19"}          # whole file; contains the calibration days, reported as such
+
+fx:
+  placeholder: true
+  note: "PLACEHOLDER static table, approximate public USD rates around Sept 2022, typed by hand. Not official, not from the dataset. The eval reports the deviation from the rates implied by the dataset's own cross-currency rows."
+  usd_per_unit:
+    US Dollar: 1.0
+    Euro: 1.0
+    UK Pound: 1.15
+    Swiss Franc: 1.03
+    Yen: 0.0070
+    Yuan: 0.144
+    Rupee: 0.0125
+    Ruble: 0.0165
+    Shekel: 0.29
+    Canadian Dollar: 0.75
+    Australian Dollar: 0.68
+    Mexican Peso: 0.050
+    Brazil Real: 0.19
+    Saudi Riyal: 0.266
+    Bitcoin: 20000.0
+
+# Bank-side engine (IBM-scale vectorised variant of D1 flow-through+ and D5 rare-exit concentration; own design).
+engine:
+  rare_max_degree: 3          # a counterparty token is "rare" if <= 3 own clients of the bank transact with it (METHODOLOGY.md)
+  drain_window_h: 24          # onward-transfer window after the largest inflow
+  # additive log-odds: logit = bias + sum(weight * feature); hand-set, see docs/IBM_EVAL.md for the rationale per weight
+  weights:
+    bias: -7.0
+    drain_24h: 2.0            # share of the largest inflow sent on (to others than its payer) within 24 h, 0..1
+    flow_ratio: 1.5           # min(in,out)/max(in,out), 0..1: money passes through instead of staying or originating
+    low_retention: 0.5        # indicator: inflow > 0 and retention <= 0.1
+    rare_out_share: 1.0       # share of outflow amount to rare counterparties, 0..1
+    log_n_rare_cp: 0.5        # log1p(number of distinct rare counterparties): fan-out / fan-in to rare accounts
+    log_deg_in: 0.5           # log1p(distinct payers): fan-in
+    log10_max_in_24h: 0.15    # log10(1 + max USD inflow in any 24 h window): materiality
+    neighbour: 2.0            # second pass: max first-pass probability among counterparties that are OWN clients of the same node
+  threshold_grid_quantiles: 400   # candidate thresholds = this many score quantiles on the calibration window
+
+radar:
+  candidate_offset: 1.5       # candidate band = score >= threshold - 1.5 (includes weakly suspicious accounts), never all accounts
+  token_max_degree: 3         # only rare counterparty tokens are submitted (popular tokens carry little signal and more exposure)
+  tokens_per_candidate: 4     # top counterparties by amount per candidate
+  max_tokens_per_bank: 600    # PSI cost: ~22 ms per 2048-bit modexp on this laptop, ~8 modexps per token per pair session
+  workers: 10                 # pairwise sessions run in parallel processes (each one calls radar.sessions.run_radar on one pair)
+  cluster_boost: 2.0          # logit points added to every account in a disclosed cluster (never removed: monotone)
+  epoch_key: "ibm-eval-epoch-1"
+  bank_secret_prefix: "ibm-secret-"
+  guards_from: config/thresholds.yaml   # radar_guards (min set size, max tokens, rate limit, unscored share) reused as is
+
+baselines:
+  random_seed: 7

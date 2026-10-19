@@ -1,7 +1,5 @@
 from datetime import UTC, datetime, timedelta
 
-import pytest
-
 from radar.clustering import build_clusters
 from radar.guards import Guards
 
