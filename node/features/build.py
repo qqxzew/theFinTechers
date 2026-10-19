@@ -65,6 +65,7 @@ def _client_row(cid: str, rows: list[dict], deg: dict[str, int], cfg: dict, cyc:
         if (in_total + out_total) else 0.0,
         "max_single_in": max((r["amount_czk"] for r in ins), default=0.0),
         "out_amounts": [r["amount_czk"] for r in outs],
+        "share_low": (sum(r["amount_czk"] for r in outs if deg.get(r["counterparty_token"], 1) <= cfg.get("low_max", 12)) / out_total) if out_total else 0.0,
         "life_payment_share": (sum(1 for r in outs if deg.get(r["counterparty_token"], 1) >= pop_min) / len(outs)) if outs else 0.0,
         "top_exit_share": (max(_by_token(outs).values()) / out_total) if out_total else 0.0,
     }

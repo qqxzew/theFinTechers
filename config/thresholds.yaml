@@ -65,7 +65,12 @@ cases:
     cluster: 10
     amount_log_points: 15
     amount_ref: 10000.0
+radar:
+  use_significance: false      # false = master-prompt baseline (cluster size/rarity score, no significance gate)
+  min_significance: 2.0        # -log10 of the Bonferroni-adjusted combined p-value (2.0 = p_adj <= 0.01)
+  significance_cap: 8.0
 token_export:
+  weak_top_frac: 0.0           # share of the bank's clients exported as WEAK candidates (privacy/recall knob)
   min_prob: 0.05        # candidate band lower bound (includes weakly suspicious)
   min_set_size: 5
 radar_guards: {min_set_size: 5, max_tokens: 5000, max_sessions_per_hour: 20, max_unscored_share: 0.2}
