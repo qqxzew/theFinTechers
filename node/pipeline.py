@@ -173,7 +173,7 @@ def apply_clusters(res: NodeResult, clusters: list[dict]) -> list[Case]:
             xs = Signal(signal_id=f"X:{cid}", detector_id="X", version="1", client_id=cid, score=member_score[cid],
                         evidence=[f"cluster_id={member[cid]}"], explanation_template_key="radar_cluster",
                         source="Stáj radar: blinded cross-bank exit-token match (PSI)")
-            out.append(build_case(res.bank_id, cid, [*sigs_by[cid], xs], res.exculpatory.get(cid, []), meta, res.cfg["cases"]))
+            out.append(_floor(build_case(res.bank_id, cid, [*sigs_by[cid], xs], res.exculpatory.get(cid, []), meta, res.cfg["cases"]), res, member_score[cid]))
         else:
             out.append(case)
     have = {c.client_id for c in out}
@@ -184,6 +184,14 @@ def apply_clusters(res: NodeResult, clusters: list[dict]) -> list[Case]:
         meta = {**res.client_meta[cid], "in_cluster": True, "cluster_id": cl_id}
         xs = Signal(signal_id=f"X:{cid}", detector_id="X", version="1", client_id=cid, score=member_score[cid], evidence=[f"cluster_id={cl_id}"],
                     explanation_template_key="radar_cluster", source="Stáj radar: blinded cross-bank exit-token match (PSI)")
-        out.append(build_case(res.bank_id, cid, [xs], exc, meta, res.cfg["cases"]))
+        out.append(_floor(build_case(res.bank_id, cid, [xs], exc, meta, res.cfg["cases"]), res, member_score[cid]))
     return out
+
+
+def _floor(case: Case, res: NodeResult, x_score: float) -> Case:
+    """Pre-registered: with the significance gate ON, members of a disclosed cluster get priority >= 30 + round(20 x x_score)."""
+    if not res.cfg.get("radar", {}).get("use_significance", False):
+        return case
+    floor = res.cfg["cases"]["fp_max_priority"] + round(20 * x_score)
+    return case if case.priority >= floor else case.model_copy(update={"priority": min(100, floor)})
 

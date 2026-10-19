@@ -35,10 +35,13 @@ def one(path: str, frac: float, significance: bool) -> dict:
     mules = set(lab.filter(pl.col("label") == "mule")["client_id"])
     stealth = set(lab.filter(pl.col("scheme") == "same_hand_stealth")["client_id"])
     allc = set(lab["client_id"])
+    ghost = set(lab.filter(pl.col("scheme") == "ghost_ring")["client_id"])
+    original = mules - ghost
 
     def m(cases):
         flagged = {cid for cid, c in cases.items() if cid in allc and _flag(c, tau)}
-        return {"tp": len(flagged & mules), "fp": len(flagged - mules), "fn": len(mules - flagged), "stealth_recall": round(len(flagged & stealth) / len(stealth), 4)}
+        return {"tp": len(flagged & mules), "fp": len(flagged - mules), "fn": len(mules - flagged), "stealth_recall": round(len(flagged & stealth) / len(stealth), 4),
+                "ghost_recall": round(len(flagged & ghost) / len(ghost), 4), "original_recall": round(len(flagged & original) / len(original), 4)}
 
     ref_label = {}
     for b, r in res.items():

@@ -44,3 +44,16 @@ Second round with a lowered local threshold for payers to a significant account 
 * **Guard 3:** disclosed non-mule candidates of NEW <= baseline's on each seed (baseline expected 0).
 * **Guard 4:** all existing tests stay green.
 * Fraction choice (dev seeds with ghost_ring, regenerated): the SMALLEST `weak_top_frac` in {0.05, 0.10, 0.20, 0.40} whose dev-mean ghost recall is >= 90 % of the best sweep value and whose FP is <= baseline + 1 on every dev seed. If no fraction yields dev-mean ghost recall > baseline + 0.30, the experiment is declared negative WITHOUT running seeds 707/808 and `main` stays unchanged.
+
+---
+## FREEZE (dev sweep with ghost_ring, 7 dev seeds; raw: `eval/out/weak_sweep_v2_dev_ghost.json`)
+| variant | ghost recall isolated / with radar | recall original schemes | FP (sum of 7 seeds) | exported tokens per world (mean) | disclosed non-mule candidates |
+|---|---|---|---|---|---|
+| baseline (frac 0, no significance) | 0.00 / 0.00 | 1.000 | 49 | 224 | 0 |
+| significance only | 0.00 / 0.00 | 1.000 | 49 | 224 | 0 |
+| weak 0.05 | 0.00 / **1.00** | 1.000 | 49 | 1,410 | 0 |
+| weak 0.10 | 0.00 / 0.14 | 1.000 | 49 | 2,390 | 0 |
+| weak 0.20 | 0.00 / 0.00 | 0.985 | 49 | 4,503 | 0 |
+| weak 0.40 | 0.00 / 0.00 | 0.985 | 49 | 8,807 | 0 |
+
+By the pre-registered rule the chosen fraction is **0.05**. The curve is NOT monotone: more exported candidates dilute the significance of a match, so the knob is fragile; 0.05 works here partly because the ghost accounts rank in the top 5 % by the local pass-through score (they forward 90 % within hours) - a ring that forwards slowly would not be selected. Config frozen in `config/thresholds.yaml` (weak_top_frac 0.05, use_significance true, min_significance 2.0, significance_cap 8.0). Seeds 707 and 808 are generated only after the tag `prereg-config-frozen`.

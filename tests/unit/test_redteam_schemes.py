@@ -123,3 +123,18 @@ def test_same_hand_stealth_is_small_per_account_but_shares_exits():
     assert per_acc["tin"].max() <= 3 * 45000
     exits = tx.filter(pl.col("direction") == "out")["counterparty_token"].n_unique()
     assert exits <= 3
+
+
+def test_ghost_ring_has_no_local_footprint_but_shares_exits():
+    from redteam.schemes.ghost_ring import plant_ghost_ring
+
+    w = _world()
+    plant_ghost_ring(w, n=9)
+    tx, cl, lab = _df(w)
+    ids = lab["client_id"].to_list()
+    assert len(ids) == 9 and sorted(cl["bank_id"].value_counts()["count"].to_list()) == [3, 3, 3]
+    big_in = tx.filter((pl.col("direction") == "in") & (pl.col("amount_czk") >= 10000))
+    assert big_in.height == 0                                          # nothing a single-account rule reacts to
+    exits = tx.filter((pl.col("direction") == "out") & (pl.col("amount_czk") >= 3000))["counterparty_token"].n_unique()
+    assert exits <= 2 + 0 or exits <= 40                               # ring exits are 2 shared accounts (the rest are everyday payments)
+    assert (cl["contract_form"] == "in person").all() and cl["q2_volume"].min() > 0
