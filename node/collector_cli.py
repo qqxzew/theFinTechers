@@ -15,7 +15,6 @@ import time
 import urllib.request
 from pathlib import Path
 
-import numpy as np
 import polars as pl
 
 from node.expansion import expand_how, expand_where

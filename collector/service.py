@@ -66,12 +66,12 @@ def flags(round_id: str) -> dict:
     if rnd is None:
         raise HTTPException(404, "unknown round")
     try:
-        P, K, I = (rnd.total(x).astype(np.int64) for x in ("P", "K", "I"))
+        P, K, ind = (rnd.total(x).astype(np.int64) for x in ("P", "K", "I"))
     except MissingBankError as e:
         log.warning("round %s FAILED loudly: %s", round_id, e)
         raise HTTPException(409, str(e)) from e
     log.info("round %s: sums of masked vectors computed (plain totals only; no single bank's counts are ever visible)", round_id)
-    wr = where_test(P, K, I, q=CONFIG["q"], p_inst=CONFIG["p_inst"], allowlist_buckets=CONFIG["allowlist"])
+    wr = where_test(P, K, ind, q=CONFIG["q"], p_inst=CONFIG["p_inst"], allowlist_buckets=CONFIG["allowlist"])
     out: dict[str, Any] = {"round": round_id, "where": {"flagged": [{"bucket": f["bucket"], "small": f["small"], "banks": f["banks"], "p": f["p"], "totals": {"P": f["P"], "K": f["K"]}}
                                                                     for f in wr.flagged],
                                                         "n_suppressed_institutional": len(wr.suppressed), "n_tested": wr.n_tested}, "how": {"flagged": []}}
