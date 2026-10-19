@@ -32,9 +32,9 @@ def build_clusters(rows: list[dict], n_tests: int | None = None, min_significanc
         by_tok: dict[str, dict[str, list[dict]]] = {}
         for row in rows:
             by_tok.setdefault(row["token_id"], {}).setdefault(row["bank_id"], []).append(row)
-        for tok, banks in by_tok.items():
-            if all("deg" in rs[0] and rs[0].get("deg") is not None and rs[0].get("n_eligible") for rs in banks.values()):
-                entries = [(len(rs), rs[0]["n_eligible"], rs[0]["deg"], rs[0]["n_cands"]) for rs in banks.values()]
+        for tok, per_bank in by_tok.items():
+            if all("deg" in rs[0] and rs[0].get("deg") is not None and rs[0].get("n_eligible") for rs in per_bank.values()):
+                entries = [(len(rs), rs[0]["n_eligible"], rs[0]["deg"], rs[0]["n_cands"]) for rs in per_bank.values()]
                 token_sig[tok] = adjusted_minus_log10(token_p(entries), n_tests)
 
     clusters: list[dict] = []

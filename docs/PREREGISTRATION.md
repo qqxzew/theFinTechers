@@ -57,3 +57,16 @@ Second round with a lowered local threshold for payers to a significant account 
 | weak 0.40 | 0.00 / 0.00 | 0.985 | 49 | 8,807 | 0 |
 
 By the pre-registered rule the chosen fraction is **0.05**. The curve is NOT monotone: more exported candidates dilute the significance of a match, so the knob is fragile; 0.05 works here partly because the ghost accounts rank in the top 5 % by the local pass-through score (they forward 90 % within hours) - a ring that forwards slowly would not be selected. Config frozen in `config/thresholds.yaml` (weak_top_frac 0.05, use_significance true, min_significance 2.0, significance_cap 8.0). Seeds 707 and 808 are generated only after the tag `prereg-config-frozen`.
+
+---
+## RESULT on held-out seeds 707 and 808 (run ONCE, after tag `prereg-config-frozen`; raw: `eval/out/weak_sweep_707_808.json`)
+| seed | variant | ghost recall (radar) | recall original schemes (radar) | TP / FP / FN | exported tokens | bytes exchanged | disclosed non-mule candidates |
+|---|---|---|---|---|---|---|---|
+| 707 | baseline | 0.00 | 0.982 | 55 / 6 / 10 | 210 | 152,576 | 0 |
+| 707 | NEW (weak 0.05 + significance) | **1.00** | 1.000 | 65 / 6 / 0 | 1,394 | 1,269,760 | 0 |
+| 808 | baseline | 0.00 | 1.000 | 57 / 6 / 9 | 225 | 171,008 | 0 |
+| 808 | NEW | **1.00** | 1.000 | 66 / 6 / 0 | 1,443 | 1,308,672 | 0 |
+
+**Criteria:** primary (ghost recall +0.30): +1.00 PASS. Guard 1 (FP <= baseline + 1): 6 vs 6 on both seeds PASS. Guard 2 (original schemes not worse): PASS (707: 0.982 -> 1.000). Guard 3 (non-mule disclosed candidates): 0 vs 0 PASS. Guard 4 (tests): 127 passed PASS. The change is merged into `main`.
+
+**What this does and does not show.** It shows that, in a world where a ring has no usable local signal, exporting the top 5 % of clients by pass-through score and judging matches by their statistical improbability finds the ring with no extra false positives. It does NOT show real-world benefit: the ghost ring is our own scenario, added after the first sweep showed no headroom; the local pass-through score assumes the ring forwards money within hours; the result is fragile in the knob (at 10 % the same ring is not found on seed 707/808 because the extra candidates dilute the significance; at 20-40 % even original-scheme recall drops on some worlds); and the privacy cost is real: about 6.6x more exported tokens (210 -> 1,394), 8x more bytes, 4-5x more match rows seen by the coordinator.
