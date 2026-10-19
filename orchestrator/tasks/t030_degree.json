@@ -1,0 +1,14 @@
+{
+ "id": "t030_degree",
+ "goal": "Create node/features/degree.py with counterparty_degree(tx: pl.DataFrame) -> pl.DataFrame with columns counterparty_token, degree = number of DISTINCT client_id per counterparty_token (all directions). tx columns: client_id, ts (UTC datetime), amount_czk, direction ('in'|'out'|'remit_out'), counterparty_token. 'outflow' means direction in ('out','remit_out').",
+ "read": [
+  "tests/unit/test_features.py"
+ ],
+ "write": [
+  "node/features/degree.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_features.py -q -k degree"
+ ],
+ "max_steps": 20
+}

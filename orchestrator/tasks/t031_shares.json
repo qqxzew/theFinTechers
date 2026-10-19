@@ -1,0 +1,14 @@
+{
+ "id": "t031_shares",
+ "goal": "Create node/features/shares.py with outflow_shares(tx, degree, rare_max=3, popular_min=100) -> pl.DataFrame. tx columns: client_id, ts (UTC datetime), amount_czk, direction ('in'|'out'|'remit_out'), counterparty_token. 'outflow' means direction in ('out','remit_out'). degree has columns counterparty_token, degree. For each client with at least one outflow: out_total = sum of outflow amount_czk; share_rare = outflow amount to counterparties with degree <= rare_max divided by out_total; share_popular = degree >= popular_min; share_mid = the rest. Counterparties missing from degree count as degree 1 (rare). Output columns exactly: client_id, out_total, share_rare, share_mid, share_popular.",
+ "read": [
+  "tests/unit/test_features.py"
+ ],
+ "write": [
+  "node/features/shares.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_features.py -q -k outflow_shares"
+ ],
+ "max_steps": 20
+}

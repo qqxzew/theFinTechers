@@ -1,0 +1,14 @@
+{
+ "id": "t034_hours",
+ "goal": "Create node/features/hours.py with active_hour_profile(tx) -> pl.DataFrame. tx columns: client_id, ts (UTC datetime), amount_czk, direction ('in'|'out'|'remit_out'), counterparty_token. 'outflow' means direction in ('out','remit_out'). For each client, count ALL transactions per hour of the day in Europe/Prague local time (ts.dt.convert_time_zone('Europe/Prague').dt.hour()) and normalise to sum 1. Output columns exactly: client_id, hour_hist (list of 24 floats, index = hour 0..23).",
+ "read": [
+  "tests/unit/test_features.py"
+ ],
+ "write": [
+  "node/features/hours.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_features.py -q -k active_hour"
+ ],
+ "max_steps": 20
+}

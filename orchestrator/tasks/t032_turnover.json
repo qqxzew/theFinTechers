@@ -1,0 +1,14 @@
+{
+ "id": "t032_turnover",
+ "goal": "Create node/features/turnover.py with max_window_sums(tx, windows_h: list[int]) -> pl.DataFrame. tx columns: client_id, ts (UTC datetime), amount_czk, direction ('in'|'out'|'remit_out'), counterparty_token. 'outflow' means direction in ('out','remit_out'). For every client and every w in windows_h compute in_max_{w}h = the maximum, over all sliding windows (ts_i - w hours, ts_i] ending at an inflow transaction, of the sum of inflow amount_czk; out_max_{w}h the same for outflows (windows ending at an outflow). 0.0 if the client has none. Output: client_id plus those columns, ordered in_max_{w}h for each w then out_max_{w}h for each w. Plain Python two-pointer per client is fine (for 400k rows it must finish in under 30 seconds: sort once, use a deque or two pointers, do not do O(n^2)).",
+ "read": [
+  "tests/unit/test_features.py"
+ ],
+ "write": [
+  "node/features/turnover.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_features.py -q -k max_window"
+ ],
+ "max_steps": 20
+}

@@ -1,0 +1,14 @@
+{
+ "id": "t033_cycles",
+ "goal": "Create node/features/cycles.py with inflow_cycles(tx, gap_h: float = 6, out_window_h: float = 24) -> pl.DataFrame. tx columns: client_id, ts (UTC datetime), amount_czk, direction ('in'|'out'|'remit_out'), counterparty_token. 'outflow' means direction in ('out','remit_out'). Per client: sort inflows by ts and group them into cycles: a new cycle starts when the gap to the previous inflow is > gap_h hours. cycle_id = 0,1,2... per client in time order; start = first inflow ts; end = last inflow ts; in_amount = sum of inflow amounts. Each outflow is assigned to the LATEST cycle whose start <= outflow ts, provided outflow ts <= that cycle's end + out_window_h hours; otherwise unassigned. out_amount = sum of assigned outflow amounts; retention = max(0, 1 - out_amount/in_amount); lag_h = amount-weighted mean of (outflow ts - cycle end) in hours over assigned outflows (clip each difference at 0 from below); lag_h = null if out_amount == 0. Output columns exactly: client_id, cycle_id, start, end, in_amount, out_amount, retention, lag_h. Clients without inflows produce no rows.",
+ "read": [
+  "tests/unit/test_features.py"
+ ],
+ "write": [
+  "node/features/cycles.py"
+ ],
+ "accept": [
+  "python -m pytest tests/unit/test_features.py -q -k inflow_cycles"
+ ],
+ "max_steps": 20
+}
