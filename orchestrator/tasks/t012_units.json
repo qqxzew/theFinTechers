@@ -1,0 +1,8 @@
+{
+  "id": "t012_units",
+  "goal": "Create ingest/units.py.\n- projected_monthly(value, unit): unit 'monthly' -> value; 'quarterly' -> value/3; 'yearly' -> value/12; any other unit raises ValueError.\n- Q2_DAYS = 91 (Q2 2026: April 30 + May 31 + June 30).\n- q2_daily_average(value, unit): 'quarterly' -> value/91; 'monthly' -> value*3/91 (value is one average month, a quarter is 3 months); 'yearly' -> value/365; other raises ValueError.",
+  "read": ["tests/unit/test_units.py"],
+  "write": ["ingest/units.py"],
+  "accept": ["python -m pytest tests/unit/test_units.py -q"],
+  "max_steps": 8
+}

@@ -1,0 +1,8 @@
+﻿client ID;country of client;date of contract;contract concluded;PEP;type of client;expected volume of transactions at the time of contract conclusion [CZK];expected number of transactions at the time of contract conclusion;real volume of transactions in 2Q2026 [CZK];real number of transactions in 2Q2026;maximal volume of transaction in 2Q2026 [CZK];AML risk score
+K000001;CZ;13.01.2020;in person;N;legal entity;436378.81;115;1730336.85;456;30356.79;low
+K000002;CZ;13.01.2020;in person;N;legal entity;302747.53;67;1161285.31;257;36148.96;high
+K000003;CZ;14.01.2020;in person;N;natural person;67526.24;22;224064.35;73;24555.00;low
+K000004;CZ;14.01.2020;in person;N;legal entity;156856.28;133;491797.50;417;9434.96;low
+K000005;CZ;15.01.2020;in person;N;natural person;66902.53;13;205853.94;40;41170.79;medium
+K000006;SK;15.01.2020;in person;N;legal entity;519587.48;156;1452180.40;436;26645.51;low
+K000007;CZ;15.01.2020;in person;N;natural person;39041.55;27;115678.66;80;11567.87;low

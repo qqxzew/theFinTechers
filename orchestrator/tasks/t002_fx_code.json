@@ -1,0 +1,8 @@
+{
+  "id": "t002_fx_code",
+  "goal": "Create ingest/fx.py with two functions.\n- load_fx(path) -> dict: reads a YAML file (use yaml.safe_load) and returns the dict as is.\n- to_czk(amount, currency, fx) -> float: amount * fx['rates'][currency]; raises KeyError if the currency is missing.\nNothing else. Do NOT create config/fx.yaml (another task does that).",
+  "read": ["tests/unit/test_fx.py"],
+  "write": ["ingest/fx.py"],
+  "accept": ["python -m pytest tests/unit/test_fx.py -q -k \"not shipped_config\""],
+  "max_steps": 8
+}

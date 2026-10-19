@@ -1,0 +1,8 @@
+# Decision log
+
+| # | Date | Decision | Why |
+|---|---|---|---|
+| D-001 | 2026-10-19 | ČNB local copy of `transactions.csv`/`clients.csv` (identical to `s3://ai-hackathon-datasets-422928733782/CNB/`, same sizes 36474908 / 497141 bytes) is used from `data/raw/cnb/`. | Already downloaded by the team; verified row counts 397,853 / 5,493 and direction counts 187,152 out / 170,986 in / 39,715 remittance. |
+| D-002 | 2026-10-19 | ČNB timestamps are read as Europe/Prague local time and converted to UTC. | Source gives no zone; local time is the natural reading for a Czech bank. |
+| D-003 | 2026-10-19 | Client column parsing is positional, not by header text. | Header spelling in the source differs from the spec ("at the time" vs "at thetime"). |
+| D-004 | 2026-10-19 | Work is split into small tasks executed by sandboxed Kimi-K3 workers (`orchestrator/`); acceptance tests are written by the orchestrator, not by the worker. | Workers are weak; prevents self-grading. |

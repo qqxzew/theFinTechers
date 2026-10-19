@@ -1,0 +1,8 @@
+{
+  "id": "t003_fx_config",
+  "goal": "Create config/fx.yaml: top keys `placeholder: true`, `source: \"PLACEHOLDER rates for July 2026, NOT official CNB rates - replace\"`, `date: \"2026-07\"`, and `rates:` mapping currency -> CZK per 1 unit for exactly these codes: CZK 1.0, EUR 24.3, USD 21.5, PLN 5.7, CNY 3.0, HUF 0.061, RON 4.9, GBP 28.5, SEK 2.15, DKK 3.26, CHF 25.8, JPY 0.14, TRY 0.5, NOK 2.05, KRW 0.016, AUD 14.2, BRL 3.9, CAD 15.7, INR 0.26, ISK 0.16, MXN 1.15, SGD 16.3, ZAR 1.2. Plain YAML, no other keys.",
+  "read": [],
+  "write": ["config/fx.yaml"],
+  "accept": ["python -c \"import yaml;d=yaml.safe_load(open('config/fx.yaml'));assert d['placeholder'] is True and len(d['rates'])==23\""],
+  "max_steps": 6
+}

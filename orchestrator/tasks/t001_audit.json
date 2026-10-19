@@ -1,0 +1,9 @@
+{
+  "id": "t001_audit",
+  "goal": "Create audit/log.py implementing an append-only hash-chained JSONL log.\n- class AuditLog(path): append(actor, action, why, rule_version, model_version, input_hash, **extra) -> dict. The entry dict has keys: seq (int from 0), ts (ISO UTC string), actor, action, why, rule_version, model_version, input_hash, extra (dict), prev_hash, hash. prev_hash of the first entry is 64 zeros. hash = sha256 hex of json.dumps of the entry WITHOUT the 'hash' key, sort_keys=True, ensure_ascii=False, separators=(',',':')... but write each line to file with json.dumps(entry, sort_keys=False) (default separators ', ' and ': ').\n- Opening an existing file continues the chain from the last line.\n- function verify_chain(path) -> tuple[bool, int | None]: (True, None) if intact, else (False, index_of_first_bad_line). A line is bad if its hash does not match recomputation or prev_hash does not equal the previous line's hash.\n- IMPORTANT: when recomputing the hash in verify, parse the line with json.loads, drop 'hash', and hash with the same canonical function used in append.\nUse only the standard library.",
+  "read": ["tests/unit/test_audit_chain.py"],
+  "write": ["audit/log.py"],
+  "accept": ["python -m pytest tests/unit/test_audit_chain.py -q"],
+  "max_steps": 10,
+  "retries": 2
+}

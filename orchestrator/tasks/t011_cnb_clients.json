@@ -1,0 +1,8 @@
+{
+  "id": "t011_cnb_clients",
+  "goal": "Create ingest/cnb_clients.py using polars.\n- load_clients(path, bank_id: str = 'B0') -> pl.DataFrame. Source: semicolon-separated, utf-8-sig, 12 columns IN THIS ORDER: client ID; country of client; date of contract (dd.mm.yyyy); contract concluded; PEP (Y/N); type of client; expected volume; expected number; real volume Q2; real number Q2; maximal volume Q2; AML risk score. Read everything as strings and rename BY POSITION (do not rely on header text).\n- Output columns exactly in this order: client_id, bank_id, client_country, contract_date (pl.Datetime, parsed from dd.mm.yyyy), contract_form, pep (bool: 'Y'->True else False), client_type, expected_volume (float), expected_count (float), q2_volume (float), q2_count (float), q2_max (float), aml_risk, source_dataset ('cnb'), derived (False, bool).\n- Keep client_type and other strings exactly as in the source.",
+  "read": ["tests/unit/test_cnb_ingest.py", "tests/fixtures/cnb_clients_sample.csv"],
+  "write": ["ingest/cnb_clients.py"],
+  "accept": ["python -m pytest tests/unit/test_cnb_ingest.py -q -k clients"],
+  "max_steps": 16
+}
