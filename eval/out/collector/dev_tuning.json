@@ -1,0 +1,23 @@
+{
+ "table": {
+  "30": {
+   "dev_mean_shared_stealth_recall_c": 1.0,
+   "crimefree_network_only_errors_mean": 0.0,
+   "honest_raised_max_any_seed_cell": 1,
+   "admissible": true
+  },
+  "50": {
+   "dev_mean_shared_stealth_recall_c": 1.0,
+   "crimefree_network_only_errors_mean": 5.6,
+   "honest_raised_max_any_seed_cell": 8,
+   "admissible": false
+  },
+  "80": {
+   "dev_mean_shared_stealth_recall_c": 1.0,
+   "crimefree_network_only_errors_mean": 5.6,
+   "honest_raised_max_any_seed_cell": 8,
+   "admissible": false
+  }
+ },
+ "chosen": "30"
+}
