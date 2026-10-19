@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 
 import numpy as np
 
@@ -66,7 +66,7 @@ class World:
                country: str = "CZ", currency: str = "CZK") -> str:
         """direction in {'in','out','remit_out'}; the client's own account is the client id."""
         assert direction in ("in", "out", "remit_out")
-        assert START <= ts <= END + timedelta(days=1), ts
+        ts = min(max(ts, START), END)   # keep every event inside July 2026 (late-month schemes would otherwise spill over)
         bank = self._bank_of[client_id]
         self._n_tx += 1
         txid = f"RT{self._n_tx:08d}"

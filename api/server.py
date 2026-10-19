@@ -164,7 +164,6 @@ def create_app(st: DemoState) -> FastAPI:
     @app.post("/api/cases/{case_id}/decision")
     def decision(case_id: str, body: DecisionBody):
         c = get_case(case_id)
-        f = st.feats[c.client_id]
         viol: list[str] = []
         if body.action not in ("confirm", "override"):
             viol.append("unknown_action")

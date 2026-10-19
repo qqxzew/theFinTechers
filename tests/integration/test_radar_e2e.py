@@ -19,7 +19,9 @@ def node(bank, groups):
 
 
 def test_psi_clusters_and_no_plaintext_on_wire():
-    filler = lambda b: [(f"{b}-f{i}", [f"SECRET-{b}-{i}"], 8.0 + i, 0.0) for i in range(6)]  # 6 unique tokens per bank, never shared
+    def filler(b):   # 6 unique tokens per bank, never shared
+        return [(f"{b}-f{i}", [f"SECRET-{b}-{i}"], 8.0 + i, 0.0) for i in range(6)]
+
     n1 = node("B1", [("a1", ["EXIT-1", "EXIT-2"], 2.5, 0.08), ("a2", ["EXIT-1"], 2.4, 0.08)] + filler("B1"))
     n2 = node("B2", [("b1", ["EXIT-1", "EXIT-2"], 2.6, 0.08), ("b2", ["EXIT-2"], 2.5, 0.08)] + filler("B2"))
     n3 = node("B3", [("c1", ["EXIT-2"], 2.4, 0.08)] + filler("B3"))

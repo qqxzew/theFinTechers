@@ -72,4 +72,7 @@ def to_markdown(opo: dict) -> str:
     lines = [f"# {opo['title']}", ""]
     for s in opo["sections"]:
         lines += [f"## {s['no']}. {s['title']}", s["text"], ""]
+    if opo.get("section_v_violations"):
+        lines += ["## Upozornění kontroly (QA) – k vyřešení člověkem před použitím", ""]
+        lines += [f"- {v.get('kind')}: {v.get('detail', '')} (věta {v.get('sentence')})" for v in opo["section_v_violations"]] + [""]
     return "\n".join(lines)

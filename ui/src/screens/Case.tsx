@@ -1,12 +1,27 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Bar as RBar, BarChart, CartesianGrid, Cell, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { ApiError, explainCase, getCase, postDecision } from '../api';
+import { ApiError, askCase, explainCase, getCase, postDecision } from '../api';
 import Graph from '../components/Graph';
 import { rememberCase } from '../components/Layout';
-import { Bar, Card, Chip, ClusterBadge, ErrorBox, Loading, PageHeader, PriorityBar, RouteChip, RuleChip, StatusChip, TriageChip, ViolationList, fmtScalar } from '../components/ui';
+import { Bar, Card, Chip, ClusterBadge, ErrorBox, Loading, NA, PageHeader, PriorityBar, RouteChip, RuleChip, StatusChip, TriageChip, ViolationList, fmtScalar } from '../components/ui';
 import { useI18n, type I18nKey, type Lang } from '../i18n';
 import { STAFF, useApp, useAsync } from '../state';
+import type { AskResponse } from '../types';
+
+/**
+ * Normalise an explanation/answer ref to a highlight target:
+ * 'sig:<signal_id>' (also for 'D6:R03035.evidence'), 'feature:<key>' ('features.x', 'feature:x'), 'cluster', or null.
+ */
+function resolveRef(ref: string, signalIds: Set<string>): string | null {
+  if (signalIds.has(ref)) return `sig:${ref}`;
+  const dot = ref.indexOf('.');
+  if (dot > 0 && signalIds.has(ref.slice(0, dot))) return `sig:${ref.slice(0, dot)}`;
+  const f = /^features?[.:](.+)$/.exec(ref);
+  if (f) return `feature:${f[1]}`;
+  if (ref === 'cluster' || ref.startsWith('cluster:') || ref.startsWith('cluster.') || ref.startsWith('X:')) return 'cluster';
+  return null;
+}
 import type { CaseDetail, Explanation, Sentence, Signal } from '../types';
 
 export default function CaseScreen() {
@@ -51,13 +66,15 @@ function CaseView({ data, reload }: { data: CaseDetail; reload: () => void }) {
 
   const focusRef = useCallback(
     (ref: string) => {
-      setHl(ref);
-      const el = document.getElementById(signalIds.has(ref) ? `sig-${ref}` : ref.startsWith('cluster:') ? 'cluster-card' : ref.startsWith('feature:') ? 'features-card' : '');
+      const target = resolveRef(ref, signalIds);
+      if (!target) return;
+      setHl(target);
+      const el = document.getElementById(target.startsWith('sig:') ? `sig-${target.slice(4)}` : target === 'cluster' ? 'cluster-card' : 'features-card');
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         if (el.tagName === 'DETAILS') (el as HTMLDetailsElement).open = true;
       }
-      window.setTimeout(() => setHl((h) => (h === ref ? null : h)), 3500);
+      window.setTimeout(() => setHl((h) => (h === target ? null : h)), 3500);
     },
     [signalIds],
   );
@@ -119,7 +136,7 @@ function CaseView({ data, reload }: { data: CaseDetail; reload: () => void }) {
             </h3>
             {data.signals.length === 0 && <p className="text-sm text-muted">{t('c.no_signals')}</p>}
             {data.signals.map((s) => (
-              <SignalCard key={s.signal_id} s={s} kind="sus" highlighted={hl === s.signal_id} victim={victim && s.detector_id === 'VICTIM'} />
+              <SignalCard key={s.signal_id} s={s} defs={data.rule_definitions} glossary={data.feature_glossary} kind="sus" highlighted={hl === 'sig:' + s.signal_id} victim={victim && s.detector_id === 'VICTIM'} />
             ))}
           </div>
           <div className="space-y-3">
@@ -129,7 +146,7 @@ function CaseView({ data, reload }: { data: CaseDetail; reload: () => void }) {
             </h3>
             {data.exculpatory.length === 0 && <p className="rounded-md border border-dashed border-line p-3 text-sm text-muted">{t('c.no_exculpatory')}</p>}
             {data.exculpatory.map((s) => (
-              <SignalCard key={s.signal_id} s={s} kind="exc" highlighted={hl === s.signal_id} />
+              <SignalCard key={s.signal_id} s={s} defs={data.rule_definitions} glossary={data.feature_glossary} kind="exc" highlighted={hl === 'sig:' + s.signal_id} />
             ))}
           </div>
         </div>
@@ -150,7 +167,7 @@ function CaseView({ data, reload }: { data: CaseDetail; reload: () => void }) {
           <ExplanationCard caseId={data.case_id} state={explain} setState={setExplain} onRef={focusRef} signalIds={signalIds} />
         </div>
         <div className="space-y-5 xl:col-span-2">
-          <div id="cluster-card" className={`rounded-lg transition-shadow ${hl?.startsWith('cluster:') ? 'ring-2 ring-warn' : ''}`}>
+          <div id="cluster-card" className={`rounded-lg transition-shadow ${hl === 'cluster' ? 'ring-2 ring-warn' : ''}`}>
             <Card title={t('c.cluster')}>
               {data.cluster ? (
                 <div className="flex flex-wrap items-center gap-4">
@@ -164,9 +181,13 @@ function CaseView({ data, reload }: { data: CaseDetail; reload: () => void }) {
               )}
             </Card>
           </div>
+          <DropsCard accounts={data.cluster?.matched_exit_accounts} />
           <TriageCard data={data} />
         </div>
       </div>
+
+      <AskPanel caseId={data.case_id} onRef={focusRef} signalIds={signalIds} />
+
 
       <DecisionPanel data={data} onDone={reload} />
 
@@ -176,7 +197,10 @@ function CaseView({ data, reload }: { data: CaseDetail; reload: () => void }) {
           <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
             {Object.entries(data.features).map(([k, v]) => (
               <div key={k} className={`contents ${hl === `feature:${k}` ? 'font-semibold text-teal' : ''}`}>
-                <dt className="mono text-muted">{k}</dt>
+                <dt className="mono text-muted" title={data.feature_glossary?.[k]}>
+                  {k}
+                  {data.feature_glossary?.[k] && <span className="block font-sans text-[11px] font-normal leading-snug text-muted/80">{data.feature_glossary[k]}</span>}
+                </dt>
                 <dd className="mono tnum">{fmtScalar(v, num)}</dd>
               </div>
             ))}
@@ -227,9 +251,56 @@ function renderTemplate(tpl: string, ev: Signal['evidence'], num: (n: number, d?
   });
 }
 
-function SignalCard({ s, kind, highlighted, victim }: { s: Signal; kind: 'sus' | 'exc'; highlighted: boolean; victim?: boolean }) {
+/** 24-value hour histogram (or any short numeric array) as a tiny bar strip. */
+function MiniHist({ values, label }: { values: number[]; label: string }) {
+  const max = Math.max(...values, 1e-9);
+  return (
+    <span className="inline-flex h-5 items-end gap-[1px]" role="img" aria-label={`${label}: ${values.map((v) => v.toFixed(2)).join(', ')}`}>
+      {values.map((v, i) => (
+        <span key={i} title={`${i}: ${v.toFixed(2)}`} className="w-[5px] rounded-t-sm bg-navy/80" style={{ height: `${Math.max(1, (v / max) * 20)}px`, opacity: v === 0 ? 0.25 : 1 }} />
+      ))}
+    </span>
+  );
+}
+
+function EvidenceValue({ k, v }: { k: string; v: unknown }) {
+  const { num } = useI18n();
+  if (Array.isArray(v) && v.length >= 8 && v.every((x) => typeof x === 'number')) return <MiniHist values={v as number[]} label={k} />;
+  if (Array.isArray(v) && v.length && v.every((x) => typeof x === 'number')) return <>{(v as number[]).map((x) => fmtScalar(x, num)).join(', ')}</>;
+  if (Array.isArray(v) && v.every((x) => typeof x === 'string'))
+    return (
+      <span className="inline-flex flex-wrap gap-1">
+        {(v as string[]).map((x) => (
+          <Chip key={x} mono tone="outline">
+            {x}
+          </Chip>
+        ))}
+      </span>
+    );
+  return <>{fmtScalar(v, num)}</>;
+}
+
+function SignalCard({
+  s,
+  kind,
+  highlighted,
+  victim,
+  defs,
+  glossary,
+}: {
+  s: Signal;
+  kind: 'sus' | 'exc';
+  highlighted: boolean;
+  victim?: boolean;
+  defs?: Record<string, string>;
+  glossary?: Record<string, string>;
+}) {
   const { t, num, pct } = useI18n();
   const accent = victim ? 'border-l-violet' : kind === 'sus' ? 'border-l-warn' : 'border-l-teal';
+  // The backend may send either a sentence template with {placeholders} or a bare template id
+  // (e.g. "d5_rare_exit_concentration"). For an id, show the rule definition as the plain sentence.
+  const isTemplateId = /^[a-z0-9_]+$/i.test(s.template);
+  const sentence = isTemplateId ? defs?.[s.detector_id] : renderTemplate(s.template, s.evidence, num, pct);
   return (
     <article
       id={`sig-${s.signal_id}`}
@@ -247,15 +318,26 @@ function SignalCard({ s, kind, highlighted, victim }: { s: Signal; kind: 'sus' |
           <Bar value={s.score} tone={kind === 'sus' ? 'warn' : 'teal'} width="w-16" label={`score ${s.score}`} />
         </span>
       </header>
-      <p className="mt-2 text-sm leading-relaxed">{renderTemplate(s.template, s.evidence, num, pct)}</p>
-      <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 rounded bg-paper/70 px-2 py-1.5 text-xs">
-        {Object.entries(s.evidence).map(([k, v]) => (
-          <div key={k} className="contents">
-            <dt className="mono text-muted">{k}</dt>
-            <dd className="mono tnum break-all">{fmtScalar(v, num)}</dd>
-          </div>
-        ))}
-      </dl>
+      <p className="mt-2 text-sm leading-relaxed">{sentence ?? <span className="italic text-muted">{t('common.na')}</span>}</p>
+      {isTemplateId && (
+        <p className="mt-0.5 text-[11px] text-muted">
+          {t('c.template')}: <span className="mono">{s.template}</span>
+        </p>
+      )}
+      {Object.keys(s.evidence).length > 0 && (
+        <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 rounded bg-paper/70 px-2 py-1.5 text-xs">
+          {Object.entries(s.evidence).map(([k, v]) => (
+            <div key={k} className="contents">
+              <dt className="mono text-muted" title={glossary?.[k]}>
+                {k}
+              </dt>
+              <dd className="mono tnum break-all">
+                <EvidenceValue k={k} v={v} />
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
       {s.notes.length > 0 && (
         <ul className="mt-2 list-disc pl-4 text-xs text-muted">
           {s.notes.map((n, i) => (
@@ -340,7 +422,7 @@ function RefChips({ refs, onRef, signalIds }: { refs: string[]; onRef: (r: strin
   return (
     <>
       {refs.map((r) => {
-        const clickable = signalIds.has(r) || r.startsWith('cluster:') || r.startsWith('feature:');
+        const clickable = resolveRef(r, signalIds) !== null;
         return clickable ? (
           <button key={r} type="button" onClick={() => onRef(r)} className="rounded" aria-label={`highlight ${r}`}>
             <Chip tone="navy" mono className="hover:bg-navy/20">
@@ -518,7 +600,9 @@ function DecisionPanel({ data, onDone }: { data: CaseDetail; onDone: () => void 
   const minP = meta?.four_eyes_min_priority ?? 70;
   const fourEyes = data.priority >= minP;
   const overrideTarget = data.triage === 'FP' ? 'REVIEW' : 'FP';
-  const reasonMissing = action === 'override' && !reason.trim();
+  // Server rule: an override needs a written reason of at least 10 characters.
+  const reasonMissing = action === 'override' && reason.trim().length < 10;
+  const staff = meta?.staff?.length ? meta.staff.map((name) => ({ name, role: '' })) : STAFF;
   const canSubmit = !busy && decider.trim() !== '' && !reasonMissing;
 
   const submit = async (e: React.FormEvent) => {
@@ -599,7 +683,7 @@ function DecisionPanel({ data, onDone }: { data: CaseDetail; onDone: () => void 
           />
           {action === 'override' && (
             <p id="reason-help" className={`text-xs ${reasonMissing ? 'text-warn' : 'text-muted'}`}>
-              {t('c.reason_required')}
+              {t('c.reason_required')} {t('c.reason_min')}
             </p>
           )}
         </div>
@@ -611,7 +695,7 @@ function DecisionPanel({ data, onDone }: { data: CaseDetail; onDone: () => void 
             </label>
             <input id="decider" className="input w-52" value={decider} onChange={(e) => setDecider(e.target.value)} list="staff-list" />
             <datalist id="staff-list">
-              {STAFF.map((s) => (
+              {staff.map((s) => (
                 <option key={s.name} value={s.name} />
               ))}
             </datalist>
@@ -635,9 +719,10 @@ function DecisionPanel({ data, onDone }: { data: CaseDetail; onDone: () => void 
               </label>
               <select id="approver" className="input w-60" value={approver} onChange={(e) => setApprover(e.target.value)} aria-describedby="fe-help">
                 <option value="">{t('c.approver_none')}</option>
-                {STAFF.map((s) => (
+                {staff.map((s) => (
                   <option key={s.name} value={s.name}>
-                    {s.name} ({t(`role.${s.role}` as I18nKey)})
+                    {s.name}
+                    {s.role ? ` (${t(`role.${s.role}` as I18nKey)})` : ''}
                   </option>
                 ))}
               </select>
@@ -680,6 +765,119 @@ function DecisionPanel({ data, onDone }: { data: CaseDetail; onDone: () => void 
           </span>
         </div>
       </form>
+    </Card>
+  );
+}
+
+function DropsCard({ accounts }: { accounts?: string[] }) {
+  const { t } = useI18n();
+  return (
+    <Card title={t('c.drops')}>
+      {accounts && accounts.length > 0 ? (
+        <ul className="flex flex-wrap gap-1.5" aria-label={t('c.drops')}>
+          {accounts.map((a) => (
+            <li key={a}>
+              <Chip mono tone="outline">
+                {a}
+              </Chip>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <NA />
+      )}
+      <p className="mt-3 text-xs leading-relaxed text-muted">{t('c.drops_note')}</p>
+    </Card>
+  );
+}
+
+const SUGGESTED: Record<Lang, string[]> = {
+  cs: ['Proč se spustilo pravidlo C?', 'Proč se spustil detektor D5?', 'Co by muselo platit, aby byl případ uzavřen jako FP?'],
+  en: ['Why did rule C fire?', 'Why did D5 fire?', 'What would have to be true for this case to be closed as FP?'],
+};
+
+function AskPanel({ caseId, onRef, signalIds }: { caseId: string; onRef: (r: string) => void; signalIds: Set<string> }) {
+  const { t, lang, num } = useI18n();
+  const [q, setQ] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const [res, setRes] = useState<AskResponse | null>(null);
+  const [asked, setAsked] = useState('');
+  const [err, setErr] = useState<string | null>(null);
+  useEffect(() => {
+    if (!busy) return;
+    const start = Date.now();
+    const h = window.setInterval(() => setElapsed(Math.round((Date.now() - start) / 1000)), 500);
+    return () => window.clearInterval(h);
+  }, [busy]);
+
+  const ask = async (question: string) => {
+    const qq = question.trim();
+    if (!qq || busy) return;
+    setQ(qq);
+    setBusy(true);
+    setElapsed(0);
+    setErr(null);
+    setRes(null);
+    setAsked(qq);
+    try {
+      setRes(await askCase(caseId, qq));
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Card title={t('c.ask')} sub={t('c.ask_sub')} id="ask">
+      <form
+        className="flex flex-wrap gap-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          void ask(q);
+        }}
+      >
+        <label htmlFor="ask-q" className="sr-only">
+          {t('c.ask')}
+        </label>
+        <input id="ask-q" className="input min-w-0 flex-1" placeholder={t('c.ask_ph')} value={q} onChange={(e) => setQ(e.target.value)} maxLength={500} />
+        <button className="btn-primary" disabled={busy || !q.trim()} aria-busy={busy}>
+          {busy ? t('c.asking') : t('c.ask_btn')}
+        </button>
+      </form>
+      <div className="mt-2 flex flex-wrap items-center gap-1.5">
+        <span className="text-[11px] text-muted">{t('c.ask_suggest')}:</span>
+        {SUGGESTED[lang].map((s) => (
+          <button key={s} type="button" className="rounded" onClick={() => void ask(s)} disabled={busy}>
+            <Chip tone="neutral" className="hover:text-ink">
+              {s}
+            </Chip>
+          </button>
+        ))}
+      </div>
+      <div className="mt-4 space-y-3" aria-live="polite">
+        {busy && (
+          <p role="status" className="flex items-center gap-2 text-sm text-muted">
+            <span className="h-3 w-3 animate-spin rounded-full border-2 border-line border-t-teal" aria-hidden="true" />
+            {t('c.asking')} <span className="tnum">{num(elapsed)} s</span>
+          </p>
+        )}
+        {err && <ErrorBox error={err} />}
+        {res && (
+          <>
+            <p className="text-xs text-muted">
+              „{asked}“
+            </p>
+            {res.violations?.length > 0 ? <ViolationList items={res.violations} title={t('c.qa_violations')} /> : <p className="text-xs text-good">{t('c.qa_ok')}</p>}
+            {res.answer?.length ? <SentenceList items={res.answer} onRef={onRef} signalIds={signalIds} /> : <NA />}
+            <p className="text-[11px] text-muted">
+              {t('c.model')}: <span className="mono">{res.model_id ?? '–'}</span>
+              {res.attempts !== undefined && ` · ${res.attempts} ${t('c.attempts')}`}
+            </p>
+          </>
+        )}
+      </div>
     </Card>
   );
 }

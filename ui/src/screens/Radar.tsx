@@ -35,7 +35,7 @@ function RadarView({ d }: { d: RadarResponse }) {
                 <Stat n={num(b.n_review)} l={t('r.review')} />
                 <Stat n={num(b.n_candidates_exported)} l={t('r.exported')} />
               </div>
-              <Graph graph={b.local_graph} height={170} layout="concentric" ariaLabel={`${b.bank_id} local graph`} />
+              <Graph graph={b.local_graph} height={230} layout="concentric" ariaLabel={`${b.bank_id} local graph`} />
             </Card>
           ))}
         </div>
@@ -113,9 +113,13 @@ function Stat({ n, l }: { n: string; l: string }) {
 
 function WirePanel({ wire }: { wire: WireMsg[] }) {
   const { t, tx, num } = useI18n();
-  const sessions = useMemo(() => [...new Set(wire.map((w) => w.session))], [wire]);
+  // Bank-to-bank PSI messages carry hex ciphertext; the coordinator session carries match rows (objects).
+  const isPair = (w: WireMsg) => /^[^:x×-]+[:x×-][^:x×-]+$/.test(w.session) && w.sample.every((s) => typeof s === 'string');
+  const pairWire = useMemo(() => wire.filter(isPair), [wire]);
+  const coordWire = useMemo(() => wire.filter((w) => !isPair(w)), [wire]);
+  const sessions = useMemo(() => [...new Set(pairWire.map((w) => w.session))], [pairWire]);
   const [session, setSession] = useState(sessions[0] ?? '');
-  const msgs = wire.filter((w) => w.session === session);
+  const msgs = pairWire.filter((w) => w.session === session);
   const [step, setStep] = useState(0);
   const [playing, setPlaying] = useState(false);
   useEffect(() => setStep(0), [session]);
@@ -127,7 +131,7 @@ function WirePanel({ wire }: { wire: WireMsg[] }) {
 
   if (!wire.length) return null;
   const m = msgs[step];
-  const [a, b] = session.split(/x|×|-/);
+  const [a, b] = session.split(/[:x×-]/);
   const fromA = m ? m.from === a : true;
 
   return (
@@ -185,17 +189,24 @@ function WirePanel({ wire }: { wire: WireMsg[] }) {
               <span key={`${session}-${step}`} className={`absolute inset-y-0 w-1/4 rounded-full bg-warn motion-safe:animate-[wire_1.8s_ease-in-out_infinite] ${fromA ? '' : '[animation-direction:reverse]'}`} />
             </div>
             <ul className="mt-3 space-y-1 rounded-md bg-ink/[0.04] p-2.5" aria-label="ciphertext samples">
-              {m.sample.map((h, i) => (
-                <li key={i} className="mono break-all text-[11px] leading-snug text-ink/80">
-                  {h}
-                </li>
-              ))}
+              {m.sample.map((h, i) => {
+                const hex = String(h);
+                return (
+                  <li key={i} className="mono break-all text-[11px] leading-snug text-ink/80" title={hex}>
+                    {hex.length > 96 ? `${hex.slice(0, 96)}…` : hex}
+                    {hex.length > 96 && <span className="text-muted"> ({num(hex.length / 2)} B, {t('r.truncated')})</span>}
+                  </li>
+                );
+              })}
               <li className="mono text-[11px] text-muted">… +{num(Math.max(0, m.n - m.sample.length))}</li>
             </ul>
           </div>
           <BankBox id={b} active={!fromA} />
         </div>
       )}
+      {coordWire.map((w, i) => (
+        <CoordinatorRows key={i} w={w} />
+      ))}
     </Card>
   );
 }
@@ -262,5 +273,48 @@ function ExposureTable({ d }: { d: RadarResponse }) {
         </table>
       </div>
     </Card>
+  );
+}
+
+function CoordinatorRows({ w }: { w: WireMsg }) {
+  const { t, num } = useI18n();
+  const rows = w.sample.filter((s): s is Record<string, unknown> => typeof s === 'object' && s !== null);
+  const cols = [...new Set(rows.flatMap((r) => Object.keys(r)))];
+  return (
+    <div className="mt-6 border-t border-line pt-4">
+      <h3 className="text-sm font-semibold">
+        {t('r.coordinator')} <span className="tnum font-normal text-muted">· {num(w.n)} · {w.from} → {w.session}</span>
+      </h3>
+      <p className="text-xs text-muted">{t('r.coordinator_sub')}</p>
+      {rows.length ? (
+        <div className="mt-2 overflow-x-auto">
+          <table className="w-full border-collapse text-xs">
+            <thead className="border-b border-line">
+              <tr>
+                {cols.map((c) => (
+                  <th key={c} className="th mono">
+                    {c}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, i) => (
+                <tr key={i} className="border-b border-line/70 last:border-0">
+                  {cols.map((c) => (
+                    <td key={c} className="px-3 py-1.5 mono tnum">
+                      {typeof r[c] === 'object' ? JSON.stringify(r[c]) : String(r[c] ?? '–')}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="mt-1 text-[11px] text-muted tnum">… +{num(Math.max(0, w.n - rows.length))}</p>
+        </div>
+      ) : (
+        <p className="mt-2 text-xs text-muted">{w.sample.map(String).join(', ')}</p>
+      )}
+    </div>
   );
 }

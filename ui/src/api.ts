@@ -1,7 +1,7 @@
 // Single fetch layer. With VITE_API_BASE set, calls the real FastAPI backend.
 // Without it, reads MOCK JSON files from /mock/ and simulates write endpoints in memory.
 import type {
-  AuditResponse, AuditVerify, CaseDetail, DecisionRequest, DecisionResponse, ExplainResponse,
+  AskResponse, AuditResponse, AuditVerify, CaseDetail, DecisionRequest, DecisionResponse, ExplainResponse,
   HonestyResponse, Meta, MetricsResponse, OpoDraft, QueueFilters, QueueResponse, RadarResponse, Sentence,
 } from './types';
 
@@ -113,6 +113,16 @@ export async function explainCase(id: string): Promise<ExplainResponse> {
   return res;
 }
 
+export async function askCase(id: string, question: string): Promise<AskResponse> {
+  if (!USING_MOCKS) return sendJson('POST', `/api/cases/${encodeURIComponent(id)}/ask`, { question });
+  await new Promise((r) => setTimeout(r, 1200));
+  try {
+    return await getJson<AskResponse>(`${MOCK}/ask_${id}.json`);
+  } catch {
+    return await getJson<AskResponse>(`${MOCK}/ask_default.json`);
+  }
+}
+
 export async function postDecision(id: string, body: DecisionRequest): Promise<DecisionResponse> {
   if (!USING_MOCKS) return sendJson('POST', `/api/cases/${encodeURIComponent(id)}/decision`, body);
   // MOCK of the server-side checks (the real server is the authority).
@@ -126,8 +136,8 @@ export async function postDecision(id: string, body: DecisionRequest): Promise<D
   if (m && body.decider === m.relationship_owner) v.push('decider_is_relationship_owner');
   if (m && m.rule_authors.includes(body.decider)) v.push('decider_is_rule_author');
   if (m && body.decider === m.first_triager) v.push('decider_is_first_triager');
-  if (body.action === 'override' && !body.reason.trim()) v.push('override_reason_required');
-  if ((ROLE_RANK[body.role] ?? 0) < (ROLE_RANK[c.escalation.role] ?? 0)) v.push('decider_role_below_escalation_target');
+  if (body.action === 'override' && body.reason.trim().length < 10) v.push('override_requires_written_reason');
+  if ((ROLE_RANK[body.role] ?? 0) < (ROLE_RANK[c.escalation.role] ?? 0)) v.push('role_below_escalation_target');
   if (c.priority >= meta.four_eyes_min_priority && (!body.approver || body.approver === body.decider)) v.push('four_eyes_required');
   if (v.length) return { ok: false, violations: v };
   const decision = { ...body, approver: body.approver ?? null, ts: new Date().toISOString() };
@@ -135,8 +145,18 @@ export async function postDecision(id: string, body: DecisionRequest): Promise<D
   return { ok: true, violations: [], decision };
 }
 
+// The first GET of an OPO draft runs an LLM on the server (~1-2 min). De-duplicate concurrent
+// requests (React StrictMode mounts effects twice in dev) so only one draft call is made.
+const opoInflight = new Map<string, Promise<OpoDraft>>();
+
 export async function getOpo(id: string): Promise<OpoDraft> {
-  if (!USING_MOCKS) return getJson(`${API_BASE}/api/opo/${encodeURIComponent(id)}`);
+  if (!USING_MOCKS) {
+    const hit = opoInflight.get(id);
+    if (hit) return hit;
+    const p = getJson<OpoDraft>(`${API_BASE}/api/opo/${encodeURIComponent(id)}`).finally(() => opoInflight.delete(id));
+    opoInflight.set(id, p);
+    return p;
+  }
   const o = await getJson<OpoDraft>(`${MOCK}/opo_${id}.json`);
   const sv = mockSectionV.get(id);
   return sv ? { ...o, section_v_sentences: sv, section_v_violations: [] } : o;

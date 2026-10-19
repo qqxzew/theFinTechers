@@ -10,11 +10,13 @@ export interface Meta {
     agent_primary: string;
     fallback: string;
     bulk: string;
-    active: { agent_primary: string };
+    active: { agent_primary: string; fallback?: string; bulk?: string };
   };
   chain: { ok: boolean; length: number; head: string };
   roles: string[];
   four_eyes_min_priority: number;
+  /** Staff ids known to the server (used for decider/approver selects). */
+  staff?: string[];
 }
 
 export type Triage = 'FP' | 'REVIEW';
@@ -45,6 +47,8 @@ export interface QueueCounts {
 export interface QueueResponse {
   counts: QueueCounts;
   items: QueueItem[];
+  /** Number of cases matching the filters; items may be capped by the server. */
+  total_matching?: number;
 }
 
 export interface QueueFilters {
@@ -142,7 +146,11 @@ export interface CaseDetail {
     n_other_banks: number;
     n_other_candidates: number;
     lag_ret_concentration: number | null;
+    /** Plaintext exit accounts of THIS bank's client that matched other banks (visible only at the owning bank). */
+    matched_exit_accounts?: string[];
   } | null;
+  feature_glossary?: Record<string, string>;
+  data_label?: string;
   rule_definitions: Record<string, string>;
   timeline: TimelineEntry[];
   local_graph: LocalGraph;
@@ -204,7 +212,8 @@ export interface WireMsg {
   msg: string;
   from: string;
   n: number;
-  sample: string[];
+  /** Hex ciphertext for bank-to-bank messages; match-row objects for the coordinator session. */
+  sample: (string | Record<string, unknown>)[];
 }
 
 export interface Exposure {
@@ -237,8 +246,17 @@ export interface Confusion {
   f1: number;
 }
 
+export type Overall = Confusion & { n_mules: number; n_accounts: number };
+
 export interface ModeResult {
-  overall: Confusion & { n_mules: number; n_accounts: number };
+  overall: Overall;
+  rank?: { average_precision: number; precision_at_k: number; k?: number; mules_without_case?: number };
+  overall_any_priority?: Overall;
+  per_bank?: Record<string, Overall>;
+  per_bank_any_priority?: Record<string, Overall>;
+  best_single_bank_f1?: number;
+  mean_bank_f1?: number;
+  clusters_disclosed?: number;
   exposure: Record<string, unknown>;
 }
 
@@ -250,8 +268,17 @@ export interface CnbSection {
   rule_c_alerts: number;
   rule_c_triage: { FP: number; REVIEW: number };
   priority_hist: { bin: string; count: number }[];
-  mom_persona: { n: number; fp_rate: number } | null;
+  mom_persona: { n: number; fp_rate: number; definition?: string; review_any_priority?: number; review_actionable?: number; fp_rate_any_priority?: number } | null;
   sample_sheet_url: string | null;
+  dataset?: string;
+  synthetic?: boolean;
+  alerts_by_type?: Record<string, number>;
+  cases?: number;
+  triage?: Record<string, number>;
+  routes?: Record<string, number>;
+  signals_by_detector?: Record<string, number>;
+  operating_point_min_priority?: number;
+  actionable_review?: number;
 }
 
 export interface MetricsResponse {
@@ -264,6 +291,10 @@ export interface MetricsResponse {
   failures: { worst_false_positives: Record<string, unknown>[]; false_negatives: Record<string, unknown>[] };
   cnb: CnbSection | null;
   operating_point: { definition: string; min_priority: number };
+  /** Optional extra sections; rendered generically when present. */
+  threshold_curve_held_out_mean?: unknown;
+  ring_size_sweep?: unknown;
+  headline_held_out_mean?: unknown;
 }
 
 export interface AuditEntry {
@@ -277,6 +308,7 @@ export interface AuditEntry {
   input_hash: string;
   prev_hash: string;
   hash: string;
+  extra?: Record<string, unknown>;
 }
 
 export interface AuditResponse {
@@ -297,4 +329,12 @@ export interface HonestyResponse {
   limitations: string[];
   legal_note: string;
   not_found_in_public_sources: string[];
+}
+
+export interface AskResponse {
+  answer: Sentence[];
+  violations: (Record<string, unknown> | string)[];
+  model_id: string;
+  attempts?: number;
+  question_hash?: string;
 }

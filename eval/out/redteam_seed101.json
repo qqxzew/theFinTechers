@@ -305,31 +305,19 @@
   "min_priority": 30
  },
  "breakdown_isolated": {
-  "mule/fixed_skim": {
-   "n": 6,
-   "flagged_as_mule_case": 6,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
-  "background/cnb_background": {
-   "n": 3000,
-   "flagged_as_mule_case": 7,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0023
-  },
   "mule/same_hand": {
    "n": 20,
    "flagged_as_mule_case": 20,
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
-  "victim/victim": {
-   "n": 8,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 7,
-   "rate": 0.875
+  "mule/fixed_skim": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
   },
-  "honest/students_rent": {
+  "honest/fundraiser": {
    "n": 6,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
@@ -341,20 +329,26 @@
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
+  "honest/middleman_cohost": {
+   "n": 6,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
   "honest/freelancer": {
    "n": 10,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
   },
-  "honest/fundraiser": {
-   "n": 6,
+  "victim/victim": {
+   "n": 8,
    "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
+   "routed_to_victim_protection": 7,
+   "rate": 0.875
   },
-  "honest/middleman_cohost": {
-   "n": 6,
+  "honest/migrant_remit": {
+   "n": 10,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
@@ -365,8 +359,8 @@
    "routed_to_victim_protection": 0,
    "rate": 0.0
   },
-  "honest/migrant_remit": {
-   "n": 10,
+  "honest/students_rent": {
+   "n": 6,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
@@ -376,6 +370,12 @@
    "flagged_as_mule_case": 6,
    "routed_to_victim_protection": 0,
    "rate": 1.0
+  },
+  "honest/second_hand_seller": {
+   "n": 10,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
   },
   "mule/same_hand_stealth": {
    "n": 15,
@@ -383,22 +383,64 @@
    "routed_to_victim_protection": 0,
    "rate": 0.9333
   },
-  "honest/second_hand_seller": {
+  "background/cnb_background": {
+   "n": 3000,
+   "flagged_as_mule_case": 7,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0023
+  }
+ },
+ "breakdown_staj_psi": {
+  "mule/same_hand_stealth": {
+   "n": 15,
+   "flagged_as_mule_case": 15,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/freelancer": {
    "n": 10,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
-  }
- },
- "breakdown_staj_psi": {
-  "honest/migrant_remit": {
-   "n": 10,
+  },
+  "mule/invoice_mule": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/students_rent": {
+   "n": 6,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "mule/fixed_skim": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "victim/victim": {
+   "n": 8,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 7,
+   "rate": 0.875
+  },
+  "honest/middleman_cohost": {
+   "n": 6,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
   },
   "honest/second_hand_seller": {
    "n": 10,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "honest/fundraiser": {
+   "n": 6,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
@@ -409,25 +451,13 @@
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
-  "mule/invoice_mule": {
-   "n": 6,
-   "flagged_as_mule_case": 6,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
   "mule/same_hand": {
    "n": 20,
    "flagged_as_mule_case": 20,
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
-  "mule/same_hand_stealth": {
-   "n": 15,
-   "flagged_as_mule_case": 15,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
-  "honest/middleman_cohost": {
+  "honest/group_collection": {
    "n": 6,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
@@ -439,11 +469,25 @@
    "routed_to_victim_protection": 0,
    "rate": 0.0023
   },
-  "honest/freelancer": {
+  "honest/migrant_remit": {
    "n": 10,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
+  }
+ },
+ "breakdown_staj_psi_any_priority": {
+  "mule/fixed_skim": {
+   "n": 6,
+   "flagged_as_mule_case": 6,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "mule/same_hand": {
+   "n": 20,
+   "flagged_as_mule_case": 20,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
   },
   "victim/victim": {
    "n": 8,
@@ -451,51 +495,37 @@
    "routed_to_victim_protection": 7,
    "rate": 0.875
   },
-  "honest/group_collection": {
-   "n": 6,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "mule/fixed_skim": {
-   "n": 6,
-   "flagged_as_mule_case": 6,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
-  "honest/students_rent": {
-   "n": 6,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "honest/fundraiser": {
-   "n": 6,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  }
- },
- "breakdown_staj_psi_any_priority": {
-  "honest/students_rent": {
-   "n": 6,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "mule/same_hand_stealth": {
-   "n": 15,
-   "flagged_as_mule_case": 15,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
   "honest/migrant_remit": {
    "n": 10,
    "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
    "rate": 0.0
   },
-  "honest/fundraiser": {
+  "honest/group_collection": {
+   "n": 6,
+   "flagged_as_mule_case": 3,
+   "routed_to_victim_protection": 0,
+   "rate": 0.5
+  },
+  "background/cnb_background": {
+   "n": 3000,
+   "flagged_as_mule_case": 10,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0033
+  },
+  "mule/day_zero": {
+   "n": 8,
+   "flagged_as_mule_case": 8,
+   "routed_to_victim_protection": 0,
+   "rate": 1.0
+  },
+  "honest/freelancer": {
+   "n": 10,
+   "flagged_as_mule_case": 0,
+   "routed_to_victim_protection": 0,
+   "rate": 0.0
+  },
+  "mule/invoice_mule": {
    "n": 6,
    "flagged_as_mule_case": 6,
    "routed_to_victim_protection": 0,
@@ -507,45 +537,15 @@
    "routed_to_victim_protection": 0,
    "rate": 0.0
   },
-  "mule/day_zero": {
-   "n": 8,
-   "flagged_as_mule_case": 8,
-   "routed_to_victim_protection": 0,
-   "rate": 1.0
-  },
-  "background/cnb_background": {
-   "n": 3000,
-   "flagged_as_mule_case": 10,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0033
-  },
-  "honest/freelancer": {
-   "n": 10,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 0,
-   "rate": 0.0
-  },
-  "victim/victim": {
-   "n": 8,
-   "flagged_as_mule_case": 0,
-   "routed_to_victim_protection": 7,
-   "rate": 0.875
-  },
-  "mule/invoice_mule": {
+  "honest/fundraiser": {
    "n": 6,
    "flagged_as_mule_case": 6,
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
-  "honest/group_collection": {
-   "n": 6,
-   "flagged_as_mule_case": 3,
-   "routed_to_victim_protection": 0,
-   "rate": 0.5
-  },
-  "mule/same_hand": {
-   "n": 20,
-   "flagged_as_mule_case": 20,
+  "mule/same_hand_stealth": {
+   "n": 15,
+   "flagged_as_mule_case": 15,
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
@@ -555,11 +555,11 @@
    "routed_to_victim_protection": 0,
    "rate": 1.0
   },
-  "mule/fixed_skim": {
+  "honest/students_rent": {
    "n": 6,
-   "flagged_as_mule_case": 6,
+   "flagged_as_mule_case": 0,
    "routed_to_victim_protection": 0,
-   "rate": 1.0
+   "rate": 0.0
   }
  },
  "failures_staj_psi": {

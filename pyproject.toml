@@ -9,6 +9,7 @@ ignore = ["E501"]
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+markers = ["slow: real-subprocess distributed test (set STAJ_SLOW_TESTS=1)"]
 
 [tool.mypy]
 ignore_missing_imports = true

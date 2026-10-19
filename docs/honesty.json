@@ -5,12 +5,12 @@
     {"name": "Red-team world (redteam/)", "kind": "planted",
      "description": "Generated locally by an isolated package from ČNB distributions: 3 banks, ~3,000 background clients resampled from ČNB, plus PLANTED schemes (day-zero handover, same hand, stealth same hand, fixed skim, invoice mule, victim draining own savings) and PLANTED honest look-alikes (migrant remittances, students splitting rent, second-hand seller, group collection, co-host middleman, freelancer, fundraiser). Labels are hidden from the detectors and used only by eval/."},
     {"name": "IBM AMLworld HI-Small (Altman et al., NeurIPS 2023)", "kind": "generic",
-     "description": "Generic synthetic laundering patterns (fan-out, cycle, ...), NOT Czech mule schemes. Downloaded; evaluation not yet computed."}
+     "description": "Generic synthetic laundering patterns (fan-out, cycle, ...), NOT Czech mule schemes. Evaluated (docs/IBM_EVAL.md): our engine is weak on it (held-out F1 0.043, AP 0.037; the radar lifts AP to 0.051 without new flags)."}
   ],
   "planted": [
     "All mule accounts, victim accounts and honest look-alike personas in the red-team world are planted by us; detection rates on them measure how well the detectors recognise OUR OWN scheme definitions, not real-world recall.",
     "The persona separators E6-E8 were designed against our own personas; their false-positive rates on real customers are unknown.",
-    "Thresholds of D6 and the radar candidate band were set while looking at dev seed 7; the headline numbers are reported on held-out seed 101."
+    "Thresholds of D6 and the radar candidate band were set while looking at dev seed 7; the headline numbers are reported on held-out seeds 505 and 606 (dev seeds: 7, 101, 202, 303, 404)."
   ],
   "limitations": [
     "The ČNB data contain no mule networks; the cross-bank value of the radar is demonstrated only on planted red-team data.",

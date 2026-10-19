@@ -47,6 +47,10 @@ def opo_to_pdf(opo: dict, path: str) -> str:
     for s in opo["sections"]:
         story.append(Paragraph(escape(f"{s['no']}. {s['title']}"), h))
         story.append(Paragraph(escape(s["text"]).replace("\n", "<br/>"), body))
+    if opo.get("section_v_violations"):
+        story.append(Paragraph(escape("Upozornění kontroly (QA) – k vyřešení člověkem před použitím"), h))
+        for v in opo["section_v_violations"]:
+            story.append(Paragraph(escape(f"- {v.get('kind')}: {v.get('detail', '')} (věta {v.get('sentence')})"), body))
     doc = SimpleDocTemplate(path, pagesize=A4, leftMargin=18 * mm, rightMargin=18 * mm, topMargin=18 * mm, bottomMargin=16 * mm,
                             title=opo["title"], author="Stáj (draft generator)")
     doc.build(story, onFirstPage=banner, onLaterPages=banner)
