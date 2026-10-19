@@ -21,6 +21,7 @@ from redteam.lookalikes.second_hand_seller import plant_second_hand_seller
 from redteam.lookalikes.students_rent import plant_students_rent
 from redteam.schemes.day_zero import plant_day_zero
 from redteam.schemes.fixed_skim import plant_fixed_skim
+from redteam.schemes.ghost_ring import plant_ghost_ring
 from redteam.schemes.invoice_mule import plant_invoice_mule
 from redteam.schemes.same_hand import plant_same_hand
 from redteam.schemes.same_hand_stealth import plant_same_hand_stealth
@@ -52,6 +53,10 @@ def generate(seed: int, out: str, n_banks: int = 3, n_per_bank: int = 1000, cnb_
     for lab_row in list(w.labels):
         if lab_row["persona"] in ("fundraiser", "group_collection", "middleman_cohost", "students_rent", "freelancer"):
             w.add_everyday(lab_row["client_id"])
+    saved = w.rng
+    w.rng = np.random.default_rng(seed * 7919 + 1)       # own stream: planting the ghost ring does not change any other part of the world
+    plant_ghost_ring(w, n=9)
+    w.rng = saved
     p = Path(out)
     p.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(w.tx, infer_schema_length=None).sort("ts").write_parquet(p / "tx.parquet")

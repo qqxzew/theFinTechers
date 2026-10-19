@@ -58,6 +58,10 @@ class NodeResult:
     degree: dict[str, int] = field(default_factory=dict)
     ref_to_client: dict[str, str] = field(default_factory=dict)
     cfg: dict = field(default_factory=dict)
+    n_eligible: int = 0
+    feat_by_id: dict[str, dict] = field(default_factory=dict)
+    client_meta: dict[str, dict] = field(default_factory=dict)
+    ctx: dict = field(default_factory=dict)
 
 
 def _rule_signals(a: pl.DataFrame, b: pl.DataFrame, c: pl.DataFrame) -> list[Signal]:
@@ -115,12 +119,16 @@ def run_node(bank_id: str, tx: pl.DataFrame, clients: pl.DataFrame, cfg: dict, b
     hr = cfg["hr_countries"]
     cl_by = {r["client_id"]: r for r in clients.to_dicts()}
     cases, probs, metas = [], {}, {}
-    for cid, sigs in sus.items():
+
+    def _meta_for(cid: str) -> dict:
         f = by_id[cid]
-        meta = {"aml_risk": f["aml_risk"] or "low", "pep": bool(f["pep"]), "high_risk_country": (cl_by[cid]["client_country"] or "") in hr,
+        return {"aml_risk": f["aml_risk"] or "low", "pep": bool(f["pep"]), "high_risk_country": (cl_by[cid]["client_country"] or "") in hr,
                 "days_since_contract": f["days_since_contract"] if f["days_since_contract"] is not None else 9999,
                 "contract_form": f["contract_form"], "in_cluster": False, "big_amount": f["big_in_amount"] or f["max_single_in"] or 0.0,
                 "cluster_id": None}
+
+    for cid, sigs in sus.items():
+        meta = _meta_for(cid)
         metas[cid] = meta
         case = build_case(bank_id, cid, sigs, exc.get(cid, []), meta, cfg["cases"])
         cases.append(case)
@@ -130,8 +138,16 @@ def run_node(bank_id: str, tx: pl.DataFrame, clients: pl.DataFrame, cfg: dict, b
     dd = counterparty_degree(tx)
     degree = dict(zip(dd["counterparty_token"].to_list(), dd["degree"].to_list(), strict=True))
     from node.tokens.export import cand_ref
-    ref_to_client = {cand_ref(bank_secret, c.client_id): c.client_id for c in cases}
-    return NodeResult(bank_id, feat, cases, probs, alerts, cand, [s for v in sus.values() for s in v], metas, exc, degree, ref_to_client, cfg)
+    exported = {c["cand_ref"] for c in cand}
+    ref_to_client = {}
+    client_meta = {}
+    for cid in by_id:
+        ref = cand_ref(bank_secret, cid)
+        if ref in exported:
+            ref_to_client[ref] = cid
+            client_meta[cid] = metas.get(cid) or _meta_for(cid)
+    n_eligible = sum(1 for f in by_id.values() if f.get("exit_tokens_low"))
+    return NodeResult(bank_id, feat, cases, probs, alerts, cand, [s for v in sus.values() for s in v], metas, exc, degree, ref_to_client, cfg, n_eligible, by_id, client_meta, ctx)
 
 
 def apply_clusters(res: NodeResult, clusters: list[dict]) -> list[Case]:
@@ -144,7 +160,8 @@ def apply_clusters(res: NodeResult, clusters: list[dict]) -> list[Case]:
         for bank, ref in c["candidates"]:
             if bank == res.bank_id and ref in res.ref_to_client:
                 member[res.ref_to_client[ref]] = c["cluster_id"]
-                member_score[res.ref_to_client[ref]] = c["score"]
+                use_sig = res.cfg.get("radar", {}).get("use_significance", False) and c.get("x_score") is not None
+                member_score[res.ref_to_client[ref]] = c["x_score"] if use_sig else c["score"]
     out = []
     sigs_by: dict[str, list[Signal]] = {}
     for s in res.signals:
@@ -156,7 +173,25 @@ def apply_clusters(res: NodeResult, clusters: list[dict]) -> list[Case]:
             xs = Signal(signal_id=f"X:{cid}", detector_id="X", version="1", client_id=cid, score=member_score[cid],
                         evidence=[f"cluster_id={member[cid]}"], explanation_template_key="radar_cluster",
                         source="Stáj radar: blinded cross-bank exit-token match (PSI)")
-            out.append(build_case(res.bank_id, cid, [*sigs_by[cid], xs], res.exculpatory.get(cid, []), meta, res.cfg["cases"]))
+            out.append(_floor(build_case(res.bank_id, cid, [*sigs_by[cid], xs], res.exculpatory.get(cid, []), meta, res.cfg["cases"]), res, member_score[cid]))
         else:
             out.append(case)
+    have = {c.client_id for c in out}
+    for cid, cl_id in member.items():
+        if cid in have or cid not in res.feat_by_id:
+            continue
+        exc = [sg for m in INNOCENCE for sg in m.detect(res.feat_by_id[cid], res.ctx)]
+        meta = {**res.client_meta[cid], "in_cluster": True, "cluster_id": cl_id}
+        xs = Signal(signal_id=f"X:{cid}", detector_id="X", version="1", client_id=cid, score=member_score[cid], evidence=[f"cluster_id={cl_id}"],
+                    explanation_template_key="radar_cluster", source="Stáj radar: blinded cross-bank exit-token match (PSI)")
+        out.append(_floor(build_case(res.bank_id, cid, [xs], exc, meta, res.cfg["cases"]), res, member_score[cid]))
     return out
+
+
+def _floor(case: Case, res: NodeResult, x_score: float) -> Case:
+    """Pre-registered: with the significance gate ON, members of a disclosed cluster get priority >= 30 + round(20 x x_score)."""
+    if not res.cfg.get("radar", {}).get("use_significance", False):
+        return case
+    floor = res.cfg["cases"]["fp_max_priority"] + round(20 * x_score)
+    return case if case.priority >= floor else case.model_copy(update={"priority": min(100, floor)})
+

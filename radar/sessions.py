@@ -27,6 +27,11 @@ class BankNode:
     candidates: list[dict]          # [{'token','cand_ref','score'}]
     rarity: dict[str, float]        # token -> 1/bank_degree
     stats: dict[str, dict]          # cand_ref -> {'lag_median_h','retention_median'} (coarsened before sending)
+    n_eligible: int = 0             # clients of this bank that could have been exported (aggregate count)
+    deg: dict[str, int] = field(default_factory=dict)   # token -> number of this bank's clients that touch it (disclosed only for MATCHED tokens)
+
+    def n_cands(self) -> int:
+        return len({c["cand_ref"] for c in self.candidates})
 
     def submission(self) -> list[dict]:
         best: dict[str, float] = {}
@@ -55,7 +60,8 @@ def _bucket(v: float | None, step: float) -> float | None:
 
 
 def run_radar(nodes: list[BankNode], guards: Guards, epoch_key: bytes, audit: AuditLog | None = None,
-              now: datetime | None = None, cardinality_only: bool = False) -> RadarResult:
+              now: datetime | None = None, cardinality_only: bool = False, min_significance: float | None = None,
+              significance_cap: float = 8.0) -> RadarResult:
     now = now or datetime.now(UTC)
     wire: list[dict] = []
     refused: dict[str, str] = {}
@@ -100,11 +106,15 @@ def run_radar(nodes: list[BankNode], guards: Guards, epoch_key: bytes, audit: Au
     for n in live:
         for t in matched[n.bank_id]:
             for ref in n.refs_for(t):
-                rows.append({"token_id": token_id(epoch_key, t), "bank_id": n.bank_id, "cand_ref": ref, "rarity": n.rarity.get(t, 0.5)})
+                row = {"token_id": token_id(epoch_key, t), "bank_id": n.bank_id, "cand_ref": ref, "rarity": n.rarity.get(t, 0.5)}
+                if n.n_eligible and t in n.deg:
+                    row.update({"deg": n.deg[t], "n_eligible": n.n_eligible, "n_cands": n.n_cands()})
+                rows.append(row)
                 s = n.stats.get(ref, {})
                 lagret[(n.bank_id, ref)] = (_bucket(s.get("lag_median_h"), 1.0), _bucket(s.get("retention_median"), 0.02))
     wire.append({"session": "coordinator", "msg": "match rows", "from": "banks", "n": len(rows), "sample": [{k: v for k, v in r.items()} for r in rows[:2]]})
-    clusters = build_clusters(rows)
+    n_tests = sum(len(n.submission()) for n in live)
+    clusters = build_clusters(rows, n_tests=n_tests, min_significance=min_significance, significance_cap=significance_cap)
     for c in clusters:
         stats = [lagret[k] for k in c["candidates"] if k in lagret and lagret[k][0] is not None and lagret[k][1] is not None]
         c["post_match"] = {}

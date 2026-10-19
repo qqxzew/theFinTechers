@@ -35,7 +35,7 @@ def to_bank_node(r: NodeResult) -> BankNode:
     feat = {row["client_id"]: row for row in r.features.select(["client_id", "lag_median_h", "retention_median"]).to_dicts()}
     stats = {ref: {k: feat[cid][k] for k in ("lag_median_h", "retention_median")} for ref, cid in r.ref_to_client.items()}
     rarity = {c["token"]: 1.0 / max(1, r.degree.get(c["token"], 1)) for c in r.candidates}
-    return BankNode(r.bank_id, r.candidates, rarity, stats)
+    return BankNode(r.bank_id, r.candidates, rarity, stats, n_eligible=r.n_eligible, deg=r.degree)
 
 
 def _flag(c, min_priority: int) -> bool:
@@ -109,7 +109,10 @@ def evaluate(path: str, cfg: dict | None = None, audit_path: str | None = None) 
     cases_iso = {c.client_id: c for r in iso.values() for c in r.cases}
     audit = AuditLog(audit_path) if audit_path else None
     guards = Guards(cfg["radar_guards"])
-    radar = run_radar([to_bank_node(r) for r in iso.values()], guards, epoch_key=b"epoch-eval", audit=audit, now=t0)
+    rcfg = cfg.get("radar", {})
+    radar = run_radar([to_bank_node(r) for r in iso.values()], guards, epoch_key=b"epoch-eval", audit=audit, now=t0,
+                      min_significance=rcfg.get("min_significance") if rcfg.get("use_significance") else None,
+                      significance_cap=rcfg.get("significance_cap", 8.0))
     cases_psi: dict[str, object] = {}
     for b, r in iso.items():
         for c in apply_clusters(r, radar.clusters):
