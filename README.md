@@ -17,6 +17,7 @@ audit: append-only SHA-256 hash chain · governance: no self-review, four-eyes, 
 ```
 * The decision path is deterministic (additive log-odds, regulator rules, explicit exculpatory signals). The LLM never scans raw rows and never decides.
 * Every factual sentence the LLM writes must cite a signal id or a field of the structured case JSON; a validator rejects unsupported numbers and references.
+* The radar can also collect **weak evidence**: banks export a small, configurable share of their clients as weak candidates and cross-bank matches are judged by their statistical improbability (pre-registered experiment, `docs/PREREGISTRATION.md`; the privacy cost is measured and shown).
 * Honest limits are part of the product: see the Honesty screen and [docs/DECISIONS.md](docs/DECISIONS.md).
 
 ## Quick start (Windows, Git Bash)

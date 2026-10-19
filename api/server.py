@@ -293,7 +293,7 @@ def _report_extras() -> dict:
     if not os.path.exists("eval/report.json"):
         return {}
     r = json.load(open("eval/report.json", encoding="utf-8"))
-    return {k: r[k] for k in ("headline_held_out_mean", "threshold_curve_held_out_mean", "ring_size_sweep", "held_out_seeds", "dev_seeds") if k in r}
+    return {k: r[k] for k in ("headline_held_out_mean", "threshold_curve_held_out_mean", "ring_size_sweep", "held_out_seeds", "dev_seeds", "weak_evidence_experiment") if k in r}
 
 
 def _prefixed(b: dict) -> dict:
@@ -329,5 +329,5 @@ def _opo_payload(st: DemoState, case_id: str, sv: dict) -> dict:
 if __name__ == "__main__":
     import uvicorn
 
-    world = os.environ.get("STAJ_WORLD", "data/redteam/seed505")
+    world = os.environ.get("STAJ_WORLD", "data/redteam/seed707")
     uvicorn.run(create_app(build_state(world)), host="127.0.0.1", port=int(os.environ.get("PORT", "8000")))

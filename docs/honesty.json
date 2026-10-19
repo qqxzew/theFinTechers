@@ -8,6 +8,7 @@
      "description": "Generic synthetic laundering patterns (fan-out, cycle, ...), NOT Czech mule schemes. Evaluated (docs/IBM_EVAL.md): our engine is weak on it (held-out F1 0.043, AP 0.037; the radar lifts AP to 0.051 without new flags)."}
   ],
   "planted": [
+    "The ghost_ring (accounts with no usable local signal) was added after a first sweep showed that the radar baseline already reached full recall on the original schemes; it is reported separately and the pre-registration is in docs/PREREGISTRATION.md.",
     "All mule accounts, victim accounts and honest look-alike personas in the red-team world are planted by us; detection rates on them measure how well the detectors recognise OUR OWN scheme definitions, not real-world recall.",
     "The persona separators E6-E8 were designed against our own personas; their false-positive rates on real customers are unknown.",
     "Thresholds of D6 and the radar candidate band were set while looking at dev seed 7; the headline numbers are reported on held-out seeds 505 and 606 (dev seeds: 7, 101, 202, 303, 404)."

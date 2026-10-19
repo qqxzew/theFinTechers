@@ -14,8 +14,8 @@ from pathlib import Path
 from eval import cnb_eval
 from eval.redteam_eval import evaluate
 
-DEV = [7, 101, 202, 303, 404]       # 202/303/404 were looked at by the audit agent, so they count as dev
-HELD_OUT = [505, 606]
+DEV = [7, 101, 202, 303, 404, 505, 606]   # all seen while building/tuning/auditing
+HELD_OUT = [707, 808]                     # generated AFTER the configuration freeze (tag prereg-config-frozen), run once
 RING_SIZES = [6, 9]                  # stealth ring size sweep (accounts in the ring; default world has 12-18)
 OUT = Path("eval")
 
@@ -48,6 +48,9 @@ def main(skip_cnb: bool = False) -> dict:
         for s in HELD_OUT:
             r = evaluate(ensure_ring_world(s, n))
             ring[f"seed{s}_ring{n}"] = {m: r["curves"][m]["30"] for m in ("isolated", "staj_psi")}
+    weak = {"dev": json.load(open("eval/out/weak_sweep_v2_dev_ghost.json")), "held_out": json.load(open("eval/out/weak_sweep_707_808.json")),
+            "dev_without_ghost_ring": json.load(open("eval/out/weak_sweep_v1_dev_ceiling.json")),
+            "preregistration": "docs/PREREGISTRATION.md", "frozen_config": {"weak_top_frac": 0.05, "use_significance": True, "min_significance": 2.0}}
     cnb = None if skip_cnb else cnb_eval.main()
     held = [seeds[s] for s in HELD_OUT]
 
@@ -64,7 +67,7 @@ def main(skip_cnb: bool = False) -> dict:
              for m in ("isolated", "staj_psi", "naive_raw_sharing")}
     abl = {k: {m: mean([r["ablations"][k][m] for r in held]) for m in ("precision", "recall", "f1")} for k in held[0]["ablations"]}
     report = {"synthetic": True, "operating_point": held[0]["operating_point"], "dev_seeds": DEV, "held_out_seeds": HELD_OUT,
-              "headline_held_out_mean": headline, "threshold_curve_held_out_mean": curve, "ring_size_sweep": ring, "ablations_held_out_mean": abl,
+              "headline_held_out_mean": headline, "threshold_curve_held_out_mean": curve, "ring_size_sweep": ring, "weak_evidence_experiment": weak, "ablations_held_out_mean": abl,
               "per_seed": {str(s): {"modes": {m: {"overall": r["modes"][m]["overall"], "rank": r["modes"][m]["rank"], "exposure": r["modes"][m]["exposure"]}
                                               for m in r["modes"]}, "ablations": r["ablations"], "breakdown_staj_psi": r["breakdown_staj_psi"],
                                     "disclosed_cluster_candidate_labels": r["disclosed_cluster_candidate_labels"],
@@ -79,6 +82,11 @@ def main(skip_cnb: bool = False) -> dict:
              "naive_raw_sharing_f1": headline["naive_raw_sharing"]["f1"],
              "psi_raw_records_exposed": headline["staj_psi"]["raw_records_exposed"], "naive_raw_records_exposed": headline["naive_raw_sharing"]["raw_records_exposed"],
              "psi_bytes": headline["staj_psi"]["bytes_exchanged"], "naive_bytes": headline["naive_raw_sharing"]["bytes_exchanged"]}
+    wh = weak["held_out"]
+    pitch["ghost_ring_recall_baseline_radar"] = round(sum(wh[s]["baseline"]["staj_psi"]["ghost_recall"] for s in wh) / len(wh), 3)
+    pitch["ghost_ring_recall_weak_evidence_radar"] = round(sum(wh[s]["weak_0.05"]["staj_psi"]["ghost_recall"] for s in wh) / len(wh), 3)
+    pitch["exported_tokens_baseline"] = int(sum(wh[s]["baseline"]["exported_tokens"] for s in wh) / len(wh))
+    pitch["exported_tokens_weak_evidence"] = int(sum(wh[s]["weak_0.05"]["exported_tokens"] for s in wh) / len(wh))
     if cnb:
         pitch["cnb_rule_a_share_of_clients_default"] = round(cnb["rule_a_alerts_per_unit"]["expected=monthly,q2=quarterly"] / cnb["n_clients"], 4)
         pitch["cnb_cases_auto_closed_fp"] = cnb["triage"].get("FP", 0)
@@ -126,7 +134,19 @@ def to_markdown(r: dict) -> str:
               f"- Rule A alerts per unit interpretation: {c['rule_a_alerts_per_unit']}", f"- Rule B alerts: {c['rule_b_alerts']}; rule C alerts: {c['rule_c_alerts']} (triage {c['rule_c_triage']})",
               f"- Cases: {c['cases']} - triage {c['triage']}; actionable REVIEW (priority >= {c['operating_point_min_priority']}): {c['actionable_review']}",
               f"- 'Mom' persona: {c['mom_persona']}", f"- 30-case review sheet: {c['sample_sheet_url']}"]
-    L += ["", "## Notes", ""] + [f"- {n}" for n in r["notes"]]
+    w = r["weak_evidence_experiment"]
+    L += ["", "## Weak-evidence radar experiment (pre-registered: docs/PREREGISTRATION.md)", "",
+          "Variants: baseline = candidates only above the local probability band, cluster score by size; NEW = additionally the top 5 % of each bank's clients by a "
+          "local pass-through score, matches judged by statistical improbability (Fisher + Bonferroni), priority floor for significant clusters. "
+          "The `ghost_ring` is a planted ring with NO usable local signal, added after the first sweep showed no headroom.", "",
+          "| world | variant | ghost recall (radar) | original-scheme recall (radar) | TP/FP/FN | exported tokens | bytes exchanged |", "|---|---|---|---|---|---|---|"]
+    for part in ("held_out", "dev"):
+        for s, v in w[part].items():
+            for name in ("baseline", "weak_0.05", "weak_0.10", "weak_0.20"):
+                x = v[name]["staj_psi"]
+                L.append(f"| {s} ({part.replace('_', '-')}) | {name} | {x['ghost_recall']} | {x['original_recall']} | {x['tp']}/{x['fp']}/{x['fn']} | {v[name]['exported_tokens']} | {v[name]['bytes']:,} |")
+    L += ["", "The curve is NOT monotone: more exported candidates dilute the significance of a match (10 % and above lose the ring). Privacy cost of the weak band: "
+          "about 6x more exported tokens and 8x more bytes. See LIMITATIONS.md.", "", "## Notes", ""] + [f"- {n}" for n in r["notes"]]
     return "\n".join(L) + "\n"
 
 
