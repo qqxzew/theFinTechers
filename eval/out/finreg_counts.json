@@ -1,0 +1,29 @@
+{
+  "n_tx": 397853,
+  "n_clients": 5493,
+  "fx_placeholder": true,
+  "rule_a": {
+    "expected=monthly,q2=monthly": 5493,
+    "expected=monthly,q2=quarterly": 5493,
+    "expected=monthly,q2=yearly": 5493,
+    "expected=quarterly,q2=monthly": 5493,
+    "expected=quarterly,q2=quarterly": 5493,
+    "expected=quarterly,q2=yearly": 5493,
+    "expected=yearly,q2=monthly": 5493,
+    "expected=yearly,q2=quarterly": 5493,
+    "expected=yearly,q2=yearly": 5493
+  },
+  "rule_b": {
+    "alerts": 112,
+    "by_reason": {
+      "pep_large_outgoing": 112
+    }
+  },
+  "rule_c": {
+    "alerts": 1088
+  },
+  "rule_c_first_inflow": {
+    "alerts": 916
+  },
+  "seconds": 37.3
+}

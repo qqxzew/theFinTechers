@@ -1,0 +1,3 @@
+# Interpretation of the ČNB profile columns. Decision recorded in docs/DECISIONS.md after the alert-rate report.
+expected_unit: monthly   # monthly | quarterly | yearly
+q2_unit: quarterly       # monthly | quarterly | yearly

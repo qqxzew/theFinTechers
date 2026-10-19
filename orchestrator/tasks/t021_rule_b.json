@@ -1,0 +1,8 @@
+{
+  "id": "t021_rule_b",
+  "goal": "Create node/rules/rule_b.py with `rule_b(tx: pl.DataFrame, clients: pl.DataFrame, hr_countries: set[str], cfg: dict) -> pl.DataFrame`.\ntx columns: tx_id, client_id, amount_czk, direction ('in'|'out'|'remit_out'), payer_country, payee_country, ts. clients columns: client_id, client_country, pep (bool). cfg: min_amount_hr, pep_outgoing_min. ONE alert per transaction.\nLeft-join clients on client_id. Condition HR: amount_czk > cfg['min_amount_hr'] AND (payer_country in hr_countries OR payee_country in hr_countries OR client_country in hr_countries). Condition PEP: pep is True AND direction in ('out','remit_out') AND amount_czk > cfg['pep_outgoing_min'].\nReason string: 'high_risk_country' if only HR; 'pep_large_outgoing' if only PEP; 'high_risk_country+pep_large_outgoing' if both. Return only rows with a reason. Output columns exactly: tx_id, client_id, alert_type (constant 'B'), reason, amount_czk. Use polars expressions (is_in with list(hr_countries)); handle null countries as False.",
+  "read": ["tests/unit/test_rule_b.py"],
+  "write": ["node/rules/rule_b.py"],
+  "accept": ["python -m pytest tests/unit/test_rule_b.py -q"],
+  "max_steps": 16
+}

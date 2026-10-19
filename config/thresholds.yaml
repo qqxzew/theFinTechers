@@ -1,0 +1,14 @@
+# FINREG rule parameters (regulator-fixed values per hackathon task spec). All configurable.
+rule_a:
+  daily_share_of_projected: 0.25
+  daily_vs_q2_avg_mult: 3.0
+  single_vs_q2_max_mult: 2.0
+rule_b:
+  min_amount_hr: 10000.0
+  pep_outgoing_min: 100000.0
+rule_c:
+  inflow_threshold: 100000.0
+  inflow_window_h: 24
+  outflow_window_h: 6
+  outflow_share: 0.8
+  anchor: threshold_crossing   # threshold_crossing | first_inflow

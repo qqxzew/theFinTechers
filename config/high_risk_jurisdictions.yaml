@@ -1,0 +1,12 @@
+# Compiled 2026-10-19 from public sources via web search; NOT verified against the primary texts.
+# Replace/verify before any real use (config change + decision record only, never code).
+verified_against_primary: false
+eu:
+  source: "https://eur-lex.europa.eu/eli/reg_del/2026/46/oj/eng (amending Delegated Regulation (EU) 2016/1675; Reg. 2026/46 adds Russia, in force 2026-01-29; 2026/83 removes BF, ML, MZ, NG, ZA, TZ)"
+  as_of: "2026-01-29"
+  countries: [AF, DZ, AO, BO, VG, CM, CI, CD, HT, IR, KE, LA, LB, MC, MM, NA, NP, KP, RU, SS, SY, VE, VN, VU, YE]
+fatf:
+  source: "https://www.fatf-gafi.org/en/countries/black-and-grey-lists.html (page not fetchable from this environment; black list from public reporting)"
+  as_of: "unverified"
+  call_for_action: [IR, KP, MM]
+  increased_monitoring: []   # TODO verify current grey list at the latest FATF plenary
