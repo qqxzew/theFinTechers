@@ -8,3 +8,5 @@ orchestrator/runs/
 .ruff_cache/
 .mypy_cache/
 node_modules/
+
+demo/
