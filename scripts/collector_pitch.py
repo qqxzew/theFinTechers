@@ -1,9 +1,9 @@
 """Adds a `collector` block to pitch_numbers.json from the FROZEN TEST runs only (eval/out/collector/test*_summary.json). Touches no other key."""
 import json
 
-O = "eval/out/collector/"
-nc = json.load(open(O + "test_how_summary.json"))
-cu = json.load(open(O + "test_how_cum_summary.json"))
+OUT = "eval/out/collector/"
+nc = json.load(open(OUT + "test_how_summary.json"))
+cu = json.load(open(OUT + "test_how_cum_summary.json"))
 pitch = json.load(open("pitch_numbers.json", encoding="utf-8"))
 
 

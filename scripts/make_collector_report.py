@@ -1,18 +1,18 @@
 """Assembles eval/collector_report.md from the frozen result files (numbers come from eval/out/collector/*.json and *_tables.md)."""
 import json
 
-O = "eval/out/collector/"
+OUT = "eval/out/collector/"
 
 
 def rd(f: str) -> str:
-    return open(O + f, encoding="utf-8").read()
+    return open(OUT + f, encoding="utf-8").read()
 
 
 def body(f: str) -> str:
     return rd(f).split("\n", 1)[1]
 
 
-cnb = json.load(open(O + "cnb_control.json"))
+cnb = json.load(open(OUT + "cnb_control.json"))
 cnbl = "; ".join(f"split seed {r['split_seed']}: tested {r['n_tested']}, flagged {r['n_flagged_buckets']}, raised {r['n_raised_customers']}, in Rule C {r['raised_in_rule_c']}" for r in cnb["runs"])
 md = f"""# Collector report (night 19-20.10.2026)
 
