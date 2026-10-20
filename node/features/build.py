@@ -120,6 +120,8 @@ def build_features(tx: pl.DataFrame, clients: pl.DataFrame, cfg: dict, asof: dat
                          "expected_volume", "q2_volume"])
     feat = feat.join(cl, on="client_id", how="left")
     feat = feat.join(shares.drop("out_total"), on="client_id", how="left").join(turn, on="client_id", how="left").join(hours, on="client_id", how="left")
+    # null-guard for partial-month replay (D-021): a client with inflows only so far has no outflow shares; output is identical for every full-month input
+    feat = feat.with_columns(pl.col(["share_rare", "share_mid", "share_popular"]).fill_null(0.0))
     feat = feat.with_columns(
         ((pl.lit(asof) - pl.col("contract_date").dt.replace_time_zone("UTC")).dt.total_days()).alias("days_since_contract"),
         (pl.col("in_total") + pl.col("out_total")).alias("july_total"),

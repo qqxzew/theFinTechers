@@ -28,3 +28,7 @@ demo:        ## seed data -> run nodes + radar -> evaluation -> API (open http:/
 	$(MAKE) worlds
 	$(MAKE) eval
 	$(MAKE) api
+
+.PHONY: demo-collector
+demo-collector:  ## collector + 3 bank processes locally, one masked round; then open outbreak/
+	$(PY) scripts/demo_collector.py

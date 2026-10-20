@@ -1,0 +1,38 @@
+{
+ "n_clients": 5493,
+ "n_tx": 397853,
+ "rule_c_clients": 16,
+ "p_inst": 30,
+ "runs": [
+  {
+   "split_seed": 0,
+   "p0": 0.04938934619764998,
+   "n_tested": 526,
+   "n_flagged_buckets": 0,
+   "n_suppressed_buckets": 0,
+   "n_raised_customers": 0,
+   "raised_in_rule_c": 0,
+   "flagged": []
+  },
+  {
+   "split_seed": 1,
+   "p0": 0.048991194362910766,
+   "n_tested": 525,
+   "n_flagged_buckets": 0,
+   "n_suppressed_buckets": 0,
+   "n_raised_customers": 0,
+   "raised_in_rule_c": 0,
+   "flagged": []
+  },
+  {
+   "split_seed": 2,
+   "p0": 0.049505088010074166,
+   "n_tested": 516,
+   "n_flagged_buckets": 0,
+   "n_suppressed_buckets": 0,
+   "n_raised_customers": 0,
+   "raised_in_rule_c": 0,
+   "flagged": []
+  }
+ ]
+}

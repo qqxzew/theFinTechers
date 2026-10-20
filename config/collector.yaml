@@ -1,0 +1,14 @@
+# Collector (FROZEN for P0 by the pre-registered dev rule, eval/out/collector/dev_tuning.json)
+where:
+  window_days: 30
+  q: 0.01
+  p_inst: 30        # tuned on dev seeds 1-5 from {30, 50, 80}
+  small_max: 20
+  min_k: 3
+  min_banks: 2
+how:               # FROZEN for P1 (Amendment 2), not tuned
+  min_obs: 4
+  min_banks: 2
+  q: 0.01
+  last_days: 2
+  family: enumerated

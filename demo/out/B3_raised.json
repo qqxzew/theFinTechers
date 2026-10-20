@@ -1,0 +1,339 @@
+{
+ "bank": "B3",
+ "round": "demo",
+ "raised": {
+  "R03126": {
+   "type": "collector_where",
+   "role": "pass_through_payer",
+   "totals": {
+    "P": 9,
+    "K": 8
+   },
+   "banks": 3,
+   "p_value": 7.341194199331126e-17,
+   "window": [
+    31,
+    60
+   ],
+   "small": true
+  },
+  "R03014": {
+   "type": "collector_where",
+   "role": "pass_through_payer",
+   "totals": {
+    "P": 11,
+    "K": 11
+   },
+   "banks": 3,
+   "p_value": 3.2154518872108845e-24,
+   "window": [
+    31,
+    60
+   ],
+   "small": true
+  },
+  "R03017": {
+   "type": "collector_where",
+   "role": "pass_through_payer",
+   "totals": {
+    "P": 12,
+    "K": 12
+   },
+   "banks": 3,
+   "p_value": 2.3525385259851822e-26,
+   "window": [
+    31,
+    60
+   ],
+   "small": true
+  },
+  "R03034": {
+   "type": "collector_where",
+   "role": "pass_through_payer",
+   "totals": {
+    "P": 9,
+    "K": 9
+   },
+   "banks": 3,
+   "p_value": 6.006929822714641e-20,
+   "window": [
+    31,
+    60
+   ],
+   "small": true
+  },
+  "R03011": {
+   "type": "collector_where",
+   "role": "pass_through_payer",
+   "totals": {
+    "P": 11,
+    "K": 11
+   },
+   "banks": 3,
+   "p_value": 3.2154518872108845e-24,
+   "window": [
+    31,
+    60
+   ],
+   "small": true
+  },
+  "R03026": {
+   "type": "collector_where",
+   "role": "pass_through_payer",
+   "totals": {
+    "P": 10,
+    "K": 10
+   },
+   "banks": 3,
+   "p_value": 4.394882687261531e-22,
+   "window": [
+    31,
+    60
+   ],
+   "small": true
+  },
+  "R03037": {
+   "type": "collector_where",
+   "role": "pass_through_payer",
+   "totals": {
+    "P": 9,
+    "K": 9
+   },
+   "banks": 3,
+   "p_value": 6.006929822714641e-20,
+   "window": [
+    31,
+    60
+   ],
+   "small": true
+  },
+  "R03023": {
+   "type": "collector_where",
+   "role": "pass_through_payer",
+   "totals": {
+    "P": 11,
+    "K": 11
+   },
+   "banks": 3,
+   "p_value": 3.2154518872108845e-24,
+   "window": [
+    31,
+    60
+   ],
+   "small": true
+  },
+  "R03120": {
+   "type": "collector_where",
+   "role": "pass_through_payer",
+   "totals": {
+    "P": 9,
+    "K": 8
+   },
+   "banks": 3,
+   "p_value": 7.341194199331126e-17,
+   "window": [
+    31,
+    60
+   ],
+   "small": true
+  },
+  "R03020": {
+   "type": "collector_where",
+   "role": "pass_through_payer",
+   "totals": {
+    "P": 12,
+    "K": 12
+   },
+   "banks": 3,
+   "p_value": 2.3525385259851822e-26,
+   "window": [
+    31,
+    60
+   ],
+   "small": true
+  },
+  "R03043": {
+   "type": "collector_where",
+   "role": "pass_through_payer",
+   "totals": {
+    "P": 7,
+    "K": 7
+   },
+   "banks": 3,
+   "p_value": 1.1221814899030407e-15,
+   "window": [
+    31,
+    60
+   ],
+   "small": true
+  },
+  "R03029": {
+   "type": "collector_where",
+   "role": "pass_through_payer",
+   "totals": {
+    "P": 11,
+    "K": 11
+   },
+   "banks": 3,
+   "p_value": 3.2154518872108845e-24,
+   "window": [
+    31,
+    60
+   ],
+   "small": true
+  },
+  "R03123": {
+   "type": "collector_where",
+   "role": "pass_through_payer",
+   "totals": {
+    "P": 9,
+    "K": 8
+   },
+   "banks": 3,
+   "p_value": 7.341194199331126e-17,
+   "window": [
+    31,
+    60
+   ],
+   "small": true
+  },
+  "R03040": {
+   "type": "collector_where",
+   "role": "pass_through_payer",
+   "totals": {
+    "P": 7,
+    "K": 7
+   },
+   "banks": 3,
+   "p_value": 1.1221814899030407e-15,
+   "window": [
+    31,
+    60
+   ],
+   "small": true
+  }
+ },
+ "collector_flags": {
+  "round": "demo",
+  "where": {
+   "flagged": [
+    {
+     "bucket": 24693,
+     "small": true,
+     "banks": 3,
+     "p": 1.1221814899030407e-15,
+     "totals": {
+      "P": 7,
+      "K": 7
+     }
+    },
+    {
+     "bucket": 41546,
+     "small": true,
+     "banks": 3,
+     "p": 7.341194199331126e-17,
+     "totals": {
+      "P": 9,
+      "K": 8
+     }
+    },
+    {
+     "bucket": 47758,
+     "small": true,
+     "banks": 3,
+     "p": 2.3525385259851822e-26,
+     "totals": {
+      "P": 12,
+      "K": 12
+     }
+    },
+    {
+     "bucket": 78341,
+     "small": true,
+     "banks": 3,
+     "p": 4.394882687261531e-22,
+     "totals": {
+      "P": 10,
+      "K": 10
+     }
+    },
+    {
+     "bucket": 79858,
+     "small": true,
+     "banks": 3,
+     "p": 1.1221814899030407e-15,
+     "totals": {
+      "P": 7,
+      "K": 7
+     }
+    },
+    {
+     "bucket": 169438,
+     "small": true,
+     "banks": 3,
+     "p": 3.2154518872108845e-24,
+     "totals": {
+      "P": 11,
+      "K": 11
+     }
+    },
+    {
+     "bucket": 184273,
+     "small": true,
+     "banks": 3,
+     "p": 2.8653581583213492e-09,
+     "totals": {
+      "P": 4,
+      "K": 4
+     }
+    },
+    {
+     "bucket": 200533,
+     "small": true,
+     "banks": 3,
+     "p": 8.210277375458715e-18,
+     "totals": {
+      "P": 8,
+      "K": 8
+     }
+    },
+    {
+     "bucket": 243079,
+     "small": true,
+     "banks": 3,
+     "p": 3.2154518872108845e-24,
+     "totals": {
+      "P": 11,
+      "K": 11
+     }
+    },
+    {
+     "bucket": 251462,
+     "small": true,
+     "banks": 3,
+     "p": 3.2154518872108845e-24,
+     "totals": {
+      "P": 11,
+      "K": 11
+     }
+    },
+    {
+     "bucket": 253757,
+     "small": true,
+     "banks": 3,
+     "p": 6.006929822714641e-20,
+     "totals": {
+      "P": 9,
+      "K": 9
+     }
+    }
+   ],
+   "n_suppressed_institutional": 2,
+   "n_tested": 85
+  },
+  "how": {
+   "n_windows": 4176,
+   "flagged": []
+  }
+ }
+}

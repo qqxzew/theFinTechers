@@ -11,6 +11,7 @@ root_packages =
     ingest
     common
     redteam
+    collector
 
 [importlinter:contract:blue-cannot-import-red]
 name = Blue team must never import the red-team generator
@@ -25,6 +26,7 @@ source_modules =
     api
     ingest
     common
+    collector
 forbidden_modules =
     redteam
 
@@ -41,6 +43,7 @@ forbidden_modules =
     export
     api
     eval
+    collector
 
 [importlinter:contract:node-has-no-labels-or-eval]
 name = Bank-node code must not import the evaluation harness (labels live there)
@@ -50,3 +53,20 @@ source_modules =
     radar
 forbidden_modules =
     eval
+
+[importlinter:contract:collector-sees-no-bank-data]
+name = The collector holds only masked vectors and sums: it must not import bank, radar, ingest, evaluation or red-team code
+type = forbidden
+source_modules =
+    collector
+forbidden_modules =
+    node
+    radar
+    ingest
+    copilot
+    audit
+    escalation
+    export
+    api
+    eval
+    redteam

@@ -8,6 +8,7 @@ import numpy as np
 
 START = datetime(2026, 7, 1, tzinfo=UTC)
 END = datetime(2026, 7, 31, 23, 59, 59, tzinfo=UTC)
+HIST_START = datetime(2026, 6, 1, tzinfo=UTC)   # collector worlds: 30 days of honest history before the evaluation month
 
 
 @dataclass
@@ -25,6 +26,8 @@ class World:
     _n_ext: int = 0
     _bank_of: dict = field(default_factory=dict)
     popular_tokens: list = field(default_factory=list)
+    ring_flows: list = field(default_factory=list)       # red-team ground truth for the time evaluation (never given to banks)
+    decoy_tx: set = field(default_factory=set)            # tx_ids of decoy activity (not cloned into the history)
 
     def new_ext_account(self, country: str = "CZ") -> str:
         """A fresh external account token (e.g. an IBAN-like string of an account outside the bank)."""
@@ -63,10 +66,11 @@ class World:
         return cid
 
     def add_tx(self, client_id: str, ts: datetime, amount_czk: float, direction: str, counterparty_token: str,
-               country: str = "CZ", currency: str = "CZK") -> str:
+               country: str = "CZ", currency: str = "CZK", clamp: bool = True) -> str:
         """direction in {'in','out','remit_out'}; the client's own account is the client id."""
         assert direction in ("in", "out", "remit_out")
-        ts = min(max(ts, START), END)   # keep every event inside July 2026 (late-month schemes would otherwise spill over)
+        if clamp:
+            ts = min(max(ts, START), END)   # keep every event inside July 2026 (late-month schemes would otherwise spill over)
         bank = self._bank_of[client_id]
         self._n_tx += 1
         txid = f"RT{self._n_tx:08d}"

@@ -54,3 +54,10 @@ Data: `data/raw/cnb/` (ČNB hackathon dataset, from the organisers' S3 bucket) a
 Act 253/2008 Coll. § 18 (reporting to FAÚ; § 18(3): the report does not name the employee who detected the transaction) · FAÚ Methodological Guideline No. 4 (Aug 2025) · banking secrecy § 38 Act 21/1992 Coll. · EU AMLR 2024/1624 Art. 75 (information-sharing partnerships from 10 July 2027; supervisor notification and DPIA) · EU PSR (political agreement 27 Nov 2025). **PSI minimises what is shared; it does not replace a legal basis.**
 
 What we did not find in public sources as of 19 Oct 2026: a catalogue of Czech/CEE mule schemes encoded as detectors; explicit honest look-alike personas with a separator per persona; "same hand" (single operator) detection from transactions alone; PSI-based cross-bank matching of mule exit tokens; a draft FAÚ report structured by Methodological Guideline No. 4.
+
+## Built during the hackathon: Collector (night 19->20.10)
+A second shared node that receives masked counts about ALL customers of all banks (never customer-level data), finds unusual pass-through destinations (WHERE) and unusual skim/delay patterns (HOW), and returns only flagged bucket ids and windows. Each bank then raises its own matching customers once; the analyst decides.
+- Pre-registration: `eval/prereg_collector.md` (+ `eval/prereg_collector_amendment2.md`); results and every failure: `eval/collector_report.md`.
+- Code: `node/signatures.py`, `node/secagg.py`, `node/expansion.py`, `node/collector_cli.py`, `collector/` (aggregation, statistics, FastAPI service), `redteam/generate_collector.py`, `eval/collector_*.py`.
+- Demo: `make demo-collector`, then `python -m http.server 8200 -d outbreak` (Outbreak page, a demo view).
+- LIMITATIONS: synthetic worlds; one team builds generator and detectors; the collector colluding with all but one bank breaks secrecy; no dropout recovery; short-history baseline; legal status not confirmed (see `LIMITATIONS.md` item 14).
