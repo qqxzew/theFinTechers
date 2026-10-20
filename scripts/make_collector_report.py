@@ -80,7 +80,7 @@ Per round: sums P, K, I over 2^18 hash buckets (HMAC under a key the collector n
 The existing keys are unchanged from main (weak-evidence radar, held-out seeds 707/808, from the earlier frozen radar experiment). The new `collector` block is written by `scripts/collector_pitch.py` and reads only the frozen test runs (`eval/out/collector/test_how_summary.json` and `test_how_cum_summary.json`, seeds 4101/4202/4303). It contains both the non-cumulative and the queue-persistent (d) numbers. No dev number is in it.
 
 ## Service and UI
-`collector/service.py` (POST /rounds/{{id}}/submit, GET /rounds/{{id}}/flags; 409 on a missing bank), `node/collector_cli.py submit|expand`, `make demo-collector` (3 bank processes and the collector; logs show only masked vectors and sums), `outbreak/index.html` (the Outbreak demo view as a standalone page; case cards carry the badge "Raised by network"). The old Stáj UI was not touched, by the owner's instruction.
+`collector/service.py` (POST /rounds/{{id}}/submit, GET /rounds/{{id}}/flags; 409 on a missing bank), `node/collector_cli.py submit|expand`, `make demo-collector` (3 bank processes and the collector; logs show only masked vectors and sums), `outbreak/` (the Outbreak demo view, React + TypeScript + Vite; case cards carry the badge "Raised by network"). The old Stáj UI was not touched, by the owner's instruction.
 """
 open("eval/collector_report.md", "w", encoding="utf-8").write(md)
 print(len(md))

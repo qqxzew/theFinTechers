@@ -45,6 +45,6 @@ for t in range(1, 32):
                  "total": ct[day - 2:day + 1].sum(axis=(0, 3)).tolist(), "windows": wins, "raised": raised})
 out = {"world": Path(world).name, "demo_view": True, "hub_mode": meta["hub_mode"], "script_jitter": meta["script_jitter"], "banks": banks,
        "delay_labels": ["0-15 min", "15-60 min", "1-4 h", "4-12 h", "12-24 h", "24-72 h"], "days": days}
-Path("outbreak").mkdir(exist_ok=True)
-Path("outbreak/data.json").write_text(json.dumps(out), encoding="utf-8")
-print(f"outbreak/data.json: {len(days)} days, flagged windows on {sum(1 for d in days if d['windows'])} days")
+Path("outbreak/public").mkdir(parents=True, exist_ok=True)
+Path("outbreak/public/data.json").write_text(json.dumps(out), encoding="utf-8")
+print(f"outbreak/public/data.json: {len(days)} days, flagged windows on {sum(1 for d in days if d['windows'])} days")

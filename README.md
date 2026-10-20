@@ -59,5 +59,5 @@ What we did not find in public sources as of 19 Oct 2026: a catalogue of Czech/C
 A second shared node that receives masked counts about ALL customers of all banks (never customer-level data), finds unusual pass-through destinations (WHERE) and unusual skim/delay patterns (HOW), and returns only flagged bucket ids and windows. Each bank then raises its own matching customers once; the analyst decides.
 - Pre-registration: `eval/prereg_collector.md` (+ `eval/prereg_collector_amendment2.md`); results and every failure: `eval/collector_report.md`.
 - Code: `node/signatures.py`, `node/secagg.py`, `node/expansion.py`, `node/collector_cli.py`, `collector/` (aggregation, statistics, FastAPI service), `redteam/generate_collector.py`, `eval/collector_*.py`.
-- Demo: `make demo-collector`, then `python -m http.server 8200 -d outbreak` (Outbreak page, a demo view).
+- Demo: `make demo-collector` (writes `outbreak/public/data.json`), then `cd outbreak && npm install && npm run dev` (Outbreak page, React + TypeScript + Vite, a demo view, http://127.0.0.1:5174).
 - LIMITATIONS: synthetic worlds; one team builds generator and detectors; the collector colluding with all but one bank breaks secrecy; no dropout recovery; short-history baseline; legal status not confirmed (see `LIMITATIONS.md` item 14).

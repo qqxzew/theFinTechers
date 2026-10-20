@@ -1,6 +1,6 @@
 """make demo-collector: starts the collector and three bank processes locally and runs one round.
 
-The logs show that the collector only ever holds masked vectors and sums. Output for the Outbreak page: outbreak/data.json.
+The logs show that the collector only ever holds masked vectors and sums. Output for the Outbreak page: outbreak/public/data.json.
 """
 from __future__ import annotations
 
@@ -50,7 +50,7 @@ def main() -> None:
         for b in ("B1", "B2", "B3"):
             subprocess.run([PY, "-m", "node.collector_cli", "expand", "--bank", b, "--out", f"demo/out/{b}_raised.json", *common], check=True, env=ENV)
         subprocess.run([PY, "scripts/build_outbreak_data.py", WORLD], check=True, env=ENV)
-        print("\nOpen outbreak/index.html through a static server:  python -m http.server 8200 -d outbreak  ->  http://127.0.0.1:8200")
+        print("\nOutbreak page (React + TypeScript): cd outbreak && npm install && npm run dev  ->  http://127.0.0.1:5174")
     finally:
         coll.terminate()
 
