@@ -14,5 +14,92 @@
  "exported_tokens_weak_evidence": 1418,
  "cnb_rule_a_share_of_clients_default": 0.85,
  "cnb_cases_auto_closed_fp": 4659,
- "cnb_cases_review": 11
+ "cnb_cases_review": 11,
+ "collector": {
+  "synthetic": true,
+  "source": "eval/out/collector/test_how*_summary.json (test seeds 4101, 4202, 4303; frozen tags collector-where-frozen, collector-how-frozen)",
+  "crimefree_network_only_errors_per_seed": {
+   "c": 0.0,
+   "d": 0.0
+  },
+  "shared_stealth_recall_month_end": {
+   "shared_none": {
+    "a": 0.0,
+    "b": 0.0,
+    "c": 1.0
+   },
+   "shared_medium": {
+    "a": 0.0,
+    "b": 0.0,
+    "c": 1.0
+   },
+   "shared_high": {
+    "a": 0.0,
+    "b": 0.0,
+    "c": 1.0
+   }
+  },
+  "shared_stealth_recall_queue_persistent": {
+   "shared_none": {
+    "a": 0.0,
+    "b": 0.0,
+    "c": 1.0
+   },
+   "shared_medium": {
+    "a": 0.0,
+    "b": 0.2903225806451613,
+    "c": 1.0
+   },
+   "shared_high": {
+    "a": 0.0,
+    "b": 0.6666666666666666,
+    "c": 1.0
+   }
+  },
+  "rotating_stealth_recall_queue_persistent_d": {
+   "rotating_none": 0.8095238095238095,
+   "rotating_medium": 0.6129032258064516,
+   "rotating_high": 0.0
+  },
+  "rotating_stealth_recall_month_end_d_NONCUMULATIVE": {
+   "rotating_none": 0.0,
+   "rotating_medium": 0.0,
+   "rotating_high": 0.0
+  },
+  "median_first_flag_day": {
+   "shared_none": {
+    "a": 32.0,
+    "b": 32.0,
+    "c": 8.0,
+    "d": 8.0,
+    "e": 24.0
+   },
+   "rotating_none": {
+    "a": 32.0,
+    "b": 32.0,
+    "c": 32.0,
+    "d": 8.0,
+    "e": 32.0
+   },
+   "rotating_medium": {
+    "a": 32.0,
+    "b": 32.0,
+    "c": 32.0,
+    "d": 13.0,
+    "e": 32.0
+   }
+  },
+  "honest_raised_mean": {
+   "shared_none": {
+    "c": 1.6666666666666667,
+    "d": 1.6666666666666667
+   },
+   "rotating_none": {
+    "c": 0.6666666666666666,
+    "d": 0.6666666666666666
+   }
+  },
+  "records_exposed_to_collector": 0,
+  "collector_bytes_per_bank_per_month": 97517568
+ }
 }

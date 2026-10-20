@@ -53,6 +53,7 @@ def cell_summary(cell_res: dict[int, dict], methods: tuple[str, ...]) -> dict:
         n = sum(r["n_stealth"] for r in rows)
         firsts: dict[int, list[float]] = {s: [] for s in cell_res}
         czk: dict[int, list[float]] = {s: [] for s in cell_res}
+        czk2: dict[int, list[float]] = {s: [] for s in cell_res}
         never = tot = 0
         for s in cell_res:
             r = cell_res[s]["methods"][m]
@@ -61,6 +62,7 @@ def cell_summary(cell_res: dict[int, dict], methods: tuple[str, ...]) -> dict:
                 never += ft is None
                 firsts[s].append(CENSOR_DAY if ft is None else ft)
                 czk[s].append(r["czk_before_first_flag_by_ring"][ring])
+                czk2[s].append(r["czk_through_flag_day_by_ring"][ring])
         mule_first = [CENSOR_DAY if v["first_day"] is None else v["first_day"] for s in cell_res for v in cell_res[s]["methods"][m]["per_mule"].values()]
         mule_czk = [v["czk_before"] for s in cell_res for v in cell_res[s]["methods"][m]["per_mule"].values()]
         mean = lambda k: float(np.mean([r[k] for r in rows if r[k] is not None])) if any(r[k] is not None for r in rows) else None  # noqa: E731
@@ -71,7 +73,7 @@ def cell_summary(cell_res: dict[int, dict], methods: tuple[str, ...]) -> dict:
             "network_only_errors_mean": float(np.mean([r["network_only_errors"] for r in rows])),
             "local_false_flags_a_mean": float(np.mean([r["local_false_flags_a"] for r in rows])),
             "n_flagged_mean": float(np.mean([r["n_flagged"] for r in rows])), "reach_of_e": mean("reach_of_e"),
-            "first_flag_day": _boot_two_stage(firsts), "czk_before_first_flag": _boot_two_stage(czk), "rings": tot, "rings_never_flagged": never,
+            "first_flag_day": _boot_two_stage(firsts), "czk_before_first_flag": _boot_two_stage(czk), "czk_through_flag_day": _boot_two_stage(czk2), "rings": tot, "rings_never_flagged": never,
             "per_mule_first_day_median": float(np.median(mule_first)) if mule_first else None,
             "per_mule_czk_before_median": float(np.median(mule_czk)) if mule_czk else None,
         }
@@ -135,17 +137,17 @@ def fmt(x, nd=2):
 
 
 def markdown(summ: dict[str, dict], crit: dict, methods: tuple[str, ...], title: str) -> str:
-    L = [f"### {title}", "", "| cell | method | stealth recall (hit/n) | recall | precision | honest raised mean/max | net-only errors | first flag day median [95 % CI] | never flagged | CZK before first flag median [CI] |",
-         "|---|---|---|---|---|---|---|---|---|---|"]
+    L = [f"### {title}", "", "| cell | method | stealth recall (hit/n) | recall | precision | honest raised mean/max | net-only errors | first flag day median [95 % CI] | never flagged | CZK before first flag day, median [CI] | CZK through the flag day (incl.), median [CI] |",
+         "|---|---|---|---|---|---|---|---|---|---|---|"]
     for cell in [cell_name(h, j) for h, j in CELLS]:
         if cell not in summ:
             continue
         for m in methods:
             r = summ[cell][m]
-            ff, cz = r["first_flag_day"], r["czk_before_first_flag"]
+            ff, cz, cz2 = r["first_flag_day"], r["czk_before_first_flag"], r["czk_through_flag_day"]
             L.append(f"| {cell} | {m} | {fmt(r['stealth_recall'])} ({r['stealth_hit']}/{r['n_stealth']}) | {fmt(r['recall'])} | {fmt(r['precision'])} | "
                      f"{fmt(r['honest_raised_mean'], 1)} / {r['honest_raised_max']} | {fmt(r['network_only_errors_mean'], 1)} | "
-                     f"{fmt(ff[0], 1)} [{fmt(ff[1], 1)}, {fmt(ff[2], 1)}] | {r['rings_never_flagged']}/{r['rings']} | {fmt(cz[0], 0)} [{fmt(cz[1], 0)}, {fmt(cz[2], 0)}] |")
+                     f"{fmt(ff[0], 1)} [{fmt(ff[1], 1)}, {fmt(ff[2], 1)}] | {r['rings_never_flagged']}/{r['rings']} | {fmt(cz[0], 0)} [{fmt(cz[1], 0)}, {fmt(cz[2], 0)}] | {fmt(cz2[0], 0)} [{fmt(cz2[1], 0)}, {fmt(cz2[2], 0)}] |")
     L += ["", "Collector buckets per world at month end (mean): " + "; ".join(
         f"{c}: tested {fmt(s['buckets']['n_tested'], 0)}, flagged {fmt(s['buckets']['n_flagged_buckets'], 1)}, institutional-suppressed {fmt(s['buckets']['n_suppressed_buckets'], 1)}"
         for c, s in summ.items()), ""]

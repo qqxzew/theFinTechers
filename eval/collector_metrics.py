@@ -27,10 +27,11 @@ def method_sets(rec: dict, method: str, p_inst: str, how: str | None = None) -> 
     raise KeyError(method)
 
 
-def _czk_before(flows: pl.DataFrame, clients: set[str], day: int | None) -> float:
+def _czk_before(flows: pl.DataFrame, clients: set[str], day: int | None, inclusive: bool = False) -> float:
+    """CZK forwarded by the given ring mules before day `day` (original column) or up to and including the end of the flag day (inclusive=True)."""
     f = flows.filter(pl.col("client_id").is_in(list(clients)))
     if day is not None:
-        f = f.filter(pl.col("ts_out") < datetime(2026, 7, day, tzinfo=UTC))
+        f = f.filter(pl.col("ts_out") < datetime(2026, 7, day + (1 if inclusive else 0), tzinfo=UTC))
     return float(f["amount_out"].sum()) if f.height else 0.0
 
 
@@ -79,16 +80,19 @@ def world_metrics(replay: dict, path: str, p_inst: str, methods: tuple[str, ...]
         # time evaluation
         first: dict[int, int | None] = {}
         czk: dict[int, float] = {}
+        czk_incl: dict[int, float] = {}
         per_mule: dict[str, dict] = {}
         for ring, ms in rings.items():
             ft = next((t for t in times if sets_at(replay["times"][str(t)], m, t) & ms), None)
             first[ring] = ft
             czk[ring] = _czk_before(flows, ms, ft) if flows is not None else 0.0
+            czk_incl[ring] = _czk_before(flows, ms, ft, True) if flows is not None else 0.0
         for mid in ring_mules:
             ft = next((t for t in times if mid in sets_at(replay["times"][str(t)], m, t)), None)
             per_mule[mid] = {"first_day": ft, "czk_before": _czk_before(flows, {mid}, ft) if flows is not None else 0.0}
         rec["first_flag_day_by_ring"] = {str(k): v for k, v in first.items()}
         rec["czk_before_first_flag_by_ring"] = {str(k): v for k, v in czk.items()}
+        rec["czk_through_flag_day_by_ring"] = {str(k): v for k, v in czk_incl.items()}
         rec["per_mule"] = per_mule
         out["methods"][m] = rec
     fc = final["c"][p_inst]
